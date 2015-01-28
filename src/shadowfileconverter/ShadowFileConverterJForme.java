@@ -5,6 +5,8 @@
  */
 package shadowfileconverter;
 
+import java.io.IOException;
+
 /**
  *
  * @author Ruslan Feshchenko
@@ -118,6 +120,17 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
         // TODO add your handling code here:
+        double [] rays=new double [] {1, 0.5, 0.5, 0.3, 0.3, 0.3, 1, 0, 0, 1, 0.1, 2, 0, 0, 0, 0, 1, 0};
+        try {
+            ShadowFiles shadowFile=new ShadowFiles(true, true);
+            shadowFile.writeHeader(18,5);
+            for (int i=0; i<5; i++) {
+                shadowFile.write(rays);
+            }
+            shadowFile.close();
+        } catch (IOException e) {
+            
+        }
     }//GEN-LAST:event_ActionjButtonActionPerformed
 
     /**

@@ -85,8 +85,15 @@ public class ShadowFiles {
                 ((DataOutputStream)stream).writeDouble(rayData[i]);
             }
             ((DataOutputStream)stream).write(new byte [] {18,0,0,0});
-            ((DataOutputStream)stream).writeInt(0);
         }
+    }
+    
+    public void writeHeader(int ncol, int npoint) throws IOException {
+        ((DataOutputStream)stream).write(new byte [] {18,0,0,0});
+        ((DataOutputStream)stream).writeInt(ncol);
+        ((DataOutputStream)stream).writeInt(npoint);
+        ((DataOutputStream)stream).writeInt(0);
+        ((DataOutputStream)stream).write(new byte [] {18,0,0,0});
     }
     
     /**
