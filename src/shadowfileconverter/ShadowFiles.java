@@ -80,20 +80,23 @@ public class ShadowFiles {
      */
     public void write(double [] rayData) throws IOException {
         if (binary) {
-            ((DataOutputStream)stream).write(new byte [] {18,0,0,0});
+            ((DataOutputStream)stream).write(new byte [] {12,0,0,0});
             for (int i=0; i<rayData.length; i++) {
-                ((DataOutputStream)stream).writeDouble(rayData[i]);
+                ((DataOutputStream)stream).
+                        writeLong(Long.reverseBytes(Double.doubleToLongBits(rayData[i])));
             }
-            ((DataOutputStream)stream).write(new byte [] {18,0,0,0});
+            ((DataOutputStream)stream).write(new byte [] {12,0,0,0});
         }
     }
     
     public void writeHeader(int ncol, int npoint) throws IOException {
-        ((DataOutputStream)stream).write(new byte [] {18,0,0,0});
-        ((DataOutputStream)stream).writeInt(ncol);
-        ((DataOutputStream)stream).writeInt(npoint);
-        ((DataOutputStream)stream).writeInt(0);
-        ((DataOutputStream)stream).write(new byte [] {18,0,0,0});
+        if (binary) {
+            ((DataOutputStream)stream).write(new byte [] {12,0,0,0});
+            ((DataOutputStream)stream).writeInt(Integer.reverseBytes(ncol));
+            ((DataOutputStream)stream).writeInt(Integer.reverseBytes(npoint));
+            ((DataOutputStream)stream).writeInt(0);
+            ((DataOutputStream)stream).write(new byte [] {12,0,0,0});
+        }
     }
     
     /**
