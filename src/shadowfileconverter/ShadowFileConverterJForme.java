@@ -18,8 +18,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
     
     private boolean direction;
-    private int ncol=18;
-    private int nrays=1000;
+    private int ncol;
+    private int nrays;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -27,6 +27,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     public ShadowFileConverterJForme() {
         initComponents();
         this.direction=false;
+        this.ncol=18;
+        this.nrays=1000;
     }
 
     /**
@@ -43,6 +45,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         ActionjButton = new javax.swing.JButton();
         ProgressbarjPanel = new javax.swing.JPanel();
         jProgressBar = new javax.swing.JProgressBar();
+        jMenuBar = new javax.swing.JMenuBar();
+        OptionsjMenu = new javax.swing.JMenu();
+        ParametersjMenuItem = new javax.swing.JMenuItem();
+        HelpjMenu = new javax.swing.JMenu();
+        AboutjMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Shadow file conversion");
@@ -103,6 +110,33 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 .addComponent(jProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        OptionsjMenu.setText("Options");
+        OptionsjMenu.setToolTipText("");
+
+        ParametersjMenuItem.setText("Parameters...");
+        ParametersjMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ParametersjMenuItemActionPerformed(evt);
+            }
+        });
+        OptionsjMenu.add(ParametersjMenuItem);
+
+        jMenuBar.add(OptionsjMenu);
+
+        HelpjMenu.setText("Help");
+
+        AboutjMenuItem.setText("About...");
+        AboutjMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AboutjMenuItemActionPerformed(evt);
+            }
+        });
+        HelpjMenu.add(AboutjMenuItem);
+
+        jMenuBar.add(HelpjMenu);
+
+        setJMenuBar(jMenuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -177,6 +211,17 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ActionjButtonActionPerformed
 
+    private void AboutjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AboutjMenuItemActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(null, 
+                "<html>Shadow file convertion. <br>Version: 0.1 <br>Date: February 2015. <br>Author: Ruslan Feshchenko</html>",
+                "About ShadowFileConverter", 1);
+    }//GEN-LAST:event_AboutjMenuItemActionPerformed
+
+    private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ParametersjMenuItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -225,10 +270,15 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem AboutjMenuItem;
     private javax.swing.JComboBox ActionSelectionjComboBox;
     private javax.swing.JButton ActionjButton;
+    private javax.swing.JMenu HelpjMenu;
+    private javax.swing.JMenu OptionsjMenu;
+    private javax.swing.JMenuItem ParametersjMenuItem;
     private javax.swing.JPanel ProgressbarjPanel;
     private javax.swing.JPanel UpperjPanel;
+    private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JProgressBar jProgressBar;
     // End of variables declaration//GEN-END:variables
 }
