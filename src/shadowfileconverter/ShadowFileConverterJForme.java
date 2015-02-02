@@ -135,6 +135,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
         // TODO add your handling code here:
         double [] ray;
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(true);
         try {
             if (direction) {
                 ShadowFiles shadowFileRead=new ShadowFiles(false, false, ncol, nrays);
@@ -145,6 +147,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
+                    jProgressBar.setValue((int)(100*(i+1)/nrays));
                 }
                 shadowFileRead.close();
                 shadowFileWrite.close();
@@ -157,12 +160,13 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
+                    jProgressBar.setValue((int)(100*(i+1)/nrays));
                 }
                 shadowFileRead.close();
                 shadowFileWrite.close();
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error during file conversion!", "Error",
+            JOptionPane.showMessageDialog(null, "I/O error during file conversion!", "Error",
                             JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_ActionjButtonActionPerformed
