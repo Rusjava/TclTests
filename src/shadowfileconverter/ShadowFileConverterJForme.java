@@ -6,6 +6,9 @@
 package shadowfileconverter;
 
 import java.io.IOException;
+import java.util.Locale;
+import javax.swing.JOptionPane;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -13,12 +16,17 @@ import java.io.IOException;
  * @version 0.1
  */
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
+    
+    private boolean direction;
+    private int ncol=18;
+    private int nrays=1000;
 
     /**
      * Creates new form ShadowFileConverterJForme
      */
     public ShadowFileConverterJForme() {
         initComponents();
+        this.direction=false;
     }
 
     /**
@@ -116,19 +124,46 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private void ActionSelectionjComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionSelectionjComboBoxActionPerformed
         // TODO add your handling code here:
+        String selectedItem=(String)ActionSelectionjComboBox.getSelectedItem();
+        if (!selectedItem.equals("Shadow binary -> text")){
+            direction=true;
+        } else {
+            direction=false;
+        }
     }//GEN-LAST:event_ActionSelectionjComboBoxActionPerformed
 
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
         // TODO add your handling code here:
-        double [] rays=new double [] {1, 0.5, 0.5, 0.3, 0.3, 0.3, 1, 0, 0, 1, 0.1, 2, 0, 0, 0, 0, 1, 0};
+        double [] ray;
         try {
-            ShadowFiles shadowFile=new ShadowFiles(true, true, 18, 5);
-            for (int i=0; i<5; i++) {
-                shadowFile.write(rays);
+            if (direction) {
+                ShadowFiles shadowFileRead=new ShadowFiles(false, false, ncol, nrays);
+                nrays=shadowFileRead.getNrays();
+                ncol=shadowFileRead.getNcol();
+                ray=new double [ncol];
+                ShadowFiles shadowFileWrite=new ShadowFiles(true, true, ncol, nrays);
+                for (int i=0; i<nrays; i++) {
+                    shadowFileRead.read(ray);
+                    shadowFileWrite.write(ray);
+                }
+                shadowFileRead.close();
+                shadowFileWrite.close();
+            } else {
+                ShadowFiles shadowFileRead=new ShadowFiles(false, true, ncol, nrays);
+                nrays=shadowFileRead.getNrays();
+                ncol=shadowFileRead.getNcol();
+                ray=new double [ncol];
+                ShadowFiles shadowFileWrite=new ShadowFiles(true, false, ncol, nrays);
+                for (int i=0; i<nrays; i++) {
+                    shadowFileRead.read(ray);
+                    shadowFileWrite.write(ray);
+                }
+                shadowFileRead.close();
+                shadowFileWrite.close();
             }
-            shadowFile.close();
         } catch (IOException e) {
-            
+            JOptionPane.showMessageDialog(null, "Error during file conversion!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_ActionjButtonActionPerformed
 
@@ -141,7 +176,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
+        /*try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
@@ -156,9 +191,20 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+        }*/
         //</editor-fold>
-
+        try {
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException e) {
+            
+        } catch (InstantiationException e) {
+            
+        } catch (IllegalAccessException e) {
+            
+        } catch (UnsupportedLookAndFeelException e) {
+            
+        }
+        Locale.setDefault(new Locale("en", "US"));
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override

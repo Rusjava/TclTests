@@ -156,6 +156,14 @@ public class ShadowFiles {
         }
     }
     
+    public int getNcol() {
+        return ncol;
+    }
+    
+    public int getNrays() {
+        return nrays;
+    }
+    
     private boolean openWrite(String title) {
         JFileChooser fo=new JFileChooser ();
         fo.setDialogTitle(title);
