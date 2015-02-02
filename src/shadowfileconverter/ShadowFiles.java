@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import java.util.Formatter;
 import java.util.Scanner;
+import java.util.*;
 
 /**
  *
@@ -35,6 +36,7 @@ public class ShadowFiles {
     private Object stream=null;
     private int ncol;
     private int nrays;
+    //private Counter rayCounter;
 
     /**
      * Main constructor
@@ -138,19 +140,31 @@ public class ShadowFiles {
      * Reads binary data of one ray or of the file heading
      * @param rayData double array of 18 numbers representing 18 columns of ray data
      * @throws java.io.IOException
+     * @throws shadowfileconverter.ShadowFiles.EndOfFileException thrown when end of file is reached
+     * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
      */
-    public void read(double [] rayData) throws IOException {
+    public void read(double [] rayData) throws IOException, EndOfFileException, EndOfLineException {
         int tmp, nread=Math.min(rayData.length, ncol);
         if (binary) {
             tmp=((DataInputStream)stream).readInt();
+            if (tmp==0) {
+                throw new EndOfFileException(0);
+            }
             for (int i=0; i<nread; i++) {
                 rayData[i]=Double.longBitsToDouble(Long.reverseBytes(((DataInputStream)stream).readLong()));
             }
             tmp=((DataInputStream)stream).readInt();
         } else {
             Scanner header;
-            header=new Scanner(((BufferedReader)stream).readLine());
+            String line=((BufferedReader)stream).readLine();
+            if (line==null) {
+                throw new EndOfFileException (0);
+            }
+            header=new Scanner(line);
             for (int i=0; i<nread; i++) {
+                if (!header.hasNext()) {
+                    throw new EndOfLineException(0);
+                }
                 rayData[i]=header.nextDouble();
             }
         }
@@ -192,5 +206,25 @@ public class ShadowFiles {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Class for exception when the number of rays is less than specified
+     */
+    public static class EndOfFileException extends Exception {
+        int finalRayNumber;
+        public EndOfFileException (int finalRayNumber) {
+            this.finalRayNumber=finalRayNumber;
+        }
+    }
+    
+    /**
+     * Class for exception when the number of columns is less than specified
+     */
+    public static class EndOfLineException extends Exception {
+        int finalColNumber;
+        public EndOfLineException (int finalColNumber) {
+            this.finalColNumber=finalColNumber;
+        }
     }
 }
