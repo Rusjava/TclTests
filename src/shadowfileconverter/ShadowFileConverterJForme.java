@@ -236,7 +236,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            maxNrays=(int)Math.round(testValue(0, 100000, maxNraysBox, "10000"));
+            maxNrays=(int)Math.round(MyTextUtilities.testValue(0, 100000, maxNraysBox, "10000"));
         }
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
@@ -285,23 +285,6 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 new ShadowFileConverterJForme().setVisible(true);
             }
         });
-    }
-    
-    private Double testValue(double min, double max, JTextField field, String str) {
-        Double value;
-        try {
-            value=Double.valueOf(field.getText());
-        } catch (NumberFormatException e) {
-            field.setText(str);
-            value=Double.valueOf(str);
-            return value;
-        }
-        if (value < min || value > max ) {
-            field.setText(str);
-            value=Double.valueOf(str);
-            return value;
-        }
-        return value;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
