@@ -17,11 +17,11 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.EOFException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import java.util.Formatter;
 import java.util.Scanner;
-import java.util.*;
 
 /**
  *
@@ -45,8 +45,10 @@ public class ShadowFiles {
      * @param ncol number of columns
      * @param nrays number of rays
      * @throws java.io.FileNotFoundException
+     * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
      */
-    public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws FileNotFoundException, IOException {
+    public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws FileNotFoundException, 
+            IOException, EndOfLineException {
         this.write=write;
         this.binary=binary;
         this.ncol=ncol;
@@ -85,7 +87,11 @@ public class ShadowFiles {
                 if (openRead("Choose a text file with ray data")) {
                     Scanner header;
                     stream=new BufferedReader(new FileReader(file));
-                    header=new Scanner(((BufferedReader)stream).readLine());
+                    String line=((BufferedReader)stream).readLine();
+                    if (line==null) {
+                        throw new EOFException();
+                    }
+                    header=new Scanner(line);
                     this.ncol=Math.min(header.nextInt(), ncol);
                     this.nrays=Math.min(header.nextInt(), nrays);
                 }
@@ -140,15 +146,14 @@ public class ShadowFiles {
      * Reads binary data of one ray or of the file heading
      * @param rayData double array of 18 numbers representing 18 columns of ray data
      * @throws java.io.IOException
-     * @throws shadowfileconverter.ShadowFiles.EndOfFileException thrown when end of file is reached
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
      */
-    public void read(double [] rayData) throws IOException, EndOfFileException, EndOfLineException {
+    public void read(double [] rayData) throws IOException, EndOfLineException {
         int tmp, nread=Math.min(rayData.length, ncol);
         if (binary) {
             tmp=((DataInputStream)stream).readInt();
             if (tmp==0) {
-                throw new EndOfFileException(0);
+                throw new EOFException();
             }
             for (int i=0; i<nread; i++) {
                 rayData[i]=Double.longBitsToDouble(Long.reverseBytes(((DataInputStream)stream).readLong()));
@@ -158,7 +163,7 @@ public class ShadowFiles {
             Scanner header;
             String line=((BufferedReader)stream).readLine();
             if (line==null) {
-                throw new EndOfFileException (0);
+                throw new EOFException ();
             }
             header=new Scanner(line);
             for (int i=0; i<nread; i++) {
@@ -206,16 +211,6 @@ public class ShadowFiles {
             return true;
         }
         return false;
-    }
-    
-    /**
-     * Class for exception when the number of rays is less than specified
-     */
-    public static class EndOfFileException extends Exception {
-        int finalRayNumber;
-        public EndOfFileException (int finalRayNumber) {
-            this.finalRayNumber=finalRayNumber;
-        }
     }
     
     /**

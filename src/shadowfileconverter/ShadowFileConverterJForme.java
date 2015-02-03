@@ -6,6 +6,7 @@
 package shadowfileconverter;
 
 import java.io.IOException;
+import java.io.EOFException;
 import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -199,14 +200,14 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 shadowFileRead.close();
                 shadowFileWrite.close();
             }
+        } catch (EOFException e) {
+            JOptionPane.showMessageDialog(null, "The end of file has been reached!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "I/O error during file conversion!", "Error",
                             JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.EndOfLineException e) {
             JOptionPane.showMessageDialog(null, "The number of columns is less than specified!", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-        } catch (ShadowFiles.EndOfFileException e) {
-            JOptionPane.showMessageDialog(null, "The number of rays is less than specified!", "Error",
                             JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_ActionjButtonActionPerformed
