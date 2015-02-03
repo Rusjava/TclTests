@@ -29,7 +29,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         initComponents();
         this.direction=false;
         this.ncol=18;
-        this.nrays=1000;
+        this.nrays=10000;
     }
 
     /**
