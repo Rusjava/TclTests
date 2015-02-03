@@ -8,6 +8,8 @@ package shadowfileconverter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
+import java.util.InputMismatchException;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.DataOutputStream;
@@ -36,6 +38,7 @@ public class ShadowFiles {
     private Object stream=null;
     private int ncol;
     private int nrays;
+    private int rayCounter;
     //private Counter rayCounter;
 
     /**
@@ -46,13 +49,15 @@ public class ShadowFiles {
      * @param nrays number of rays
      * @throws java.io.FileNotFoundException
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
+     * @throws shadowfileconverter.ShadowFiles.FileIsCorruptedException thrown when the integer column or ray number can not be interpreted
      */
     public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws FileNotFoundException, 
-            IOException, EndOfLineException {
+            IOException, EndOfLineException, FileIsCorruptedException {
         this.write=write;
         this.binary=binary;
         this.ncol=ncol;
         this.nrays=nrays;
+        this.rayCounter=0;
         if (write) {
             if (binary) {
                 if (openWrite("Choose a binary file to save a ray set in")) {
@@ -92,8 +97,14 @@ public class ShadowFiles {
                         throw new EOFException();
                     }
                     header=new Scanner(line);
-                    this.ncol=Math.min(header.nextInt(), ncol);
-                    this.nrays=Math.min(header.nextInt(), nrays);
+                    try {
+                        this.ncol=Math.min(header.nextInt(), ncol);
+                        this.nrays=Math.min(header.nextInt(), nrays);
+                    } catch (InputMismatchException e) {
+                        throw new FileIsCorruptedException(rayCounter);
+                    } catch (NoSuchElementException e) {
+                        throw new EndOfLineException(rayCounter);
+                    } 
                 }
             }
         }        
@@ -126,6 +137,7 @@ public class ShadowFiles {
      */
     public void write(double [] rayData) throws IOException {
         int nread=Math.min(rayData.length, ncol);
+        rayCounter++;
         if (binary) {
             ((DataOutputStream)stream).write(new byte [] {12,0,0,0});
             for (int i=0; i<nread; i++) {
@@ -147,9 +159,11 @@ public class ShadowFiles {
      * @param rayData double array of 18 numbers representing 18 columns of ray data
      * @throws java.io.IOException
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
+     * @throws shadowfileconverter.ShadowFiles.FileIsCorruptedException thrown when the integer column or ray number can not be interpreted
      */
-    public void read(double [] rayData) throws IOException, EndOfLineException {
+    public void read(double [] rayData) throws IOException, EndOfLineException, FileIsCorruptedException {
         int tmp, nread=Math.min(rayData.length, ncol);
+        rayCounter++;
         if (binary) {
             tmp=((DataInputStream)stream).readInt();
             if (tmp==0) {
@@ -167,10 +181,13 @@ public class ShadowFiles {
             }
             header=new Scanner(line);
             for (int i=0; i<nread; i++) {
-                if (!header.hasNext()) {
-                    throw new EndOfLineException(0);
+                try {
+                    rayData[i]=header.nextDouble();
+                } catch (InputMismatchException e) {
+                    throw new FileIsCorruptedException(rayCounter);
+                } catch (NoSuchElementException e) {
+                    throw new EndOfLineException(rayCounter);
                 }
-                rayData[i]=header.nextDouble();
             }
         }
     }
@@ -217,9 +234,37 @@ public class ShadowFiles {
      * Class for exception when the number of columns is less than specified
      */
     public static class EndOfLineException extends Exception {
-        int finalColNumber;
-        public EndOfLineException (int finalColNumber) {
-            this.finalColNumber=finalColNumber;
+
+        /**
+         * The current ray number
+         */
+        public int rayNumber;
+
+        /**
+         * 
+         * @param rayNumber current ray number
+         */
+        public EndOfLineException (int rayNumber) {
+            this.rayNumber=rayNumber;
+        }
+    }
+    
+    /**
+     * Class for exception when the text file can not be read due to data corruption
+     */
+    public static class FileIsCorruptedException extends Exception {
+
+        /**
+         * The current ray number
+         */
+        public int rayNumber;
+
+        /**
+         *
+         * @param rayNumber current ray number
+         */
+        public FileIsCorruptedException (int rayNumber) {
+            this.rayNumber=rayNumber;
         }
     }
 }
