@@ -8,6 +8,8 @@ package shadowfileconverter;
 import java.io.IOException;
 import java.io.EOFException;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -171,36 +173,36 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         // TODO add your handling code here:
         int ncol, nrays;
         double [] ray;
+        ShadowFiles shadowFileRead=null, shadowFileWrite=null;
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
         try {
             if (direction) {
-                ShadowFiles shadowFileRead=new ShadowFiles(false, false, MAX_NCOL, maxNrays);
+                shadowFileRead=new ShadowFiles(false, false, MAX_NCOL, maxNrays);
                 nrays=shadowFileRead.getNrays();
                 ncol=shadowFileRead.getNcol();
                 ray=new double [ncol];
-                ShadowFiles shadowFileWrite=new ShadowFiles(true, true, MAX_NCOL, maxNrays);
+                shadowFileWrite=new ShadowFiles(true, true, MAX_NCOL, maxNrays);
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
                     jProgressBar.setValue((int)(100*(i+1)/nrays));
                 }
-                shadowFileRead.close();
-                shadowFileWrite.close();
+                
             } else {
-                ShadowFiles shadowFileRead=new ShadowFiles(false, true, MAX_NCOL, maxNrays);
+                shadowFileRead=new ShadowFiles(false, true, MAX_NCOL, maxNrays);
                 nrays=shadowFileRead.getNrays();
                 ncol=shadowFileRead.getNcol();
                 ray=new double [ncol];
-                ShadowFiles shadowFileWrite=new ShadowFiles(true, false, MAX_NCOL, maxNrays);
+                shadowFileWrite=new ShadowFiles(true, false, MAX_NCOL, maxNrays);
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
                     jProgressBar.setValue((int)(100*(i+1)/nrays));
                 }
-                shadowFileRead.close();
-                shadowFileWrite.close();
             }
+            shadowFileRead.close();
+            shadowFileWrite.close();
         } catch (EOFException e) {
             JOptionPane.showMessageDialog(null, "The end of file has been reached!", "Error",
                             JOptionPane.ERROR_MESSAGE);

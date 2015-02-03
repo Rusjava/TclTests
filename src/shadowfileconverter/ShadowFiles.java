@@ -124,19 +124,21 @@ public class ShadowFiles {
      * @throws IOException
      */
     public void close() throws IOException {
-        if (write) {
-            if (binary) {
-                ((DataOutputStream)stream).close();
+        if (stream!=null) {
+            if (write) {
+                if (binary) {
+                    ((DataOutputStream)stream).close();
+                } else {
+                    ((PrintWriter)stream).close();
+                }
             } else {
-                ((PrintWriter)stream).close();
-            }
-        } else {
-            if (binary) {
-                ((DataInputStream)stream).close();
-            } else {
-                ((BufferedReader)stream).close();
-            }
-        }          
+                if (binary) {
+                    ((DataInputStream)stream).close();
+                } else {
+                    ((BufferedReader)stream).close();
+                }
+            } 
+        }
     }
     
     /**
