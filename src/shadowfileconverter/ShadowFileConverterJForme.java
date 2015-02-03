@@ -21,6 +21,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private boolean direction;
     private int ncol;
     private int nrays;
+    private final int NCOL=18;
+    private final int NRAYS=10000;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -28,8 +30,6 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     public ShadowFileConverterJForme() {
         initComponents();
         this.direction=false;
-        this.ncol=18;
-        this.nrays=10000;
     }
 
     /**
@@ -174,11 +174,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         jProgressBar.setStringPainted(true);
         try {
             if (direction) {
-                ShadowFiles shadowFileRead=new ShadowFiles(false, false, ncol, nrays);
+                ShadowFiles shadowFileRead=new ShadowFiles(false, false, NCOL, NRAYS);
                 nrays=shadowFileRead.getNrays();
                 ncol=shadowFileRead.getNcol();
                 ray=new double [ncol];
-                ShadowFiles shadowFileWrite=new ShadowFiles(true, true, ncol, nrays);
+                ShadowFiles shadowFileWrite=new ShadowFiles(true, true, NCOL, NRAYS);
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
@@ -187,11 +187,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 shadowFileRead.close();
                 shadowFileWrite.close();
             } else {
-                ShadowFiles shadowFileRead=new ShadowFiles(false, true, ncol, nrays);
+                ShadowFiles shadowFileRead=new ShadowFiles(false, true, NCOL, NRAYS);
                 nrays=shadowFileRead.getNrays();
                 ncol=shadowFileRead.getNcol();
                 ray=new double [ncol];
-                ShadowFiles shadowFileWrite=new ShadowFiles(true, false, ncol, nrays);
+                ShadowFiles shadowFileWrite=new ShadowFiles(true, false, NCOL, NRAYS);
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
