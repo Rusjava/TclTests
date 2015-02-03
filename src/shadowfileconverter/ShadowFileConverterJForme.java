@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.EOFException;
 import java.util.Locale;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -21,15 +22,16 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private boolean direction;
     private int ncol;
     private int nrays;
-    private final int NCOL=18;
-    private final int NRAYS=10000;
+    private final int MAX_NCOL=18;
+    private int maxNrays;
 
     /**
      * Creates new form ShadowFileConverterJForme
      */
     public ShadowFileConverterJForme() {
-        initComponents();
+        this.maxNrays = 10000;
         this.direction=false;
+        initComponents();
     }
 
     /**
@@ -174,11 +176,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         jProgressBar.setStringPainted(true);
         try {
             if (direction) {
-                ShadowFiles shadowFileRead=new ShadowFiles(false, false, NCOL, NRAYS);
+                ShadowFiles shadowFileRead=new ShadowFiles(false, false, MAX_NCOL, maxNrays);
                 nrays=shadowFileRead.getNrays();
                 ncol=shadowFileRead.getNcol();
                 ray=new double [ncol];
-                ShadowFiles shadowFileWrite=new ShadowFiles(true, true, NCOL, NRAYS);
+                ShadowFiles shadowFileWrite=new ShadowFiles(true, true, MAX_NCOL, maxNrays);
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
@@ -187,11 +189,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 shadowFileRead.close();
                 shadowFileWrite.close();
             } else {
-                ShadowFiles shadowFileRead=new ShadowFiles(false, true, NCOL, NRAYS);
+                ShadowFiles shadowFileRead=new ShadowFiles(false, true, MAX_NCOL, maxNrays);
                 nrays=shadowFileRead.getNrays();
                 ncol=shadowFileRead.getNcol();
                 ray=new double [ncol];
-                ShadowFiles shadowFileWrite=new ShadowFiles(true, false, NCOL, NRAYS);
+                ShadowFiles shadowFileWrite=new ShadowFiles(true, false, MAX_NCOL, maxNrays);
                 for (int i=0; i<nrays; i++) {
                     shadowFileRead.read(ray);
                     shadowFileWrite.write(ray);
@@ -224,6 +226,16 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
         // TODO add your handling code here:
+        JTextField maxNraysBox = new JTextField();
+        maxNraysBox.setText("10000");
+        Object[] message = {
+                        "Maximal number of rays:", maxNraysBox
+        };
+        int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
+                JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            maxNrays=(int)Math.round(testValue(0, 100000, maxNraysBox, "10000"));
+        }
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
     /**
@@ -271,6 +283,23 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 new ShadowFileConverterJForme().setVisible(true);
             }
         });
+    }
+    
+    private Double testValue(double min, double max, JTextField field, String str) {
+        Double value;
+        try {
+            value=Double.valueOf(field.getText());
+        } catch (NumberFormatException e) {
+            field.setText(str);
+            value=Double.valueOf(str);
+            return value;
+        }
+        if (value < min || value > max ) {
+            field.setText(str);
+            value=Double.valueOf(str);
+            return value;
+        }
+        return value;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
