@@ -214,6 +214,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         } catch (ShadowFiles.FileIsCorruptedException e) {
             JOptionPane.showMessageDialog(null, "The file is corrupted! (line: " 
                     +(e.rayNumber+1)+")", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (ShadowFiles.FileNotOpenedException e) {
+            
         }
     }//GEN-LAST:event_ActionjButtonActionPerformed
 

@@ -28,7 +28,7 @@ import java.util.Scanner;
 /**
  *
  * @author Ruslan Feshchenko
- * @version
+ * @version 0.1
  */
 public class ShadowFiles {
     
@@ -50,9 +50,10 @@ public class ShadowFiles {
      * @throws java.io.FileNotFoundException
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
      * @throws shadowfileconverter.ShadowFiles.FileIsCorruptedException thrown when the integer column or ray number can not be interpreted
+     * @throws shadowfileconverter.ShadowFiles.FileNotOpenedException thrown when the user cancels file opening
      */
     public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws FileNotFoundException, 
-            IOException, EndOfLineException, FileIsCorruptedException {
+            IOException, EndOfLineException, FileIsCorruptedException, FileNotOpenedException {
         this.write=write;
         this.binary=binary;
         this.ncol=ncol;
@@ -67,14 +68,18 @@ public class ShadowFiles {
                     ((DataOutputStream)stream).writeInt(Integer.reverseBytes(nrays));
                     ((DataOutputStream)stream).writeInt(0);
                     ((DataOutputStream)stream).write(new byte [] {12,0,0,0});
-                }      
+                }  else {
+                    throw new FileNotOpenedException();
+                }    
             } else {
                  if (openWrite("Choose a text file to save a ray set in")) {
                      stream=new PrintWriter(new FileWriter(file, false));
                      Formatter fm=new Formatter();
                      fm.format("%d %d", ncol, nrays);
                      ((PrintWriter)stream).println(fm);
-                 }     
+                 }  else {
+                    throw new FileNotOpenedException();
+                }        
             }
  
         } else {
@@ -87,7 +92,9 @@ public class ShadowFiles {
                     this.nrays=Math.min(Integer.reverseBytes(((DataInputStream)stream).readInt()), nrays);
                     tmp=((DataInputStream)stream).readInt();
                     tmp=((DataInputStream)stream).readInt();
-                }    
+                }  else {
+                    throw new FileNotOpenedException();
+                }   
             } else {
                 if (openRead("Choose a text file with ray data")) {
                     Scanner header;
@@ -105,7 +112,9 @@ public class ShadowFiles {
                     } catch (NoSuchElementException e) {
                         throw new EndOfLineException(rayCounter);
                     } 
-                }
+                }   else {
+                    throw new FileNotOpenedException();
+                }   
             }
         }        
     }
@@ -245,6 +254,7 @@ public class ShadowFiles {
          * @param rayNumber current ray number
          */
         public EndOfLineException (int rayNumber) {
+            super();
             this.rayNumber=rayNumber;
         }
     }
@@ -264,7 +274,21 @@ public class ShadowFiles {
          * @param rayNumber current ray number
          */
         public FileIsCorruptedException (int rayNumber) {
+            super();
             this.rayNumber=rayNumber;
+        }
+    }
+    
+    /**
+     * Class for exception thrown when the user cancels file opening
+     */
+    public static class FileNotOpenedException extends Exception {
+
+        /**
+         * Empty constructor
+         */
+        public FileNotOpenedException () {
+            super();
         }
     }
 }
