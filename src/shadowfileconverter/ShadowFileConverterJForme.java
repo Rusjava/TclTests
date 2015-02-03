@@ -20,8 +20,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
     
     private boolean direction;
-    private int ncol;
-    private int nrays;
     private final int MAX_NCOL=18;
     private int maxNrays;
 
@@ -171,6 +169,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
         // TODO add your handling code here:
+        int ncol, nrays;
         double [] ray;
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
