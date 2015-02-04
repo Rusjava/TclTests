@@ -255,12 +255,12 @@ public class ShadowFiles {
         JFileChooser fo=new JFileChooser ();
         fo.setDialogTitle(title);
         if (SwingUtilities.isEventDispatchThread()) {
-            ans.ans=fo.showSaveDialog(null);  
+            ans.ans=fo.showOpenDialog(null);  
         } else {
             SwingUtilities.invokeAndWait(new Runnable(){
                 @Override
                 public void run() {
-                    ans.ans=fo.showSaveDialog(null); 
+                    ans.ans=fo.showOpenDialog(null); 
                 }
             });
         }   
