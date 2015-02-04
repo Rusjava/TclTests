@@ -7,6 +7,8 @@ package shadowfileconverter;
 
 import java.io.IOException;
 import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -216,6 +218,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "The file is corrupted! (line: " 
                     +(e.rayNumber+1)+")", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.FileNotOpenedException e) {
+            
+        } catch (InterruptedException ex) {
+            
+        } catch (InvocationTargetException ex) {
             
         }
     }//GEN-LAST:event_ActionjButtonActionPerformed

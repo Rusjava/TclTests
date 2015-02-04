@@ -20,10 +20,12 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.EOFException;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import java.util.Formatter;
 import java.util.Scanner;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -51,9 +53,11 @@ public class ShadowFiles {
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
      * @throws shadowfileconverter.ShadowFiles.FileIsCorruptedException thrown when the integer column or ray number can not be interpreted
      * @throws shadowfileconverter.ShadowFiles.FileNotOpenedException thrown when the user cancels file opening
+     * @throws java.lang.InterruptedException
+     * @throws java.lang.reflect.InvocationTargetException
      */
     public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws FileNotFoundException, 
-            IOException, EndOfLineException, FileIsCorruptedException, FileNotOpenedException {
+            IOException, EndOfLineException, FileIsCorruptedException, FileNotOpenedException, InterruptedException, InvocationTargetException {
         this.write=write;
         this.binary=binary;
         this.ncol=ncol;
@@ -211,11 +215,24 @@ public class ShadowFiles {
         return nrays;
     }
     
-    private boolean openWrite(String title) {
+    private boolean openWrite(String title) throws InterruptedException, InvocationTargetException {
+        class Answer {
+            public int ans;
+        }
+        final Answer ans=new Answer();
         JFileChooser fo=new JFileChooser ();
         fo.setDialogTitle(title);
-        int ans=fo.showOpenDialog(null);   
-        if (ans==JFileChooser.APPROVE_OPTION) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            ans.ans=fo.showSaveDialog(null);  
+        } else {
+            SwingUtilities.invokeAndWait(new Runnable(){
+                @Override
+                public void run() {
+                    ans.ans=fo.showSaveDialog(null); 
+                }
+            });
+        }
+        if (ans.ans==JFileChooser.APPROVE_OPTION) {
             file=fo.getSelectedFile();
             if (file.exists()) {
                 int n=JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
@@ -230,11 +247,24 @@ public class ShadowFiles {
         return false;
     }
     
-    private boolean openRead(String title) {
+    private boolean openRead(String title) throws InterruptedException, InvocationTargetException {
+        class Answer {
+            public int ans;
+        }
+        final Answer ans=new Answer();
         JFileChooser fo=new JFileChooser ();
         fo.setDialogTitle(title);
-        int ans=fo.showOpenDialog(null);   
-        if (ans==JFileChooser.APPROVE_OPTION) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            ans.ans=fo.showSaveDialog(null);  
+        } else {
+            SwingUtilities.invokeAndWait(new Runnable(){
+                @Override
+                public void run() {
+                    ans.ans=fo.showSaveDialog(null); 
+                }
+            });
+        }   
+        if (ans.ans==JFileChooser.APPROVE_OPTION) {
             file=fo.getSelectedFile();
             return true;
         }
