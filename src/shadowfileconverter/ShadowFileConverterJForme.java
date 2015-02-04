@@ -237,7 +237,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            maxNrays=(int)Math.round(MyTextUtilities.testValue(0, 100000, maxNraysBox, "10000"));
+            maxNrays=(int)Math.round(MyTextUtilities.TestValue(0, 100000, maxNraysBox, "10000"));
         }
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 

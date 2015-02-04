@@ -23,7 +23,7 @@ public class MyTextUtilities {
      * @param str default value
      * @return either entered value or default value in case of an error
      */
-    public static Double testValue(double min, double max, JTextField field, String str) {
+    public static Double TestValue(double min, double max, JTextField field, String str) {
         Double value;
         try {
             value=Double.valueOf(field.getText());
