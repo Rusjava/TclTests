@@ -220,7 +220,7 @@ public class ShadowFiles {
             public int ans;
         }
         final Answer ans=new Answer();
-        JFileChooser fo=new JFileChooser ();
+        final JFileChooser fo=new JFileChooser ();
         fo.setDialogTitle(title);
         if (SwingUtilities.isEventDispatchThread()) {
             ans.ans=fo.showSaveDialog(null);  
@@ -262,7 +262,7 @@ public class ShadowFiles {
             public int ans;
         }
         final Answer ans=new Answer();
-        JFileChooser fo=new JFileChooser ();
+        final JFileChooser fo=new JFileChooser ();
         fo.setDialogTitle(title);
         if (SwingUtilities.isEventDispatchThread()) {
             ans.ans=fo.showOpenDialog(null);  
