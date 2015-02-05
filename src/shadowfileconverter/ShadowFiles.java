@@ -235,9 +235,19 @@ public class ShadowFiles {
         if (ans.ans==JFileChooser.APPROVE_OPTION) {
             file=fo.getSelectedFile();
             if (file.exists()) {
-                int n=JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
-                                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (n==JOptionPane.NO_OPTION) {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    ans.ans=JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE); 
+                } else {
+                    SwingUtilities.invokeAndWait(new Runnable(){
+                        @Override
+                        public void run() {
+                            ans.ans=JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
+                                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE); 
+                        }
+                    });
+                }      
+                if (ans.ans==JOptionPane.NO_OPTION) {
                     file=null;
                     return false;
                 }
