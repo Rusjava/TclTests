@@ -58,6 +58,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Shadow file conversion");
+        setResizable(false);
 
         UpperjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
