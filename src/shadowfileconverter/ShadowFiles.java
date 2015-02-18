@@ -41,7 +41,6 @@ public class ShadowFiles {
     private int ncol;
     private int nrays;
     private int rayCounter;
-    //private Counter rayCounter;
 
     /**
      * Main constructor
