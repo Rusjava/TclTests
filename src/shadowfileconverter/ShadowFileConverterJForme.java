@@ -7,11 +7,8 @@ package shadowfileconverter;
 
 import java.io.IOException;
 import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -165,11 +162,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void ActionSelectionjComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionSelectionjComboBoxActionPerformed
         // TODO add your handling code here:
         String selectedItem=(String)ActionSelectionjComboBox.getSelectedItem();
-        if (!selectedItem.equals("Shadow binary -> text")){
-            direction=true;
-        } else {
-            direction=false;
-        }
+        direction=!selectedItem.equals("Shadow binary -> text");
     }//GEN-LAST:event_ActionSelectionjComboBoxActionPerformed
 
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
