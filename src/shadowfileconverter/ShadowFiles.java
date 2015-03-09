@@ -53,8 +53,8 @@ public class ShadowFiles {
      * @throws java.lang.InterruptedException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws FileNotFoundException, 
-            IOException, EndOfLineException, FileIsCorruptedException, FileNotOpenedException, InterruptedException, InvocationTargetException {
+    public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws  IOException,
+            EndOfLineException, FileIsCorruptedException, FileNotOpenedException, InterruptedException, InvocationTargetException {
         this.write=write;
         this.binary=binary;
         this.ncol=ncol;
@@ -169,15 +169,16 @@ public class ShadowFiles {
     /**
      * Reads binary data of one ray or of the file heading
      * @param rayData double array of 18 numbers representing 18 columns of ray data
+     * @throws java.io.EOFException
      * @throws java.io.IOException
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when end of line is reached
      * @throws shadowfileconverter.ShadowFiles.FileIsCorruptedException thrown when the integer column or ray number can not be interpreted
      */
-    public void read(double [] rayData) throws IOException, EndOfLineException, FileIsCorruptedException {
-        int tmp, nread=Math.min(rayData.length, ncol);
+    public void read(double [] rayData) throws EOFException, IOException, EndOfLineException, FileIsCorruptedException {
+        int nread=Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
-            tmp=((DataInputStream)stream).readInt();
+            int tmp=((DataInputStream)stream).readInt();
             if (tmp==0) {
                 throw new EOFException();
             }
