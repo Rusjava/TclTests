@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.EOFException;
+import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -30,7 +31,7 @@ import javax.swing.SwingUtilities;
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-public class ShadowFiles implements AutoCloseable {
+public class ShadowFiles implements Closeable {
     
     private final boolean write;
     private final boolean binary;
