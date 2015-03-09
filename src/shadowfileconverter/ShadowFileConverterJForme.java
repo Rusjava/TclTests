@@ -174,35 +174,18 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
         // TODO add your handling code here:
-        int ncol, nrays;
+        int nrays;
         double [] ray;
-        ShadowFiles shadowFileRead=null, shadowFileWrite=null;
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
-        try {
-            if (direction) {
-                shadowFileRead=new ShadowFiles(false, false, MAX_NCOL, maxNrays);
-                nrays=shadowFileRead.getNrays();
-                ncol=shadowFileRead.getNcol();
-                ray=new double [ncol];
-                shadowFileWrite=new ShadowFiles(true, true, MAX_NCOL, maxNrays);
-                for (int i=0; i<nrays; i++) {
-                    shadowFileRead.read(ray);
-                    shadowFileWrite.write(ray);
-                    jProgressBar.setValue((int)(100*(i+1)/nrays));
-                }
-                
-            } else {
-                shadowFileRead=new ShadowFiles(false, true, MAX_NCOL, maxNrays);
-                nrays=shadowFileRead.getNrays();
-                ncol=shadowFileRead.getNcol();
-                ray=new double [ncol];
-                shadowFileWrite=new ShadowFiles(true, false, MAX_NCOL, maxNrays);
-                for (int i=0; i<nrays; i++) {
-                    shadowFileRead.read(ray);
-                    shadowFileWrite.write(ray);
-                    jProgressBar.setValue((int)(100*(i+1)/nrays));
-                }
+        try (ShadowFiles shadowFileRead=new ShadowFiles(false, !direction, MAX_NCOL, maxNrays);
+                ShadowFiles shadowFileWrite=new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays())) {
+            nrays=shadowFileRead.getNrays();
+            ray=new double [shadowFileRead.getNcol()];
+            for (int i=0; i<nrays; i++) {
+                shadowFileRead.read(ray);
+                shadowFileWrite.write(ray);
+                jProgressBar.setValue((int)(100*(i+1)/nrays));
             }
             shadowFileRead.close();
             shadowFileWrite.close();
