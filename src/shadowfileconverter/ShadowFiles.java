@@ -225,12 +225,7 @@ public class ShadowFiles implements Closeable {
         if (SwingUtilities.isEventDispatchThread()) {
             ans.ans=fo.showSaveDialog(null);  
         } else {
-            SwingUtilities.invokeAndWait(new Runnable(){
-                @Override
-                public void run() {
-                    ans.ans=fo.showSaveDialog(null); 
-                }
-            });
+            SwingUtilities.invokeAndWait(()->ans.ans=fo.showSaveDialog(null));
         }
         if (ans.ans==JFileChooser.APPROVE_OPTION) {
             file=fo.getSelectedFile();
@@ -239,13 +234,8 @@ public class ShadowFiles implements Closeable {
                     ans.ans=JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
                                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE); 
                 } else {
-                    SwingUtilities.invokeAndWait(new Runnable(){
-                        @Override
-                        public void run() {
-                            ans.ans=JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
-                                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE); 
-                        }
-                    });
+                    SwingUtilities.invokeAndWait(()->ans.ans=JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
+                                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE));
                 }      
                 if (ans.ans==JOptionPane.NO_OPTION) {
                     file=null;
@@ -267,12 +257,7 @@ public class ShadowFiles implements Closeable {
         if (SwingUtilities.isEventDispatchThread()) {
             ans.ans=fo.showOpenDialog(null);  
         } else {
-            SwingUtilities.invokeAndWait(new Runnable(){
-                @Override
-                public void run() {
-                    ans.ans=fo.showOpenDialog(null); 
-                }
-            });
+            SwingUtilities.invokeAndWait(()->ans.ans=fo.showOpenDialog(null));
         }   
         if (ans.ans==JFileChooser.APPROVE_OPTION) {
             file=fo.getSelectedFile();
