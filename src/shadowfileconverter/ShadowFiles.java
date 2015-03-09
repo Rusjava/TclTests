@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 /**
  *
  * @author Ruslan Feshchenko
- * @version 0.1
+ * @version 1.0
  */
 public class ShadowFiles implements Closeable {
     

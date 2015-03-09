@@ -16,7 +16,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 /**
  *
  * @author Ruslan Feshchenko
- * @version 0.1
+ * @version 1.0
  */
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
     
@@ -206,7 +206,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void AboutjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AboutjMenuItemActionPerformed
         // TODO add your handling code here:
         JOptionPane.showMessageDialog(null, 
-                "<html>Shadow file convertion. <br>Version: 0.1 <br>Date: February 2015. <br>Author: Ruslan Feshchenko</html>",
+                "<html>Shadow file convertion. <br>Version: 1.0 <br>Date: March 2015. <br>Author: Ruslan Feshchenko</html>",
                 "About ShadowFileConverter", 1);
     }//GEN-LAST:event_AboutjMenuItemActionPerformed
 
