@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities;
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-public class ShadowFiles {
+public class ShadowFiles implements AutoCloseable {
     
     private final boolean write;
     private final boolean binary;
@@ -124,6 +124,7 @@ public class ShadowFiles {
      * Closes I/O stream
      * @throws IOException
      */
+    @Override
     public void close() throws IOException {
         if (stream!=null) {
             if (write) {
