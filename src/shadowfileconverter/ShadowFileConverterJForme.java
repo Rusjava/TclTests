@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The program converts binary Shadow ray files to text files and
+ * texts ray files to binary Shadow files
  */
 package shadowfileconverter;
 
@@ -165,6 +164,9 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         direction=!selectedItem.equals("Shadow binary -> text");
     }//GEN-LAST:event_ActionSelectionjComboBoxActionPerformed
 
+    /**
+     * Main action
+     */
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
         // TODO add your handling code here:
         int nrays;
@@ -210,6 +212,9 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 "About ShadowFileConverter", 1);
     }//GEN-LAST:event_AboutjMenuItemActionPerformed
 
+    /**
+     * Changing the maximal number of rays
+     */
     private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
         // TODO add your handling code here:
         JTextField maxNraysBox = new JTextField();
