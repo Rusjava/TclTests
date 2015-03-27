@@ -4,6 +4,7 @@
  */
 package shadowfileconverter;
 
+import TextUtilities.MyTextUtilities;
 import java.io.IOException;
 import java.io.EOFException;
 import java.lang.reflect.InvocationTargetException;
