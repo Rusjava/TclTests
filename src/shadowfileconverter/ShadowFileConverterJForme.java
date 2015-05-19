@@ -21,7 +21,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
     
     private boolean direction;
-    private final int MAX_NCOL=33;
+    private final int MAX_NCOL=18;
     private int maxNrays;
 
     /**
