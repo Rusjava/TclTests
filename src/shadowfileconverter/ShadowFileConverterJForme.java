@@ -21,14 +21,14 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
     
     private boolean direction;
-    private final int MAX_NCOL=18;
+    private final int MAX_NCOL=33;
     private int maxNrays;
 
     /**
      * Creates new form ShadowFileConverterJForme
      */
     public ShadowFileConverterJForme() {
-        this.maxNrays = 10000;
+        this.maxNrays = 100000;
         this.direction=false;
         initComponents();
     }
@@ -60,6 +60,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         UpperjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         ActionSelectionjComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Shadow binary -> text", "Text -> Shadow binary" }));
+        ActionSelectionjComboBox.setSelectedIndex(1);
+        ActionSelectionjComboBox.setToolTipText("");
         ActionSelectionjComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ActionSelectionjComboBoxActionPerformed(evt);
@@ -219,14 +221,14 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
         // TODO add your handling code here:
         JTextField maxNraysBox = new JTextField();
-        maxNraysBox.setText("10000");
+        maxNraysBox.setText("100000");
         Object[] message = {
                         "Maximal number of rays:", maxNraysBox
         };
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            maxNrays=(int)Math.round(MyTextUtilities.TestValue(0, 100000, maxNraysBox, "10000"));
+            maxNrays=(int)Math.round(MyTextUtilities.TestValue(0, 100000, maxNraysBox, "100000"));
         }
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
