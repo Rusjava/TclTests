@@ -16,12 +16,12 @@ import javax.swing.UnsupportedLookAndFeelException;
 /**
  *
  * @author Ruslan Feshchenko
- * @version 1.0
+ * @version 1.01
  */
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
-    
+
     private boolean direction;
-    private final int MAX_NCOL=18;
+    private final int MAX_NCOL = 18;
     private int maxNrays;
 
     /**
@@ -29,7 +29,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     public ShadowFileConverterJForme() {
         this.maxNrays = 100000;
-        this.direction=false;
+        this.direction = true;
         initComponents();
     }
 
@@ -163,8 +163,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private void ActionSelectionjComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionSelectionjComboBoxActionPerformed
         // TODO add your handling code here:
-        String selectedItem=(String)ActionSelectionjComboBox.getSelectedItem();
-        direction=!selectedItem.equals("Shadow binary -> text");
+        direction = (ActionSelectionjComboBox.getSelectedIndex() == 1);
     }//GEN-LAST:event_ActionSelectionjComboBoxActionPerformed
 
     /**
@@ -173,45 +172,45 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
         // TODO add your handling code here:
         int nrays;
-        double [] ray;
+        double[] ray;
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
-        try (ShadowFiles shadowFileRead=new ShadowFiles(false, !direction, MAX_NCOL, maxNrays);
-                ShadowFiles shadowFileWrite=new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays())) {
-            nrays=shadowFileRead.getNrays();
-            ray=new double [shadowFileRead.getNcol()];
-            for (int i=0; i<nrays; i++) {
+        try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays);
+                ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays())) {
+            nrays = shadowFileRead.getNrays();
+            ray = new double[shadowFileRead.getNcol()];
+            for (int i = 0; i < nrays; i++) {
                 shadowFileRead.read(ray);
                 shadowFileWrite.write(ray);
-                jProgressBar.setValue((int)(100*(i+1)/nrays));
+                jProgressBar.setValue((int) (100 * (i + 1) / nrays));
             }
             shadowFileRead.close();
             shadowFileWrite.close();
         } catch (EOFException e) {
             JOptionPane.showMessageDialog(null, "The end of file has been reached!", "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "I/O error during file conversion!", "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.EndOfLineException e) {
             JOptionPane.showMessageDialog(null, "The number of columns is less than specified on line "
-                    +(e.rayNumber+1)+" !", "Error", JOptionPane.ERROR_MESSAGE);
+                    + (e.rayNumber + 1) + " !", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.FileIsCorruptedException e) {
-            JOptionPane.showMessageDialog(null, "The file is corrupted! (line: " 
-                    +(e.rayNumber+1)+")", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "The file is corrupted! (line: "
+                    + (e.rayNumber + 1) + ")", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.FileNotOpenedException e) {
-            
+
         } catch (InterruptedException ex) {
-            
+
         } catch (InvocationTargetException ex) {
-            
+
         }
     }//GEN-LAST:event_ActionjButtonActionPerformed
 
     private void AboutjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AboutjMenuItemActionPerformed
         // TODO add your handling code here:
-        JOptionPane.showMessageDialog(null, 
-                "<html>Shadow file convertion. <br>Version: 1.0 <br>Date: March 2015. <br>Author: Ruslan Feshchenko</html>",
+        JOptionPane.showMessageDialog(null,
+                "<html>Shadow file convertion. <br>Version: 1.01 <br>Date: May 2015. <br>Author: Ruslan Feshchenko</html>",
                 "About ShadowFileConverter", 1);
     }//GEN-LAST:event_AboutjMenuItemActionPerformed
 
@@ -223,12 +222,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         JTextField maxNraysBox = new JTextField();
         maxNraysBox.setText("100000");
         Object[] message = {
-                        "Maximal number of rays:", maxNraysBox
+            "Maximal number of rays:", maxNraysBox
         };
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            maxNrays=(int)Math.round(MyTextUtilities.TestValue(0, 100000, maxNraysBox, "100000"));
+            maxNrays = (int) Math.round(MyTextUtilities.TestValue(0, 100000, maxNraysBox, "100000"));
         }
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
@@ -242,32 +241,32 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         /*try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }*/
+         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+         if ("Nimbus".equals(info.getName())) {
+         javax.swing.UIManager.setLookAndFeel(info.getClassName());
+         break;
+         }
+         }
+         } catch (ClassNotFoundException ex) {
+         java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (InstantiationException ex) {
+         java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (IllegalAccessException ex) {
+         java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+         java.util.logging.Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         }*/
         //</editor-fold>
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException e) {
-            
+
         } catch (InstantiationException e) {
-            
+
         } catch (IllegalAccessException e) {
-            
+
         } catch (UnsupportedLookAndFeelException e) {
-            
+
         }
         Locale.setDefault(new Locale("en", "US"));
         /* Create and display the form */
