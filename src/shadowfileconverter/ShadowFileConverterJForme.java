@@ -16,7 +16,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 /**
  *
  * @author Ruslan Feshchenko
- * @version 1.01
+ * @version 1.02
  */
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
