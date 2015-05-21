@@ -159,12 +159,12 @@ public class ShadowFiles implements Closeable {
         int nread = Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
-            ((DataOutputStream) stream).write(new byte[]{12, 0, 0, 0});
+            ((DataOutputStream) stream).write(new byte[]{-112, 0, 0, 0});
             for (int i = 0; i < nread; i++) {
                 ((DataOutputStream) stream).
                         writeLong(Long.reverseBytes(Double.doubleToLongBits(rayData[i])));
             }
-            ((DataOutputStream) stream).write(new byte[]{12, 0, 0, 0});
+            ((DataOutputStream) stream).write(new byte[]{-112, 0, 0, 0});
         } else {
             Formatter fm = new Formatter();
             for (int i = 0; i < nread; i++) {
