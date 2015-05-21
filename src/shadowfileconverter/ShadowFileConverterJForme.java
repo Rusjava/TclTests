@@ -184,8 +184,6 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 shadowFileWrite.write(ray);
                 jProgressBar.setValue((int) (100 * (i + 1) / nrays));
             }
-            shadowFileRead.close();
-            shadowFileWrite.close();
         } catch (EOFException e) {
             JOptionPane.showMessageDialog(null, "The end of file has been reached!", "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -210,7 +208,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void AboutjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AboutjMenuItemActionPerformed
         // TODO add your handling code here:
         JOptionPane.showMessageDialog(null,
-                "<html>Shadow file convertion. <br>Version: 1.01 <br>Date: May 2015. <br>Author: Ruslan Feshchenko</html>",
+                "<html>Shadow file convertion. <br>Version: 1.02 <br>Date: May 2015. <br>Author: Ruslan Feshchenko</html>",
                 "About ShadowFileConverter", 1);
     }//GEN-LAST:event_AboutjMenuItemActionPerformed
 
