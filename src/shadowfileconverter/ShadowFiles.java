@@ -37,6 +37,7 @@ public class ShadowFiles implements Closeable {
     protected File file = null;
     protected Object stream = null;
     protected int ncol;
+    protected byte rLength;
     protected int nrays;
     protected int rayCounter;
 
@@ -62,6 +63,7 @@ public class ShadowFiles implements Closeable {
         this.write = write;
         this.binary = binary;
         this.ncol = ncol;
+        this.rLength = (byte) (ncol * 8 - 256);
         this.nrays = nrays;
         this.rayCounter = 0;
         if (write) {
@@ -88,7 +90,7 @@ public class ShadowFiles implements Closeable {
             }
         } else {
             if (binary) {
-                byte [] tmp = new byte[4];
+                byte[] tmp = new byte[4];
                 if (openRead("Choose a binary file with ray data")) {
                     stream = new DataInputStream(new FileInputStream(file));
                     if (((DataInputStream) stream).read(tmp, 0, 4) < 4 || tmp[0] != 12) {
@@ -164,12 +166,12 @@ public class ShadowFiles implements Closeable {
         int nread = Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
-            ((DataOutputStream) stream).write(new byte[]{-112, 0, 0, 0});
+            ((DataOutputStream) stream).write(new byte[]{rLength, 0, 0, 0});
             for (int i = 0; i < nread; i++) {
                 ((DataOutputStream) stream).
                         writeLong(Long.reverseBytes(Double.doubleToLongBits(rayData[i])));
             }
-            ((DataOutputStream) stream).write(new byte[]{-112, 0, 0, 0});
+            ((DataOutputStream) stream).write(new byte[]{rLength, 0, 0, 0});
         } else {
             Formatter fm = new Formatter();
             for (int i = 0; i < nread; i++) {
@@ -195,35 +197,35 @@ public class ShadowFiles implements Closeable {
         int nread = Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
-            byte [] tmp = new byte [4];
+            byte[] tmp = new byte[4];
             int bNumber;
             /* 
-            * Reading record length of Fortran77 binary format and checking if it is 144
-            */
+             * Reading record length of Fortran77 binary format and checking if it is 144
+             */
             bNumber = ((DataInputStream) stream).read(tmp, 0, 4);
             if (bNumber == 0) {
                 throw new EOFException();
             }
-            if (bNumber < 4 || tmp[0] != -112) {
+            if (bNumber < 4 || tmp[0] != rLength) {
                 throw new FileIsCorruptedException(rayCounter);
-            } 
+            }
             /* 
-            * Reading columns and throwing an exception if the tend of file is reached
-            */
+             * Reading columns and throwing an exception if the tend of file is reached
+             */
             try {
                 for (int i = 0; i < nread; i++) {
                     rayData[i] = Double.longBitsToDouble(Long.reverseBytes(((DataInputStream) stream).readLong()));
                 }
-            } catch (EOFException ex)  {
+            } catch (EOFException ex) {
                 throw new EndOfLineException(rayCounter);
             }
             /* 
-            * Reading record length of Fortran77 binary format and checking if it is 144
-            */
+             * Reading record length of Fortran77 binary format and checking if it is 144
+             */
             bNumber = ((DataInputStream) stream).read(tmp, 0, 4);
-            if (bNumber < 4 || tmp[0] != -112) {
+            if (bNumber < 4 || tmp[0] != rLength) {
                 throw new FileIsCorruptedException(rayCounter);
-            } 
+            }
         } else {
             Scanner lineScanner;
             String line = ((BufferedReader) stream).readLine();
@@ -349,11 +351,12 @@ public class ShadowFiles implements Closeable {
             super();
         }
     }
-    
+
     /**
      * Class for passing integer numbers from inner classes
      */
     protected class Answer {
-            public int ans;
-        }
+
+        public int ans;
+    }
 }
