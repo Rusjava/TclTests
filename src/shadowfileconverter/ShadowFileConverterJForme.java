@@ -192,10 +192,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.EndOfLineException e) {
             JOptionPane.showMessageDialog(null, "The number of columns is less than specified on line "
-                    + (e.rayNumber + 1) + " !", "Error", JOptionPane.ERROR_MESSAGE);
+                    + e.rayNumber + " !", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.FileIsCorruptedException e) {
             JOptionPane.showMessageDialog(null, "The file is corrupted! (line: "
-                    + (e.rayNumber + 1) + ")", "Error", JOptionPane.ERROR_MESSAGE);
+                    + e.rayNumber + ")", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (ShadowFiles.FileNotOpenedException e) {
 
         } catch (InterruptedException ex) {

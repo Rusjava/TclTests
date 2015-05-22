@@ -32,13 +32,13 @@ import javax.swing.SwingUtilities;
  */
 public class ShadowFiles implements Closeable {
 
-    private final boolean write;
-    private final boolean binary;
-    private File file = null;
-    private Object stream = null;
-    private int ncol;
-    private int nrays;
-    private int rayCounter;
+    protected final boolean write;
+    protected final boolean binary;
+    protected File file = null;
+    protected Object stream = null;
+    protected int ncol;
+    protected int nrays;
+    protected int rayCounter;
 
     /**
      * Main constructor
@@ -86,17 +86,22 @@ public class ShadowFiles implements Closeable {
                     throw new FileNotOpenedException();
                 }
             }
-
         } else {
             if (binary) {
-                int tmp;
+                byte [] tmp = new byte[4];
                 if (openRead("Choose a binary file with ray data")) {
                     stream = new DataInputStream(new FileInputStream(file));
-                    tmp = ((DataInputStream) stream).readInt();
+                    if (((DataInputStream) stream).read(tmp, 0, 4) < 4 || tmp[0] != 12) {
+                        throw new FileIsCorruptedException(0);
+                    }
                     this.ncol = Math.min(Integer.reverseBytes(((DataInputStream) stream).readInt()), ncol);
                     this.nrays = Math.min(Integer.reverseBytes(((DataInputStream) stream).readInt()), nrays);
-                    tmp = ((DataInputStream) stream).readInt();
-                    tmp = ((DataInputStream) stream).readInt();
+                    if (((DataInputStream) stream).read(tmp, 0, 4) < 4 || tmp[0] != 0) {
+                        throw new FileIsCorruptedException(0);
+                    }
+                    if (((DataInputStream) stream).read(tmp, 0, 4) < 4 || tmp[0] != 12) {
+                        throw new FileIsCorruptedException(0);
+                    }
                 } else {
                     throw new FileNotOpenedException();
                 }
@@ -179,25 +184,46 @@ public class ShadowFiles implements Closeable {
      *
      * @param rayData double array of 18 numbers representing 18 columns of ray
      * data
-     * @throws java.io.EOFException
+     * @throws java.io.EOFException when there are no more rays
      * @throws java.io.IOException
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when
-     * end of line is reached
+     * the number of columns is less then specified
      * @throws shadowfileconverter.ShadowFiles.FileIsCorruptedException thrown
-     * when the integer column or ray number can not be interpreted
+     * when the record can not be interpreted
      */
     public void read(double[] rayData) throws EOFException, IOException, EndOfLineException, FileIsCorruptedException {
         int nread = Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
-            int tmp = ((DataInputStream) stream).readInt();
-            if (tmp == 0) {
+            byte [] tmp = new byte [4];
+            int bNumber;
+            /* 
+            * Reading record length of Fortran77 binary format and checking if it is 144
+            */
+            bNumber = ((DataInputStream) stream).read(tmp, 0, 4);
+            if (bNumber == 0) {
                 throw new EOFException();
             }
-            for (int i = 0; i < nread; i++) {
-                rayData[i] = Double.longBitsToDouble(Long.reverseBytes(((DataInputStream) stream).readLong()));
+            if (bNumber < 4 || tmp[0] != -112) {
+                throw new FileIsCorruptedException(rayCounter);
+            } 
+            /* 
+            * Reading columns and throwing an exception if the tend of file is reached
+            */
+            try {
+                for (int i = 0; i < nread; i++) {
+                    rayData[i] = Double.longBitsToDouble(Long.reverseBytes(((DataInputStream) stream).readLong()));
+                }
+            } catch (EOFException ex)  {
+                throw new EndOfLineException(rayCounter);
             }
-            tmp = ((DataInputStream) stream).readInt();
+            /* 
+            * Reading record length of Fortran77 binary format and checking if it is 144
+            */
+            bNumber = ((DataInputStream) stream).read(tmp, 0, 4);
+            if (bNumber < 4 || tmp[0] != -112) {
+                throw new FileIsCorruptedException(rayCounter);
+            } 
         } else {
             Scanner lineScanner;
             String line = ((BufferedReader) stream).readLine();
@@ -226,10 +252,6 @@ public class ShadowFiles implements Closeable {
     }
 
     private boolean openWrite(String title) throws InterruptedException, InvocationTargetException {
-        class Answer {
-
-            public int ans;
-        }
         final Answer ans = new Answer();
         final JFileChooser fo = new JFileChooser();
         fo.setDialogTitle(title);
@@ -259,10 +281,6 @@ public class ShadowFiles implements Closeable {
     }
 
     private boolean openRead(String title) throws InterruptedException, InvocationTargetException {
-        class Answer {
-
-            public int ans;
-        }
         final Answer ans = new Answer();
         final JFileChooser fo = new JFileChooser();
         fo.setDialogTitle(title);
@@ -299,7 +317,7 @@ public class ShadowFiles implements Closeable {
     }
 
     /**
-     * Class for exception when the text file can not be read due to data
+     * Class for exception when the text/binary file can not be read due to data
      * corruption
      */
     public static class FileIsCorruptedException extends Exception {
@@ -331,4 +349,11 @@ public class ShadowFiles implements Closeable {
             super();
         }
     }
+    
+    /**
+     * Class for passing integer numbers from inner classes
+     */
+    protected class Answer {
+            public int ans;
+        }
 }
