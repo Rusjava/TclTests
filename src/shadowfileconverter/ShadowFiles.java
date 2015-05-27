@@ -195,7 +195,7 @@ public class ShadowFiles implements Closeable {
         } else {
             Formatter fm = new Formatter();
             for (int i = 0; i < nread; i++) {
-                fm.format("%f ", rayData[i]);
+                fm.format("%.10f ", rayData[i]);
             }
             ((PrintWriter) stream).println(fm);
         }
