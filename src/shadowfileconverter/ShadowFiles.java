@@ -131,9 +131,10 @@ public class ShadowFiles implements Closeable {
             }
         }
     }
-    
+
     /**
      * Constructor without default path
+     *
      * @param write
      * @param binary
      * @param ncol
@@ -274,6 +275,7 @@ public class ShadowFiles implements Closeable {
 
     /**
      * Opening file for writing
+     *
      * @param title
      * @return
      * @throws InterruptedException
@@ -310,6 +312,7 @@ public class ShadowFiles implements Closeable {
 
     /**
      * Opening file for reading
+     *
      * @param title
      * @return
      * @throws InterruptedException
@@ -330,12 +333,13 @@ public class ShadowFiles implements Closeable {
         }
         return false;
     }
-    
+
     /**
      * Returning the file
+     *
      * @return
      */
-    public File getFile () {
+    public File getFile() {
         return file;
     }
 
