@@ -12,6 +12,7 @@ import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
+import java.io.File;
 
 /**
  *
@@ -23,6 +24,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private boolean direction;
     private final int MAX_NCOL = 18;
     private int maxNrays;
+    private File rFile = null, wFile = null;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -175,10 +177,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         double[] ray;
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
-        try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays);
-                ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays())) {
+        try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays, rFile);
+                ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays(), wFile)) {
             nrays = shadowFileRead.getNrays();
             ray = new double[shadowFileRead.getNcol()];
+            rFile = shadowFileRead.getFile();
+            wFile = shadowFileWrite.getFile();
             for (int i = 0; i < nrays; i++) {
                 shadowFileRead.read(ray);
                 shadowFileWrite.write(ray);

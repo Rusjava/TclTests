@@ -4,7 +4,6 @@
 package shadowfileconverter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.InputMismatchException;
 import java.io.FileOutputStream;
@@ -48,6 +47,7 @@ public class ShadowFiles implements Closeable {
      * @param binary false - open for text I/O, true - open for binary I/O
      * @param ncol number of columns
      * @param nrays number of rays
+     * @param pFile default file
      * @throws java.io.FileNotFoundException
      * @throws shadowfileconverter.ShadowFiles.EndOfLineException thrown when
      * end of line is reached
@@ -58,7 +58,7 @@ public class ShadowFiles implements Closeable {
      * @throws java.lang.InterruptedException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws IOException,
+    public ShadowFiles(boolean write, boolean binary, int ncol, int nrays, File pFile) throws IOException,
             EndOfLineException, FileIsCorruptedException, FileNotOpenedException, InterruptedException, InvocationTargetException {
         this.write = write;
         this.binary = binary;
@@ -66,6 +66,7 @@ public class ShadowFiles implements Closeable {
         this.rLength = (byte) (ncol * 8 - 256);
         this.nrays = nrays;
         this.rayCounter = 0;
+        this.file = pFile;
         if (write) {
             if (binary) {
                 if (openWrite("Choose a binary file to save a ray set in")) {
@@ -129,6 +130,24 @@ public class ShadowFiles implements Closeable {
                 }
             }
         }
+    }
+    
+    /**
+     * Constructor without default path
+     * @param write
+     * @param binary
+     * @param ncol
+     * @param nrays
+     * @throws IOException
+     * @throws EndOfLineException
+     * @throws FileIsCorruptedException
+     * @throws FileNotOpenedException
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     */
+    public ShadowFiles(boolean write, boolean binary, int ncol, int nrays) throws IOException,
+            EndOfLineException, FileIsCorruptedException, FileNotOpenedException, InterruptedException, InvocationTargetException {
+        this(write, binary, ncol, nrays, null);
     }
 
     /**
@@ -253,9 +272,16 @@ public class ShadowFiles implements Closeable {
         return nrays;
     }
 
-    private boolean openWrite(String title) throws InterruptedException, InvocationTargetException {
+    /**
+     * Opening file for writing
+     * @param title
+     * @return
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     */
+    protected boolean openWrite(String title) throws InterruptedException, InvocationTargetException {
         final Answer ans = new Answer();
-        final JFileChooser fo = new JFileChooser();
+        final JFileChooser fo = new JFileChooser(file);
         fo.setDialogTitle(title);
         if (SwingUtilities.isEventDispatchThread()) {
             ans.ans = fo.showSaveDialog(null);
@@ -282,9 +308,16 @@ public class ShadowFiles implements Closeable {
         return false;
     }
 
-    private boolean openRead(String title) throws InterruptedException, InvocationTargetException {
+    /**
+     * Opening file for reading
+     * @param title
+     * @return
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     */
+    protected boolean openRead(String title) throws InterruptedException, InvocationTargetException {
         final Answer ans = new Answer();
-        final JFileChooser fo = new JFileChooser();
+        final JFileChooser fo = new JFileChooser(file);
         fo.setDialogTitle(title);
         if (SwingUtilities.isEventDispatchThread()) {
             ans.ans = fo.showOpenDialog(null);
@@ -296,6 +329,14 @@ public class ShadowFiles implements Closeable {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Returning the file
+     * @return
+     */
+    public File getFile () {
+        return file;
     }
 
     /**
