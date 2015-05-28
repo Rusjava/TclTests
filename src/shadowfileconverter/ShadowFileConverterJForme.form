@@ -121,8 +121,6 @@
                 <StringItem index="1" value="Text -&gt; Shadow binary"/>
               </StringArray>
             </Property>
-            <Property name="selectedIndex" type="int" value="1"/>
-            <Property name="selectedItem" type="java.lang.Object" value="Text -&gt; Shadow binary"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <Events>

@@ -4,11 +4,13 @@
  */
 package shadowfileconverter;
 
-import TextUtilities.MyTextUtilities;
+import static TextUtilities.MyTextUtilities.*;
 import java.io.IOException;
 import java.io.EOFException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -25,6 +27,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private final int MAX_NCOL = 18;
     private int maxNrays;
     private File rFile = null, wFile = null;
+    private Map<JTextField, String> valueMap;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -32,6 +35,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     public ShadowFileConverterJForme() {
         this.maxNrays = 100000;
         this.direction = true;
+        this.valueMap = new HashMap<>();
         initComponents();
     }
 
@@ -62,7 +66,6 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         UpperjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         ActionSelectionjComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Shadow binary -> text", "Text -> Shadow binary" }));
-        ActionSelectionjComboBox.setSelectedIndex(1);
         ActionSelectionjComboBox.setToolTipText("");
         ActionSelectionjComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -229,7 +232,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            maxNrays = (int) Math.round(MyTextUtilities.TestValue(0, 100000, maxNraysBox, "100000"));
+            maxNrays = (int) Math.round(TestValueWithMemory(0, 100000, maxNraysBox, "100000", valueMap));
         }
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
@@ -272,11 +275,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         }
         Locale.setDefault(new Locale("en", "US"));
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ShadowFileConverterJForme().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new ShadowFileConverterJForme().setVisible(true);
         });
     }
 
