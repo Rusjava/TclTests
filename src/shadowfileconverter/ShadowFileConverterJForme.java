@@ -34,7 +34,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     public ShadowFileConverterJForme() {
         this.maxNrays = 100000;
-        this.direction = true;
+        this.direction = false;
         this.valueMap = new HashMap<>();
         initComponents();
     }
