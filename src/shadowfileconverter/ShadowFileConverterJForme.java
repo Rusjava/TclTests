@@ -19,14 +19,19 @@ package shadowfileconverter;
 import static TextUtilities.MyTextUtilities.*;
 import java.io.IOException;
 import java.io.EOFException;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Locale;
-import java.util.Map;
-import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
-import java.io.File;
+import javax.swing.SwingWorker;
+import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CancellationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -41,7 +46,9 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private final int MAX_NCOL = 18;
     private int maxNrays;
     private File rFile = null, wFile = null;
-    private Map<JTextField, String> valueMap;
+    private final Map<JTextField, String> valueMap;
+    private SwingWorker<Void, Void> worker;
+    private boolean working = false;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -64,7 +71,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
         UpperjPanel = new javax.swing.JPanel();
         ActionSelectionjComboBox = new javax.swing.JComboBox();
-        ActionjButton = new javax.swing.JButton();
+        actionJButton = new javax.swing.JButton();
         ProgressbarjPanel = new javax.swing.JPanel();
         jProgressBar = new javax.swing.JProgressBar();
         jMenuBar = new javax.swing.JMenuBar();
@@ -87,11 +94,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             }
         });
 
-        ActionjButton.setText("Start");
-        ActionjButton.setToolTipText("");
-        ActionjButton.addActionListener(new java.awt.event.ActionListener() {
+        actionJButton.setText("Start");
+        actionJButton.setToolTipText("");
+        actionJButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ActionjButtonActionPerformed(evt);
+                actionJButtonActionPerformed(evt);
             }
         });
 
@@ -103,7 +110,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(ActionSelectionjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
-                .addComponent(ActionjButton)
+                .addComponent(actionJButton)
                 .addContainerGap())
         );
         UpperjPanelLayout.setVerticalGroup(
@@ -112,7 +119,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(UpperjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ActionSelectionjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ActionjButton))
+                    .addComponent(actionJButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -188,43 +195,88 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     /**
      * Main action
      */
-    private void ActionjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ActionjButtonActionPerformed
+    private void actionJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionJButtonActionPerformed
         // TODO add your handling code here:
-        int nrays;
-        double[] ray;
+        if (working) {
+            //Cancel worker
+            worker.cancel(true);
+            return;
+        }
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
-        try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays, rFile);
-                ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays(), wFile)) {
-            nrays = shadowFileRead.getNrays();
-            ray = new double[shadowFileRead.getNcol()];
-            rFile = shadowFileRead.getFile();
-            wFile = shadowFileWrite.getFile();
-            for (int i = 0; i < nrays; i++) {
-                shadowFileRead.read(ray);
-                shadowFileWrite.write(ray);
-                jProgressBar.setValue((int) (100 * (i + 1) / nrays));
+        actionJButton.setText("Stop");
+        /*
+        * Create a new instance of worker
+        */
+        worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                int nrays;
+                double[] ray;
+                /*
+                * Open source and sink files and doing conversion
+                */
+                try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays, rFile);
+                        ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays(), wFile)) {
+                    nrays = shadowFileRead.getNrays();
+                    ray = new double[shadowFileRead.getNcol()];
+                    rFile = shadowFileRead.getFile();
+                    wFile = shadowFileWrite.getFile();
+                    for (int i = 0; i < nrays; i++) {
+                        // If canceled return
+                        if (isCancelled()) {
+                            return null;
+                        }
+                        shadowFileRead.read(ray);
+                        shadowFileWrite.write(ray);
+                        //Update progress bar
+                        setProgressBar((int) (100 * (i + 1) / nrays));
+                    }
+                    /*
+                    * processing various exception
+                    */
+                } catch (EOFException e) {
+                    ShadowFiles.safeInvokeAndWait(() -> JOptionPane.showMessageDialog(null, "The end of file has been reached!", "Error",
+                            JOptionPane.ERROR_MESSAGE));
+                } catch (IOException e) {
+                    ShadowFiles.safeInvokeAndWait(() -> JOptionPane.showMessageDialog(null, "I/O error during file conversion!", "Error",
+                            JOptionPane.ERROR_MESSAGE));
+                } catch (ShadowFiles.EndOfLineException e) {
+                    ShadowFiles.safeInvokeAndWait(() -> JOptionPane.showMessageDialog(null, "The number of columns is less than specified on line "
+                            + e.rayNumber + " !", "Error", JOptionPane.ERROR_MESSAGE));
+                } catch (ShadowFiles.FileIsCorruptedException e) {
+                    ShadowFiles.safeInvokeAndWait(() -> JOptionPane.showMessageDialog(null, "The file is corrupted! (line: "
+                            + e.rayNumber + ")", "Error", JOptionPane.ERROR_MESSAGE));
+                } catch (ShadowFiles.FileNotOpenedException e) {
+
+                }
+                return null;
             }
-        } catch (EOFException e) {
-            JOptionPane.showMessageDialog(null, "The end of file has been reached!", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "I/O error during file conversion!", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (ShadowFiles.EndOfLineException e) {
-            JOptionPane.showMessageDialog(null, "The number of columns is less than specified on line "
-                    + e.rayNumber + " !", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (ShadowFiles.FileIsCorruptedException e) {
-            JOptionPane.showMessageDialog(null, "The file is corrupted! (line: "
-                    + e.rayNumber + ")", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (ShadowFiles.FileNotOpenedException e) {
 
-        } catch (InterruptedException ex) {
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ExecutionException ex) {
+                    if (ex.getCause() instanceof InvocationTargetException) {
+                        
+                    } 
+                    if (ex.getCause() instanceof CancellationException) {
+                        
+                    } 
+                }
+                working = false;
+                actionJButton.setText("Start");
+            }
 
-        } catch (InvocationTargetException ex) {
-
-        }
-    }//GEN-LAST:event_ActionjButtonActionPerformed
+            protected void setProgressBar(final int status) {
+                javax.swing.SwingUtilities.invokeLater(() -> jProgressBar.setValue(status));
+            }
+        };
+        worker.execute();
+    }//GEN-LAST:event_actionJButtonActionPerformed
 
     private void AboutjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AboutjMenuItemActionPerformed
         // TODO add your handling code here:
@@ -295,12 +347,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem AboutjMenuItem;
     private javax.swing.JComboBox ActionSelectionjComboBox;
-    private javax.swing.JButton ActionjButton;
     private javax.swing.JMenu HelpjMenu;
     private javax.swing.JMenu OptionsjMenu;
     private javax.swing.JMenuItem ParametersjMenuItem;
     private javax.swing.JPanel ProgressbarjPanel;
     private javax.swing.JPanel UpperjPanel;
+    private javax.swing.JButton actionJButton;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JProgressBar jProgressBar;
     // End of variables declaration//GEN-END:variables

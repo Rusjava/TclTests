@@ -94,7 +94,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="ActionSelectionjComboBox" min="-2" pref="257" max="-2" attributes="0"/>
                   <EmptySpace pref="15" max="32767" attributes="0"/>
-                  <Component id="ActionjButton" min="-2" max="-2" attributes="0"/>
+                  <Component id="actionJButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -105,7 +105,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="ActionSelectionjComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="ActionjButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="actionJButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -127,13 +127,13 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ActionSelectionjComboBoxActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="ActionjButton">
+        <Component class="javax.swing.JButton" name="actionJButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Start"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ActionjButtonActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="actionJButtonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
