@@ -77,6 +77,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         jMenuBar = new javax.swing.JMenuBar();
         OptionsjMenu = new javax.swing.JMenu();
         ParametersjMenuItem = new javax.swing.JMenuItem();
+        ScriptjMenuItem = new javax.swing.JMenuItem();
         HelpjMenu = new javax.swing.JMenu();
         AboutjMenuItem = new javax.swing.JMenuItem();
 
@@ -152,6 +153,14 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             }
         });
         OptionsjMenu.add(ParametersjMenuItem);
+
+        ScriptjMenuItem.setText("Script...");
+        ScriptjMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ScriptjMenuItemActionPerformed(evt);
+            }
+        });
+        OptionsjMenu.add(ScriptjMenuItem);
 
         jMenuBar.add(OptionsjMenu);
 
@@ -302,6 +311,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
+    private void ScriptjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptjMenuItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ScriptjMenuItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -351,6 +364,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private javax.swing.JMenu OptionsjMenu;
     private javax.swing.JMenuItem ParametersjMenuItem;
     private javax.swing.JPanel ProgressbarjPanel;
+    private javax.swing.JMenuItem ScriptjMenuItem;
     private javax.swing.JPanel UpperjPanel;
     private javax.swing.JButton actionJButton;
     private javax.swing.JMenuBar jMenuBar;
