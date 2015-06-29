@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package shadowfileconverter;
 
 import java.io.File;
@@ -36,6 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import java.util.Formatter;
 import java.util.Scanner;
+import java.lang.Runnable;
 import javax.swing.SwingUtilities;
 
 /*
@@ -44,7 +44,6 @@ import javax.swing.SwingUtilities;
  * @author Ruslan Feshchenko
  * @version 1.2
  */
-
 public class ShadowFiles implements Closeable {
 
     protected final boolean write;
@@ -264,8 +263,8 @@ public class ShadowFiles implements Closeable {
             }
         } else {
             /*
-            * Reading text file using Scanner class
-            */
+             * Reading text file using Scanner class
+             */
             Scanner lineScanner;
             String line = ((BufferedReader) stream).readLine();
             if (line == null) {
@@ -304,21 +303,12 @@ public class ShadowFiles implements Closeable {
         final int[] ans = new int[1];
         final JFileChooser fo = new JFileChooser(file);
         fo.setDialogTitle(title);
-        if (SwingUtilities.isEventDispatchThread()) {
-            ans[0] = fo.showSaveDialog(null);
-        } else {
-            SwingUtilities.invokeAndWait(() -> ans[0] = fo.showSaveDialog(null));
-        }
+        safeInvokeAndWait(() -> ans[0] = fo.showSaveDialog(null));
         if (ans[0] == JFileChooser.APPROVE_OPTION) {
             file = fo.getSelectedFile();
             if (file.exists()) {
-                if (SwingUtilities.isEventDispatchThread()) {
-                    ans[0] = JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                } else {
-                    SwingUtilities.invokeAndWait(() -> ans[0] = JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE));
-                }
+                safeInvokeAndWait(() -> ans[0] = JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE));
                 if (ans[0] == JOptionPane.NO_OPTION) {
                     file = null;
                     return false;
@@ -341,11 +331,7 @@ public class ShadowFiles implements Closeable {
         final int[] ans = new int[1];
         final JFileChooser fo = new JFileChooser(file);
         fo.setDialogTitle(title);
-        if (SwingUtilities.isEventDispatchThread()) {
-            ans[0] = fo.showOpenDialog(null);
-        } else {
-            SwingUtilities.invokeAndWait(() -> ans[0] = fo.showOpenDialog(null));
-        }
+        safeInvokeAndWait(() -> ans[0] = fo.showOpenDialog(null));
         if (ans[0] == JFileChooser.APPROVE_OPTION) {
             file = fo.getSelectedFile();
             return true;
@@ -413,6 +399,21 @@ public class ShadowFiles implements Closeable {
          */
         public FileNotOpenedException() {
             super();
+        }
+    }
+
+    /**
+     * invoke and wait but check that whether it is EDT
+     *
+     * @param fn a Runnable object
+     * @throws java.lang.InterruptedException
+     * @throws java.lang.reflect.InvocationTargetException
+     */
+    public static void safeInvokeAndWait(Runnable fn) throws InterruptedException, InvocationTargetException {
+        if (SwingUtilities.isEventDispatchThread()) {
+            fn.run();
+        } else {
+            SwingUtilities.invokeAndWait(fn);
         }
     }
 }

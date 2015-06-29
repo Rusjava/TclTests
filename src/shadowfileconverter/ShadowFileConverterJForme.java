@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
@@ -290,9 +289,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         }
         Locale.setDefault(new Locale("en", "US"));
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new ShadowFileConverterJForme().setVisible(true);
-        });
+        java.awt.EventQueue.invokeLater(() -> new ShadowFileConverterJForme().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
