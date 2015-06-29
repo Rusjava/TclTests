@@ -1,6 +1,20 @@
 /*
- * General class for reading/writing Shadow files
+ * Copyright (C) 2015 Ruslan Feshchenko
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package shadowfileconverter;
 
 import java.io.File;
@@ -24,11 +38,13 @@ import java.util.Formatter;
 import java.util.Scanner;
 import javax.swing.SwingUtilities;
 
-/**
+/*
+ * General class for reading/writing Shadow files
  *
  * @author Ruslan Feshchenko
  * @version 1.2
  */
+
 public class ShadowFiles implements Closeable {
 
     protected final boolean write;
@@ -247,6 +263,9 @@ public class ShadowFiles implements Closeable {
                 throw new FileIsCorruptedException(rayCounter);
             }
         } else {
+            /*
+            * Reading text file using Scanner class
+            */
             Scanner lineScanner;
             String line = ((BufferedReader) stream).readLine();
             if (line == null) {
@@ -281,26 +300,26 @@ public class ShadowFiles implements Closeable {
      * @throws InterruptedException
      * @throws InvocationTargetException
      */
-    protected boolean openWrite(String title) throws InterruptedException, InvocationTargetException {
-        final Answer ans = new Answer();
+    private boolean openWrite(String title) throws InterruptedException, InvocationTargetException {
+        final int[] ans = new int[1];
         final JFileChooser fo = new JFileChooser(file);
         fo.setDialogTitle(title);
         if (SwingUtilities.isEventDispatchThread()) {
-            ans.ans = fo.showSaveDialog(null);
+            ans[0] = fo.showSaveDialog(null);
         } else {
-            SwingUtilities.invokeAndWait(() -> ans.ans = fo.showSaveDialog(null));
+            SwingUtilities.invokeAndWait(() -> ans[0] = fo.showSaveDialog(null));
         }
-        if (ans.ans == JFileChooser.APPROVE_OPTION) {
+        if (ans[0] == JFileChooser.APPROVE_OPTION) {
             file = fo.getSelectedFile();
             if (file.exists()) {
                 if (SwingUtilities.isEventDispatchThread()) {
-                    ans.ans = JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
+                    ans[0] = JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
                             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 } else {
-                    SwingUtilities.invokeAndWait(() -> ans.ans = JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
+                    SwingUtilities.invokeAndWait(() -> ans[0] = JOptionPane.showConfirmDialog(null, "The file already exists. Overwrite?", "Warning",
                             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE));
                 }
-                if (ans.ans == JOptionPane.NO_OPTION) {
+                if (ans[0] == JOptionPane.NO_OPTION) {
                     file = null;
                     return false;
                 }
@@ -318,16 +337,16 @@ public class ShadowFiles implements Closeable {
      * @throws InterruptedException
      * @throws InvocationTargetException
      */
-    protected boolean openRead(String title) throws InterruptedException, InvocationTargetException {
-        final Answer ans = new Answer();
+    private boolean openRead(String title) throws InterruptedException, InvocationTargetException {
+        final int[] ans = new int[1];
         final JFileChooser fo = new JFileChooser(file);
         fo.setDialogTitle(title);
         if (SwingUtilities.isEventDispatchThread()) {
-            ans.ans = fo.showOpenDialog(null);
+            ans[0] = fo.showOpenDialog(null);
         } else {
-            SwingUtilities.invokeAndWait(() -> ans.ans = fo.showOpenDialog(null));
+            SwingUtilities.invokeAndWait(() -> ans[0] = fo.showOpenDialog(null));
         }
-        if (ans.ans == JFileChooser.APPROVE_OPTION) {
+        if (ans[0] == JFileChooser.APPROVE_OPTION) {
             file = fo.getSelectedFile();
             return true;
         }
@@ -395,13 +414,5 @@ public class ShadowFiles implements Closeable {
         public FileNotOpenedException() {
             super();
         }
-    }
-
-    /**
-     * Class for passing integer numbers from inner classes
-     */
-    protected class Answer {
-
-        public int ans;
     }
 }
