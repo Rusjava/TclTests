@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.SwingWorker;
+import javax.swing.border.TitledBorder;
 import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private int maxNrays;
     private File rFile = null, wFile = null;
     private final Map<JTextField, String> valueMap;
-    private SwingWorker<Void, Void> worker;
+    private SwingWorker<Integer, Void> worker;
     private boolean working = false;
 
     /**
@@ -72,7 +73,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         UpperjPanel = new javax.swing.JPanel();
         ActionSelectionjComboBox = new javax.swing.JComboBox();
         actionJButton = new javax.swing.JButton();
-        ProgressbarjPanel = new javax.swing.JPanel();
+        ProgressbarJPanel = new javax.swing.JPanel();
         jProgressBar = new javax.swing.JProgressBar();
         jMenuBar = new javax.swing.JMenuBar();
         OptionsjMenu = new javax.swing.JMenu();
@@ -124,20 +125,20 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        ProgressbarjPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conversion progress", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        ProgressbarJPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Conversion progress", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
-        javax.swing.GroupLayout ProgressbarjPanelLayout = new javax.swing.GroupLayout(ProgressbarjPanel);
-        ProgressbarjPanel.setLayout(ProgressbarjPanelLayout);
-        ProgressbarjPanelLayout.setHorizontalGroup(
-            ProgressbarjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(ProgressbarjPanelLayout.createSequentialGroup()
+        javax.swing.GroupLayout ProgressbarJPanelLayout = new javax.swing.GroupLayout(ProgressbarJPanel);
+        ProgressbarJPanel.setLayout(ProgressbarJPanelLayout);
+        ProgressbarJPanelLayout.setHorizontalGroup(
+            ProgressbarJPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ProgressbarJPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        ProgressbarjPanelLayout.setVerticalGroup(
-            ProgressbarjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ProgressbarjPanelLayout.createSequentialGroup()
+        ProgressbarJPanelLayout.setVerticalGroup(
+            ProgressbarJPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ProgressbarJPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -183,14 +184,14 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(UpperjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(ProgressbarjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(ProgressbarJPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(UpperjPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ProgressbarjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(ProgressbarJPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -215,17 +216,19 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
         actionJButton.setText("Stop");
+        ((TitledBorder) ProgressbarJPanel.getBorder()).setTitle("Conversion progress");
         /*
-        * Create a new instance of worker
-        */
-        worker = new SwingWorker<Void, Void>() {
+         * Create a new instance of worker
+         */
+        worker = new SwingWorker<Integer, Void>() {
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Integer doInBackground() throws Exception {
                 int nrays;
+                Integer processedRays = 0;
                 double[] ray;
                 /*
-                * Open source and sink files and doing conversion
-                */
+                 * Open source and sink files and doing conversion
+                 */
                 try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays, rFile);
                         ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays(), wFile)) {
                     nrays = shadowFileRead.getNrays();
@@ -235,16 +238,17 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     for (int i = 0; i < nrays; i++) {
                         // If canceled return
                         if (isCancelled()) {
-                            return null;
+                            return processedRays;
                         }
                         shadowFileRead.read(ray);
                         shadowFileWrite.write(ray);
                         //Update progress bar
                         setProgressBar((int) (100 * (i + 1) / nrays));
+                        processedRays++;
                     }
                     /*
-                    * processing various exception
-                    */
+                     * Processing various exception
+                     */
                 } catch (EOFException e) {
                     ShadowFiles.safeInvokeAndWait(() -> JOptionPane.showMessageDialog(null, "The end of file has been reached!", "Error",
                             JOptionPane.ERROR_MESSAGE));
@@ -260,26 +264,34 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 } catch (ShadowFiles.FileNotOpenedException e) {
 
                 }
-                return null;
+                return processedRays;
             }
 
             @Override
             protected void done() {
+                Integer nProcessedrays = null;
+                //Getting the number of rays processed
                 try {
-                    get();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+                    nProcessedrays = get();
+                } catch (InterruptedException | CancellationException ex) {
+                    
                 } catch (ExecutionException ex) {
                     if (ex.getCause() instanceof InvocationTargetException) {
-                        
-                    }  else {
-                        
+
+                    } else {
+
                     }
-                } catch (CancellationException ex) {
-                        
-                } 
+                }
                 working = false;
                 actionJButton.setText("Start");
+                //Reporting the number of rays processed or if it was interrupted
+                TitledBorder border = (TitledBorder) ProgressbarJPanel.getBorder();
+                if (nProcessedrays != null) {
+                    border.setTitle("Number of rays processed: " + nProcessedrays.toString());
+                } else {
+                    border.setTitle("Processing interrupted!");
+                }       
+                ProgressbarJPanel.repaint();
             }
 
             protected void setProgressBar(final int status) {
@@ -365,7 +377,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private javax.swing.JMenu HelpjMenu;
     private javax.swing.JMenu OptionsjMenu;
     private javax.swing.JMenuItem ParametersjMenuItem;
-    private javax.swing.JPanel ProgressbarjPanel;
+    private javax.swing.JPanel ProgressbarJPanel;
     private javax.swing.JMenuItem ScriptjMenuItem;
     private javax.swing.JPanel UpperjPanel;
     private javax.swing.JButton actionJButton;

@@ -72,7 +72,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="UpperjPanel" max="32767" attributes="0"/>
-          <Component id="ProgressbarjPanel" alignment="0" max="32767" attributes="0"/>
+          <Component id="ProgressbarJPanel" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -80,7 +80,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="UpperjPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="ProgressbarjPanel" max="32767" attributes="0"/>
+              <Component id="ProgressbarJPanel" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -146,7 +146,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="ProgressbarjPanel">
+    <Container class="javax.swing.JPanel" name="ProgressbarJPanel">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
