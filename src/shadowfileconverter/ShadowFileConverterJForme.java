@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * texts ray files to binary Shadow files
  *
  * @author Ruslan Feshchenko
- * @version 1.2
+ * @version 2.0
  */
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
@@ -290,7 +290,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void AboutjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AboutjMenuItemActionPerformed
         // TODO add your handling code here:
         JOptionPane.showMessageDialog(null,
-                "<html>Shadow file convertion. <br>Version: 1.2 <br>Date: May 2015. <br>Author: Ruslan Feshchenko</html>",
+                "<html>Shadow file convertion. <br>Version: 2.0 <br>Date: July 2015. <br>Author: Ruslan Feshchenko</html>",
                 "About ShadowFileConverter", 1);
     }//GEN-LAST:event_AboutjMenuItemActionPerformed
 

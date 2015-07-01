@@ -42,7 +42,7 @@ import javax.swing.SwingUtilities;
  * General class for reading/writing Shadow files
  *
  * @author Ruslan Feshchenko
- * @version 1.2
+ * @version 2.0
  */
 public class ShadowFiles implements Closeable {
 
