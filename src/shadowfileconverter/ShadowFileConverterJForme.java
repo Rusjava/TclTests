@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /*
  * The program converts binary Shadow ray files to text files and
