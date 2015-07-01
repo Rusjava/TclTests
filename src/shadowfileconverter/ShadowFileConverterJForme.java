@@ -211,6 +211,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             worker.cancel(true);
             return;
         }
+        working = true;
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
         actionJButton.setText("Stop");
@@ -271,11 +272,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 } catch (ExecutionException ex) {
                     if (ex.getCause() instanceof InvocationTargetException) {
                         
-                    } 
-                    if (ex.getCause() instanceof CancellationException) {
+                    }  else {
                         
-                    } 
-                }
+                    }
+                } catch (CancellationException ex) {
+                        
+                } 
                 working = false;
                 actionJButton.setText("Start");
             }
