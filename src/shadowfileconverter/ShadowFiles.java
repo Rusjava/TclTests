@@ -35,7 +35,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import java.util.Formatter;
 import java.util.Scanner;
-import java.lang.Runnable;
 import javax.swing.SwingUtilities;
 
 /*
@@ -198,18 +197,18 @@ public class ShadowFiles implements Closeable {
      * @throws java.io.IOException
      */
     public void write(double[] rayData) throws IOException {
-        int nread = Math.min(rayData.length, ncol);
+        int nwrite = Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
             ((DataOutputStream) stream).write(new byte[]{rLength, 0, 0, 0});
-            for (int i = 0; i < nread; i++) {
+            for (int i = 0; i < nwrite; i++) {
                 ((DataOutputStream) stream).
                         writeLong(Long.reverseBytes(Double.doubleToLongBits(rayData[i])));
             }
             ((DataOutputStream) stream).write(new byte[]{rLength, 0, 0, 0});
         } else {
             Formatter fm = new Formatter();
-            for (int i = 0; i < nread; i++) {
+            for (int i = 0; i < nwrite; i++) {
                 fm.format("%.10f ", rayData[i]);
             }
             ((PrintWriter) stream).println(fm);

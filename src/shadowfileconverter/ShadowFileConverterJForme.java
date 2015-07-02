@@ -17,11 +17,14 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.JFormattedTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.SwingWorker;
@@ -41,11 +44,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private boolean direction;
     private final int MAX_NCOL = 18;
-    private int maxNrays;
+    private int maxNrays, bCol = 1, eCol = 18;
     private File rFile = null, wFile = null;
     private SwingWorker<Integer, Void> worker;
     private boolean working = false;
-    JFormattedTextField maxNraysBox;
+    JFormattedTextField maxRayNumberBox, beginColumn, endColumn;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -53,8 +56,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     public ShadowFileConverterJForme() {
         this.maxNrays = 100000;
         this.direction = false;
-        maxNraysBox = getIntegerFormattedTextField(100000, 1, 10000000);
-        initComponents();  
+        maxRayNumberBox = getIntegerFormattedTextField(100000, 1, 10000000);
+        beginColumn = getIntegerFormattedTextField(1, 1, MAX_NCOL);
+        endColumn = getIntegerFormattedTextField(18, 1, MAX_NCOL);
+        initComponents();
     }
 
     /**
@@ -220,16 +225,18 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         worker = new SwingWorker<Integer, Void>() {
             @Override
             protected Integer doInBackground() throws Exception {
-                int nrays;
                 Integer processedRays = 0;
-                double[] ray;
                 /*
                  * Open source and sink files and doing conversion
                  */
                 try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays, rFile);
                         ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays(), wFile)) {
-                    nrays = shadowFileRead.getNrays();
-                    ray = new double[shadowFileRead.getNcol()];
+                    int nrays = shadowFileRead.getNrays();
+                    int ncols = shadowFileRead.getNcol();
+                    double[] ray = new double[ncols];
+                    int minCol = (bCol > ncols) ? ncols : bCol;
+                    int maxCol = (eCol > ncols) ? ncols : eCol;
+                    double[] truncray = new double[maxCol - minCol + 1];
                     rFile = shadowFileRead.getFile();
                     wFile = shadowFileWrite.getFile();
                     for (int i = 0; i < nrays; i++) {
@@ -238,7 +245,14 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                             return processedRays;
                         }
                         shadowFileRead.read(ray);
-                        shadowFileWrite.write(ray);
+                        if (!direction) {
+                            for (int k = 0; k < maxCol - minCol + 1; k++) {
+                                truncray[k] = ray[minCol + k];
+                            }
+                            shadowFileWrite.write(truncray);
+                        } else {
+                            shadowFileWrite.write(ray);
+                        }  
                         //Update progress bar
                         setProgressBar((int) (100 * (i + 1) / nrays));
                         processedRays++;
@@ -310,15 +324,30 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
         // TODO add your handling code here:
+        //Cteating a JPanel for beginning and ending column numbers
+        JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+        panel.setBorder(new TitledBorder("Exported columns"));
+        panel.add(new JLabel("First column:"));
+        panel.add(beginColumn);
+        panel.add(new JLabel("Last column:"));
+        panel.add(endColumn);
+        beginColumn.setEnabled(!direction);
+        endColumn.setEnabled(!direction);
+        //Showing JOptionPane
         Object[] message = {
-            "Maximal number of rays:", maxNraysBox
+            "Maximal number of rays:", maxRayNumberBox,
+            panel
         };
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
+        //Reading values and checking if eCol >= bCol
         if (option == JOptionPane.OK_OPTION) {
-            maxNrays = (Integer) maxNraysBox.getValue();
+            maxNrays = (Integer) maxRayNumberBox.getValue();
+            bCol = (Integer) beginColumn.getValue();
+            eCol = (Integer) endColumn.getValue();
+            eCol = (eCol < bCol) ? bCol : eCol;
+            endColumn.setValue(eCol);
         }
-        System.out.println(maxNrays);
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
     private void ScriptjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptjMenuItemActionPerformed
