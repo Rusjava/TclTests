@@ -21,15 +21,12 @@ import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.text.NumberFormat;
 import javax.swing.JOptionPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import java.util.Locale;
-import javax.swing.text.InternationalFormatter;
-import javax.swing.text.NumberFormatter;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 
@@ -56,15 +53,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     public ShadowFileConverterJForme() {
         this.maxNrays = 100000;
         this.direction = false;
-        initComponents();
-        
-        maxNraysBox = new JFormattedTextField(NumberFormat.getIntegerInstance());
-        maxNraysBox.setValue(100000);
-        ((InternationalFormatter) maxNraysBox.getFormatter()).setMinimum(1);
-        ((InternationalFormatter) maxNraysBox.getFormatter()).setMaximum(10000000);
-        //(InternationalFormatter) maxNraysBox.getFormatterFactory().
-        ((InternationalFormatter) maxNraysBox.getFormatter()).setAllowsInvalid(true);
-        //JFormattedTextField.AbstractFormatter.
+        maxNraysBox = getIntegerFormattedTextField(100000, 1, 10000000);
+        initComponents();  
     }
 
     /**
