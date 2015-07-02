@@ -22,13 +22,13 @@ import java.io.EOFException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+import javax.swing.JFormattedTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import java.util.Locale;
-import java.util.Map;
-import java.util.HashMap;
+import javax.swing.text.InternationalFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 
@@ -45,9 +45,9 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private final int MAX_NCOL = 18;
     private int maxNrays;
     private File rFile = null, wFile = null;
-    private final Map<JTextField, String> valueMap;
     private SwingWorker<Integer, Void> worker;
     private boolean working = false;
+    JFormattedTextField maxNraysBox;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -55,8 +55,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     public ShadowFileConverterJForme() {
         this.maxNrays = 100000;
         this.direction = false;
-        this.valueMap = new HashMap<>();
         initComponents();
+        maxNraysBox = new JFormattedTextField(100000);
+        ((InternationalFormatter) maxNraysBox.getFormatter()).setMinimum(1);
+        ((InternationalFormatter) maxNraysBox.getFormatter()).setMaximum(10000000);
+        ((InternationalFormatter) maxNraysBox.getFormatter()).setAllowsInvalid(false);
+        //JFormattedTextField.AbstractFormatter.
     }
 
     /**
@@ -215,6 +219,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         jProgressBar.setStringPainted(true);
         actionJButton.setText("Stop");
         ((TitledBorder) ProgressbarJPanel.getBorder()).setTitle("Conversion progress");
+        ProgressbarJPanel.repaint();
         /*
          * Create a new instance of worker
          */
@@ -272,7 +277,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 try {
                     nProcessedrays = get();
                 } catch (InterruptedException | CancellationException ex) {
-                    
+
                 } catch (ExecutionException ex) {
                     if (ex.getCause() instanceof InvocationTargetException) {
 
@@ -288,7 +293,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     border.setTitle("Number of rays processed: " + nProcessedrays.toString());
                 } else {
                     border.setTitle("Processing interrupted!");
-                }       
+                }
                 ProgressbarJPanel.repaint();
             }
 
@@ -311,16 +316,15 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
         // TODO add your handling code here:
-        JTextField maxNraysBox = new JTextField();
-        maxNraysBox.setText("100000");
         Object[] message = {
             "Maximal number of rays:", maxNraysBox
         };
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            maxNrays = (int) Math.round(TestValueWithMemory(0, 100000, maxNraysBox, "100000", valueMap));
+            maxNrays = (Integer) maxNraysBox.getValue();
         }
+        System.out.println(maxNrays);
     }//GEN-LAST:event_ParametersjMenuItemActionPerformed
 
     private void ScriptjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptjMenuItemActionPerformed
