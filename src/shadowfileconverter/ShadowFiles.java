@@ -45,6 +45,10 @@ import javax.swing.SwingUtilities;
  */
 public class ShadowFiles implements Closeable {
 
+    //The number of columns in a standad Shadow file
+    static final int MAX_NCOL = 18;
+    
+    //parameters
     protected final boolean write;
     protected final boolean binary;
     protected File file = null;

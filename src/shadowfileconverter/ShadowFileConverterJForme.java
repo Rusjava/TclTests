@@ -32,6 +32,7 @@ import javax.swing.border.TitledBorder;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
+import javax.swing.BorderFactory;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -43,8 +44,7 @@ import java.util.concurrent.CancellationException;
 public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
     private boolean direction;
-    private final int MAX_NCOL = 18;
-    private int maxNrays, bCol = 1, eCol = 18;
+    private int maxNrays, bCol = 1, eCol = ShadowFiles.MAX_NCOL;
     private File rFile = null, wFile = null;
     private SwingWorker<Integer, Void> worker;
     private boolean working = false;
@@ -57,8 +57,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         this.maxNrays = 100000;
         this.direction = false;
         maxRayNumberBox = getIntegerFormattedTextField(100000, 1, 10000000);
-        beginColumn = getIntegerFormattedTextField(1, 1, MAX_NCOL);
-        endColumn = getIntegerFormattedTextField(18, 1, MAX_NCOL);
+        beginColumn = getIntegerFormattedTextField(1, 1, ShadowFiles.MAX_NCOL);
+        endColumn = getIntegerFormattedTextField(18, 1, ShadowFiles.MAX_NCOL);
         initComponents();
     }
 
@@ -229,7 +229,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 /*
                  * Open source and sink files and doing conversion
                  */
-                try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, MAX_NCOL, maxNrays, rFile);
+                try (ShadowFiles shadowFileRead = new ShadowFiles(false, !direction, ShadowFiles.MAX_NCOL, maxNrays, rFile);
                         ShadowFiles shadowFileWrite = new ShadowFiles(true, direction, shadowFileRead.getNcol(), shadowFileRead.getNrays(), wFile)) {
                     int nrays = shadowFileRead.getNrays();
                     int ncols = shadowFileRead.getNcol();
@@ -324,19 +324,23 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
         // TODO add your handling code here:
-        //Cteating a JPanel for beginning and ending column numbers
+        //Cteating JPanels for beginning and ending column numbers
+        JPanel outerpanel = new JPanel();
+        outerpanel.setBorder(BorderFactory.createTitledBorder(null,
+                        "Exported columns", TitledBorder.LEFT, TitledBorder.ABOVE_TOP));
         JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
-        panel.setBorder(new TitledBorder("Exported columns"));
         panel.add(new JLabel("First column:"));
         panel.add(beginColumn);
         panel.add(new JLabel("Last column:"));
         panel.add(endColumn);
+        outerpanel.add(panel);
         beginColumn.setEnabled(!direction);
         endColumn.setEnabled(!direction);
+        
         //Showing JOptionPane
         Object[] message = {
             "Maximal number of rays:", maxRayNumberBox,
-            panel
+            outerpanel
         };
         int option = JOptionPane.showConfirmDialog(null, message, "ShadowFileConverter parameters",
                 JOptionPane.OK_CANCEL_OPTION);
