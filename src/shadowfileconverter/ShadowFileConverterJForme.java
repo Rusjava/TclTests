@@ -29,10 +29,16 @@ import javax.swing.JFormattedTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import java.awt.event.ItemEvent;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
-import javax.swing.BorderFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -60,6 +66,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         beginColumn = getIntegerFormattedTextField(1, 1, ShadowFiles.MAX_NCOL);
         endColumn = getIntegerFormattedTextField(18, 1, ShadowFiles.MAX_NCOL);
         initComponents();
+        ButtonGroup LFGroup = new ButtonGroup();
+        LFGroup.add(DefaultJRadioButtonMenuItem);
+        LFGroup.add(SystemJRadioButtonMenuItem);
+        LFGroup.add(NimbusJRadioButtonMenuItem);
+        UIManager.addPropertyChangeListener(e -> SwingUtilities.updateComponentTreeUI(getContentPane()));
     }
 
     /**
@@ -78,9 +89,15 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         jProgressBar = new javax.swing.JProgressBar();
         jMenuBar = new javax.swing.JMenuBar();
         OptionsjMenu = new javax.swing.JMenu();
-        ParametersjMenuItem = new javax.swing.JMenuItem();
-        ScriptjMenuItem = new javax.swing.JMenuItem();
+        ParametersJMenuItem = new javax.swing.JMenuItem();
+        LookAndFeelJMenu = new javax.swing.JMenu();
+        DefaultJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
+        SystemJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
+        NimbusJRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        ScriptJMenuItem = new javax.swing.JMenuItem();
         HelpjMenu = new javax.swing.JMenu();
+        HelpJMenuItem = new javax.swing.JMenuItem();
         AboutjMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -148,25 +165,64 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         OptionsjMenu.setText("Options");
         OptionsjMenu.setToolTipText("");
 
-        ParametersjMenuItem.setText("Parameters...");
-        ParametersjMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        ParametersJMenuItem.setText("Parameters...");
+        ParametersJMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ParametersjMenuItemActionPerformed(evt);
+                ParametersJMenuItemActionPerformed(evt);
             }
         });
-        OptionsjMenu.add(ParametersjMenuItem);
+        OptionsjMenu.add(ParametersJMenuItem);
 
-        ScriptjMenuItem.setText("Script...");
-        ScriptjMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ScriptjMenuItemActionPerformed(evt);
+        LookAndFeelJMenu.setText("Look&Feel");
+
+        DefaultJRadioButtonMenuItem.setSelected(true);
+        DefaultJRadioButtonMenuItem.setText("Default");
+        DefaultJRadioButtonMenuItem.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                DefaultJRadioButtonMenuItemItemStateChanged(evt);
             }
         });
-        OptionsjMenu.add(ScriptjMenuItem);
+        LookAndFeelJMenu.add(DefaultJRadioButtonMenuItem);
+
+        SystemJRadioButtonMenuItem.setText("System");
+        SystemJRadioButtonMenuItem.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                SystemJRadioButtonMenuItemItemStateChanged(evt);
+            }
+        });
+        LookAndFeelJMenu.add(SystemJRadioButtonMenuItem);
+
+        NimbusJRadioButtonMenuItem.setText("Nimbus");
+        NimbusJRadioButtonMenuItem.setToolTipText("");
+        NimbusJRadioButtonMenuItem.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NimbusJRadioButtonMenuItemItemStateChanged(evt);
+            }
+        });
+        LookAndFeelJMenu.add(NimbusJRadioButtonMenuItem);
+
+        OptionsjMenu.add(LookAndFeelJMenu);
+        OptionsjMenu.add(jSeparator1);
+
+        ScriptJMenuItem.setText("Script...");
+        ScriptJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ScriptJMenuItemActionPerformed(evt);
+            }
+        });
+        OptionsjMenu.add(ScriptJMenuItem);
 
         jMenuBar.add(OptionsjMenu);
 
         HelpjMenu.setText("Help");
+
+        HelpJMenuItem.setText("Help topics...");
+        HelpJMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                HelpJMenuItemActionPerformed(evt);
+            }
+        });
+        HelpjMenu.add(HelpJMenuItem);
 
         AboutjMenuItem.setText("About...");
         AboutjMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -252,7 +308,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                             shadowFileWrite.write(truncray);
                         } else {
                             shadowFileWrite.write(ray);
-                        }  
+                        }
                         //Update progress bar
                         setProgressBar((int) (100 * (i + 1) / nrays));
                         processedRays++;
@@ -322,12 +378,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     /**
      * Changing the maximal number of rays
      */
-    private void ParametersjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersjMenuItemActionPerformed
+    private void ParametersJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersJMenuItemActionPerformed
         // TODO add your handling code here:
         //Cteating JPanels for beginning and ending column numbers
         JPanel outerpanel = new JPanel();
         outerpanel.setBorder(BorderFactory.createTitledBorder(null,
-                        "Exported columns", TitledBorder.LEFT, TitledBorder.ABOVE_TOP));
+                "Exported columns", TitledBorder.LEFT, TitledBorder.ABOVE_TOP));
         JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
         panel.add(new JLabel("First column:"));
         panel.add(beginColumn);
@@ -336,7 +392,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         outerpanel.add(panel);
         beginColumn.setEnabled(!direction);
         endColumn.setEnabled(!direction);
-        
+
         //Showing JOptionPane
         Object[] message = {
             "Maximal number of rays:", maxRayNumberBox,
@@ -352,11 +408,49 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             eCol = (eCol < bCol) ? bCol : eCol;
             endColumn.setValue(eCol);
         }
-    }//GEN-LAST:event_ParametersjMenuItemActionPerformed
+    }//GEN-LAST:event_ParametersJMenuItemActionPerformed
 
-    private void ScriptjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptjMenuItemActionPerformed
+    private void ScriptJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptJMenuItemActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_ScriptjMenuItemActionPerformed
+    }//GEN-LAST:event_ScriptJMenuItemActionPerformed
+
+    private void HelpJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HelpJMenuItemActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_HelpJMenuItemActionPerformed
+
+    private void DefaultJRadioButtonMenuItemItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_DefaultJRadioButtonMenuItemItemStateChanged
+        // TODO add your handling code here:
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_DefaultJRadioButtonMenuItemItemStateChanged
+
+    private void SystemJRadioButtonMenuItemItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_SystemJRadioButtonMenuItemItemStateChanged
+        // TODO add your handling code here:
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_SystemJRadioButtonMenuItemItemStateChanged
+
+    private void NimbusJRadioButtonMenuItemItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NimbusJRadioButtonMenuItemItemStateChanged
+        // TODO add your handling code here:
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            try {
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_NimbusJRadioButtonMenuItemItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -385,14 +479,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
          }*/
         //</editor-fold>
         try {
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException e) {
-
-        } catch (InstantiationException e) {
-
-        } catch (IllegalAccessException e) {
-
-        } catch (UnsupportedLookAndFeelException e) {
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 
         }
         Locale.setDefault(new Locale("en", "US"));
@@ -403,14 +491,20 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem AboutjMenuItem;
     private javax.swing.JComboBox ActionSelectionjComboBox;
+    private javax.swing.JRadioButtonMenuItem DefaultJRadioButtonMenuItem;
+    private javax.swing.JMenuItem HelpJMenuItem;
     private javax.swing.JMenu HelpjMenu;
+    private javax.swing.JMenu LookAndFeelJMenu;
+    private javax.swing.JRadioButtonMenuItem NimbusJRadioButtonMenuItem;
     private javax.swing.JMenu OptionsjMenu;
-    private javax.swing.JMenuItem ParametersjMenuItem;
+    private javax.swing.JMenuItem ParametersJMenuItem;
     private javax.swing.JPanel ProgressbarJPanel;
-    private javax.swing.JMenuItem ScriptjMenuItem;
+    private javax.swing.JMenuItem ScriptJMenuItem;
+    private javax.swing.JRadioButtonMenuItem SystemJRadioButtonMenuItem;
     private javax.swing.JPanel UpperjPanel;
     private javax.swing.JButton actionJButton;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JProgressBar jProgressBar;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     // End of variables declaration//GEN-END:variables
 }
