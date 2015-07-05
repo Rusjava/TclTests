@@ -17,10 +17,14 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,14 +35,22 @@ import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JScrollPane;
+import javax.swing.JEditorPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.text.html.parser.ParserDelegator;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.parser.DTD;
 import java.awt.event.ItemEvent;
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -413,10 +425,46 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void ScriptJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptJMenuItemActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed
-
+    /*
+    * Displaying help from a html resource file
+    */
     private void HelpJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HelpJMenuItemActionPerformed
         // TODO add your handling code here:
-
+        JEditorPane textArea = new JEditorPane();
+        try {
+            textArea.setPage(ShadowFileConverterJForme.class.getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html"));
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        //Reading HTML 4.0 DTD from the file
+        try {
+            DataInputStream dtdStream =
+                    new DataInputStream (new FileInputStream (new File(ShadowFileConverterJForme.class.
+                            getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html").toURI())));
+        } catch (FileNotFoundException | URISyntaxException ex) {
+            Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //Creating DTD object
+        //DTD dtd = ((HTMLEditorKit)textArea.getEditorKit()).;
+        textArea.setPreferredSize(new Dimension(600, 400));
+        textArea.setEditable(false);
+        HTMLEditorKit kit = new HTMLEditorKit () {
+            @Override
+            protected Parser getParser() {
+                return new ParserDelegator (){
+                    
+                };
+            }
+        };
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getViewport().add(textArea, BorderLayout.CENTER);
+        Object[] message = {
+            "Program description", scrollPane
+        };
+        JOptionPane.showMessageDialog(null, message, "Help", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_HelpJMenuItemActionPerformed
 
     private void DefaultJRadioButtonMenuItemItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_DefaultJRadioButtonMenuItemItemStateChanged
