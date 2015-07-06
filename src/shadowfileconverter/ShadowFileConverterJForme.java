@@ -449,11 +449,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         }
         //Creating DTD object
         DTD dtd = new OpenDTD("html40");
-       try (DataInputStream dtdStream = new DataInputStream (new FileInputStream (file))) {
+        /*try (DataInputStream dtdStream = new DataInputStream (new FileInputStream (file))) {
             dtd.read(dtdStream);
         } catch (IOException ex) {
          
-        }
+        }*/
+        //dtd = ((HTMLEditorKit)textArea.getEditorKit()).g
         dtd.elements.stream().forEach(el -> System.out.println(el.getName()));
         //Creating new parser for HTML4.0
         DocumentParser parser = new DocumentParser(dtd);
@@ -464,10 +465,13 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             @Override
             protected Parser getParser() {
                 return new ParserDelegator (){
-                    
+                    public void parse () {
+                        
+                    }
                 };
             }
         };
+        
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getViewport().add(textArea, BorderLayout.CENTER);
