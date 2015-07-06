@@ -17,6 +17,7 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
+import openhtml.OpenDTD;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -42,6 +43,7 @@ import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.DTD;
+import javax.swing.text.html.parser.DocumentParser;
 import java.awt.event.ItemEvent;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
@@ -50,7 +52,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -439,15 +440,24 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             return;
         }
         //Reading HTML 4.0 DTD from the file
+        File file = null;
         try {
-            DataInputStream dtdStream =
-                    new DataInputStream (new FileInputStream (new File(ShadowFileConverterJForme.class.
-                            getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html").toURI())));
-        } catch (FileNotFoundException | URISyntaxException ex) {
+            file = new File(ShadowFileConverterJForme.class.
+                            getResource("/openhtml/html40DTD").toURI());
+        } catch (URISyntaxException ex) {
             Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
         }
         //Creating DTD object
-        //DTD dtd = ((HTMLEditorKit)textArea.getEditorKit()).;
+        DTD dtd = new OpenDTD("html40");
+       try (DataInputStream dtdStream = new DataInputStream (new FileInputStream (file))) {
+            dtd.read(dtdStream);
+        } catch (IOException ex) {
+         
+        }
+        dtd.elements.stream().forEach(el -> System.out.println(el.getName()));
+        //Creating new parser for HTML4.0
+        DocumentParser parser = new DocumentParser(dtd);
+        
         textArea.setPreferredSize(new Dimension(600, 400));
         textArea.setEditable(false);
         HTMLEditorKit kit = new HTMLEditorKit () {
