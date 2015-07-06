@@ -61,19 +61,19 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
         try {
                 tdtd = DTD.getDTD(name);
         } catch (IOException e) {
-                
+             return null; 
         }
         
-        InputStream in = null;
+        InputStream in;
         try {
             String path = name + ".bdtd";
             in = getResourceAsStream(path);
             if (in != null) {
                 tdtd.read(new DataInputStream(new BufferedInputStream(in)));
-                tdtd.putDTDHash(name, tdtd);
+                DTD.putDTDHash(name, tdtd);
             }
         } catch (Exception e) {
-            System.out.println("No such a DTD!");
+            return null;
         }
         return tdtd;
     }
@@ -83,6 +83,7 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
      *
      * @param name the name of the resource, relative to the
      * OpenParserDelegator class.
+     * @return 
      * @returns a stream representing the resource
      */
     public static InputStream getResourceAsStream(final String name) {

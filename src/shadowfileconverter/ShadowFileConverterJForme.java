@@ -38,10 +38,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.text.html.parser.ParserDelegator;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.DTD;
-import javax.swing.text.html.parser.DocumentParser;
 import java.awt.event.ItemEvent;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -442,7 +440,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             }
         };
         //Setting new HTMLEditorKit
-        textArea.setEditorKit(kit);
+        textArea.setEditorKitForContentType("html/text", kit);
         
         //Reading HTML help file
         try {
