@@ -17,15 +17,13 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
-import openhtml.OpenDTD;
+import openhtml.OpenParserDelegator;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -45,8 +43,6 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.DTD;
 import javax.swing.text.html.parser.DocumentParser;
 import java.awt.event.ItemEvent;
-import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
@@ -432,6 +428,23 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void HelpJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HelpJMenuItemActionPerformed
         // TODO add your handling code here:
         JEditorPane textArea = new JEditorPane();
+        textArea.setPreferredSize(new Dimension(600, 400));
+        textArea.setEditable(false);
+        
+        //Creating default (HTML 3.2) DTD object
+        final DTD dtd = OpenParserDelegator.getDefaultDTD();
+           
+        //Setting up the new parser delegator of the HTMLEditorKit to OpenParserDelegator
+        HTMLEditorKit kit = new HTMLEditorKit () {
+            @Override
+            protected Parser getParser() {
+                return new OpenParserDelegator(dtd);
+            }
+        };
+        //Setting new HTMLEditorKit
+        textArea.setEditorKit(kit);
+        
+        //Reading HTML help file
         try {
             textArea.setPage(ShadowFileConverterJForme.class.getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html"));
         } catch (IOException e) {
@@ -439,45 +452,14 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        //Reading HTML 4.0 DTD from the file
-        File file = null;
-        try {
-            file = new File(ShadowFileConverterJForme.class.
-                            getResource("/openhtml/html40DTD").toURI());
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //Creating DTD object
-        DTD dtd = new OpenDTD("html40");
-        /*try (DataInputStream dtdStream = new DataInputStream (new FileInputStream (file))) {
-            dtd.read(dtdStream);
-        } catch (IOException ex) {
-         
-        }*/
-        //dtd = ((HTMLEditorKit)textArea.getEditorKit()).g
-        dtd.elements.stream().forEach(el -> System.out.println(el.getName()));
-        //Creating new parser for HTML4.0
-        DocumentParser parser = new DocumentParser(dtd);
-        
-        textArea.setPreferredSize(new Dimension(600, 400));
-        textArea.setEditable(false);
-        HTMLEditorKit kit = new HTMLEditorKit () {
-            @Override
-            protected Parser getParser() {
-                return new ParserDelegator (){
-                    public void parse () {
-                        
-                    }
-                };
-            }
-        };
-        
+        //Creating a scroll pane
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getViewport().add(textArea, BorderLayout.CENTER);
         Object[] message = {
             "Program description", scrollPane
         };
+        //Showing help
         JOptionPane.showMessageDialog(null, message, "Help", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_HelpJMenuItemActionPerformed
 

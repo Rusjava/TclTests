@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import javax.swing.text.html.parser.DTD;
-import javax.swing.text.html.parser.ParserDelegator;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.DocumentParser;
 /*
@@ -86,7 +85,7 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
      * OpenParserDelegator class.
      * @returns a stream representing the resource
      */
-    static InputStream getResourceAsStream(final String name) {
+    public static InputStream getResourceAsStream(final String name) {
         return AccessController.doPrivileged((PrivilegedAction<InputStream>) () -> 
                 OpenParserDelegator.class.getResourceAsStream(name));
     }
