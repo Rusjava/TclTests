@@ -17,19 +17,20 @@
 package openhtml;
 
 import java.net.URL;
+import java.util.List;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTML;
+import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 /**
- * A class extending HTMLEditorKit.Parser to create a new version of ParserDelegator
+ * A class extending HTMLEditorKit.Parser to create a new version of
+ * ParserDelegator
+ *
  * @author Ruslan Feshchenko
  * @version 0.1
  */
@@ -77,31 +78,39 @@ public class OpenHTMLDocument extends HTMLDocument {
 
         /**
          * Single parametric constructor
+         *
          * @param offset
          */
         public OpenHTMLReader(int offset) {
             super(offset);
         }
-        
+
         /**
-         * Two parametric constructor with additional functionality
-         * It registers a new tag
+         * Two parametric constructor with additional functionality It registers
+         * a set of new tags
+         *
          * @param offset
-         * @param newTag
+         * @param newTags a List of additional tags
          */
-        public OpenHTMLReader(int offset, HTML.Tag newTag) {
+        public OpenHTMLReader(int offset, List<HTML.Tag> newTags) {
             super(offset);
             /*
-            * Registering an additional tag
-            */
-            registerTag(newTag, new CharacterAction());  
+             * Registering additional tags
+             */
+            newTags.stream().forEach(tag -> registerTag(tag, new CharacterAction()));
         }
-        
+
         @Override
         public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
-            if (t.toString().equals("acronym")) {
-                registerTag(t, new CharacterAction()); 
-                a.addAttribute(HTML.Attribute.STYLE, "font:italic bold Ariel, serif;;");
+            switch (t.toString()) {
+                case "acronym":
+                    registerTag(t, new CharacterAction());
+                    a.addAttribute(HTML.Attribute.STYLE, "font: italic bold Ariel, serif;");
+                    break;
+                case "abr":
+                    registerTag(t, new CharacterAction());
+                    a.addAttribute(HTML.Attribute.STYLE, "font: italic bold Corrier, serif;");
+                    break;
             }
             super.handleStartTag(t, a, pos);
         }

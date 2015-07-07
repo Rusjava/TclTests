@@ -80,11 +80,10 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
     /**
      * Fetch a resource relative to the OpenParserDelegator class file.
      *
-     * @param name the name of the resource, relative to the
-     * OpenParserDelegator class.
+     * @param name the name of * OpenParserDelegator class.
      * @return returning a stream representing the resource
      */
-    public static InputStream getResourceAsStream(final String name) {
+    protected static InputStream getResourceAsStream(final String name) {
         return AccessController.doPrivileged((PrivilegedAction<InputStream>) () -> 
                 ParserDelegator.class.getResourceAsStream(name));
     }

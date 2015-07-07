@@ -20,7 +20,6 @@ package openhtml;
 import javax.swing.text.Element;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
-import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit.HTMLFactory;
 
 /**
@@ -30,10 +29,10 @@ import javax.swing.text.html.HTMLEditorKit.HTMLFactory;
  */
     public class OpenHTMLFactory extends HTMLFactory implements ViewFactory {
 
-    /**
-     * Constructor
-     */
-    public OpenHTMLFactory() {
+        /**
+        * Constructor
+        */
+        public OpenHTMLFactory() {
             super();
         }
         @Override

@@ -16,7 +16,8 @@
  */
 package openhtml;
 
-import static javax.swing.text.html.HTML.*;
+import static javax.swing.text.html.HTML.Tag;
+import static javax.swing.text.html.HTML.getTag;
 
 /**
  * A class extending HTML.Tag to open up methods and add HTML 4.0 tags

@@ -17,9 +17,10 @@
 package openhtml;
 
 import javax.swing.text.html.parser.DTD;
-/*
+
+/**
  * A class extending DTD class to permit creation of new DTD classes
- * (openning constructor)
+ * (opening constructor)
  * @author Ruslan Feshchenko
  * @version 0.1
  */
