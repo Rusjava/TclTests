@@ -19,7 +19,6 @@ package openhtml;
 
 import javax.swing.text.Element;
 import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTMLEditorKit.HTMLFactory;
 
 /**
@@ -27,7 +26,7 @@ import javax.swing.text.html.HTMLEditorKit.HTMLFactory;
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-    public class OpenHTMLFactory extends HTMLFactory implements ViewFactory {
+    public class OpenHTMLFactory extends HTMLFactory {
 
         /**
         * Constructor
