@@ -18,6 +18,7 @@ package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
 import openhtml.OpenParserDelegator;
+import openhtml.OpenTag;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;

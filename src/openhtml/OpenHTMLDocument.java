@@ -17,7 +17,6 @@
 package openhtml;
 
 import java.net.URL;
-import java.util.Hashtable;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
@@ -83,6 +82,7 @@ public class OpenHTMLDocument extends HTMLDocument {
         
         /**
          * Four parametric constructor with additional functionality
+         * It registers unknown tags
          * @param offset
          * @param popDepth
          * @param pushDepth
@@ -91,7 +91,10 @@ public class OpenHTMLDocument extends HTMLDocument {
         public OpenHTMLReader(int offset, int popDepth, int pushDepth,
                           HTML.Tag insertTag) {
             super(offset, popDepth, pushDepth, insertTag);
-            
+            if (insertTag instanceof HTML.UnknownTag) {
+                System.out.println(((HTML.UnknownTag)insertTag).toString());
+                registerTag(insertTag, new CharacterAction());
+            }
         }
         
     }

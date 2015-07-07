@@ -50,7 +50,10 @@ public class OpenTag extends Tag {
      */
     public static final Tag ACRONYM = new OpenTag("acronym");
     
-    static final Tag allTags[]  = {
+    /**
+     * List of all real HTML 4.0 tags
+     */
+    public static final Tag allTags[]  = {
             A, ACRONYM, ADDRESS, APPLET, AREA, B, BASE, BASEFONT, BIG,
             BLOCKQUOTE, BODY, BR, CAPTION, CENTER, CITE, CODE,
             DD, DFN, DIR, DIV, DL, DT, EM, FONT, FORM, FRAME,
