@@ -70,6 +70,9 @@ public class OpenHTMLDocument extends HTMLDocument {
         return new OpenHTMLReader(pos);
     }
 
+    /**
+     * New implementation of HTMLReader with additional HTML 4.0 tags
+     */
     public class OpenHTMLReader extends HTMLReader {
 
         /**
@@ -97,7 +100,8 @@ public class OpenHTMLDocument extends HTMLDocument {
         @Override
         public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
             if (t.toString().equals("acronym")) {
-                registerTag(t, new CharacterAction());  
+                registerTag(t, new CharacterAction()); 
+                a.addAttribute(HTML.Attribute.STYLE, "font:italic bold Ariel, serif;;");
             }
             super.handleStartTag(t, a, pos);
         }

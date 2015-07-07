@@ -38,11 +38,7 @@ import javax.swing.text.html.HTMLEditorKit.HTMLFactory;
         }
         @Override
         public View create(Element element) {
-            HTML.Tag kind = (HTML.Tag) (element.getAttributes().getAttribute(javax.swing.text.StyleConstants.NameAttribute));
-            if (kind instanceof HTML.UnknownTag && element.getName().equals("p")) {
-                System.out.println("acronym");
-                //return null;
-            }
+
             return super.create(element);
         }
     }

@@ -58,7 +58,7 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
      * @return
      */
     public static synchronized DTD getDefaultDTD() {
-        DTD tdtd = null;
+        DTD tdtd;
         String name = "html32";
         InputStream in;
         try {
@@ -82,8 +82,7 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
      *
      * @param name the name of the resource, relative to the
      * OpenParserDelegator class.
-     * @return 
-     * @returns a stream representing the resource
+     * @return returning a stream representing the resource
      */
     public static InputStream getResourceAsStream(final String name) {
         return AccessController.doPrivileged((PrivilegedAction<InputStream>) () -> 

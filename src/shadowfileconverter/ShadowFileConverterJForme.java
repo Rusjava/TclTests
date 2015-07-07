@@ -439,7 +439,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         //Creating default (HTML 3.2) DTD object
         final DTD dtd = OpenParserDelegator.getDefaultDTD();
         Element span=dtd.getElement("span");
-        dtd.defineElement("acronym", span.getType(), true, true, span.getContent(), null, null, span.getAttributes());
+        dtd.defineElement("acronym", span.getType(), false, false, span.getContent(), null, null, span.getAttributes());
 
         //Setting up the new parser delegator of the HTMLEditorKit to OpenParserDelegator
         HTMLEditorKit kit = new HTMLEditorKit() {
