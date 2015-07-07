@@ -21,6 +21,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
@@ -66,8 +67,7 @@ public class OpenHTMLDocument extends HTMLDocument {
         if (desc instanceof URL) {
             setBase((URL) desc);
         }
-        OpenHTMLReader reader = new OpenHTMLReader(pos);
-        return reader;
+        return new OpenHTMLReader(pos);
     }
 
     public class OpenHTMLReader extends HTMLReader {
@@ -81,21 +81,25 @@ public class OpenHTMLDocument extends HTMLDocument {
         }
         
         /**
-         * Four parametric constructor with additional functionality
-         * It registers unknown tags
+         * Two parametric constructor with additional functionality
+         * It registers a new tag
          * @param offset
-         * @param popDepth
-         * @param pushDepth
-         * @param insertTag
+         * @param newTag
          */
-        public OpenHTMLReader(int offset, int popDepth, int pushDepth,
-                          HTML.Tag insertTag) {
-            super(offset, popDepth, pushDepth, insertTag);
-            if (insertTag instanceof HTML.UnknownTag) {
-                System.out.println(((HTML.UnknownTag)insertTag).toString());
-                registerTag(insertTag, new CharacterAction());
-            }
+        public OpenHTMLReader(int offset, HTML.Tag newTag) {
+            super(offset);
+            /*
+            * Registering an additional tag
+            */
+            registerTag(newTag, new CharacterAction());  
         }
         
+        @Override
+        public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+            if (t.toString().equals("acronym")) {
+                registerTag(t, new CharacterAction());  
+            }
+            super.handleStartTag(t, a, pos);
+        }
     }
 }

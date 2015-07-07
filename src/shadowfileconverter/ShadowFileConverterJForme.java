@@ -18,7 +18,8 @@ package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
 import openhtml.OpenParserDelegator;
-import openhtml.OpenTag;
+import openhtml.OpenHTMLDocument;
+import openhtml.OpenHTMLFactory;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -47,6 +48,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.Document;
+import javax.swing.text.ViewFactory;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
+import javax.swing.text.html.parser.Element;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -422,28 +428,48 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed
     /*
-    * Displaying help from a html resource file
-    */
+     * Displaying help from a html resource file
+     */
     private void HelpJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HelpJMenuItemActionPerformed
         // TODO add your handling code here:
         JEditorPane textArea = new JEditorPane();
         textArea.setPreferredSize(new Dimension(600, 400));
         textArea.setEditable(false);
-        
+
         //Creating default (HTML 3.2) DTD object
         final DTD dtd = OpenParserDelegator.getDefaultDTD();
-        //dtd.defineElement(null, bCol, direction, working, null, null, null, null)
-           
+        Element span=dtd.getElement("span");
+        dtd.defineElement("acronym", span.getType(), true, true, span.getContent(), null, null, span.getAttributes());
+
         //Setting up the new parser delegator of the HTMLEditorKit to OpenParserDelegator
-        HTMLEditorKit kit = new HTMLEditorKit () {
+        HTMLEditorKit kit = new HTMLEditorKit() {
+            final ViewFactory factory;
+            {
+                factory = new OpenHTMLFactory();
+            }
             @Override
             protected Parser getParser() {
                 return new OpenParserDelegator(dtd);
+            }           
+            @Override
+            public Document createDefaultDocument() {
+                StyleSheet styles = getStyleSheet();
+                StyleSheet ss = new StyleSheet();
+                ss.addStyleSheet(styles);
+                HTMLDocument doc = new OpenHTMLDocument(ss);
+                doc.setParser(getParser());
+                doc.setAsynchronousLoadPriority(4);
+                doc.setTokenThreshold(100);
+                return doc;
+            }          
+            @Override
+            public ViewFactory getViewFactory () {
+                return factory;
             }
         };
-        //Setting new HTMLEditorKit
-        textArea.setEditorKitForContentType("html/text", kit);
-        
+        //Setting new HTMLEditorKit   
+        textArea.setEditorKitForContentType("text/html", kit);
+
         //Reading HTML help file
         try {
             textArea.setPage(ShadowFileConverterJForme.class.getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html"));

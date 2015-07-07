@@ -27,7 +27,9 @@ import java.security.PrivilegedAction;
 import javax.swing.text.html.parser.DTD;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.DocumentParser;
-/*
+import javax.swing.text.html.parser.ParserDelegator;
+
+/**
  * A class extending HTMLEditorKit.Parser to create a new version of ParserDelegator
  * @author Ruslan Feshchenko
  * @version 0.1
@@ -58,23 +60,20 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
     public static synchronized DTD getDefaultDTD() {
         DTD tdtd = null;
         String name = "html32";
-        try {
-                tdtd = DTD.getDTD(name);
-        } catch (IOException e) {
-             return null; 
-        }
-        
         InputStream in;
         try {
+            tdtd = DTD.getDTD(name);
             String path = name + ".bdtd";
             in = getResourceAsStream(path);
             if (in != null) {
                 tdtd.read(new DataInputStream(new BufferedInputStream(in)));
                 DTD.putDTDHash(name, tdtd);
+            } else {
+                return null;
             }
-        } catch (Exception e) {
-            return null;
-        }
+        } catch (IOException e) {
+             return null; 
+        }     
         return tdtd;
     }
     
@@ -88,7 +87,7 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
      */
     public static InputStream getResourceAsStream(final String name) {
         return AccessController.doPrivileged((PrivilegedAction<InputStream>) () -> 
-                OpenParserDelegator.class.getResourceAsStream(name));
+                ParserDelegator.class.getResourceAsStream(name));
     }
     
     @Override
