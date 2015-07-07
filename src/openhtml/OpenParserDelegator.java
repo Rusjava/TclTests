@@ -27,6 +27,7 @@ import java.security.PrivilegedAction;
 import javax.swing.text.html.parser.DTD;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.DocumentParser;
+import javax.swing.text.html.parser.Element;
 import javax.swing.text.html.parser.ParserDelegator;
 
 /**
@@ -75,6 +76,20 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
              return null; 
         }     
         return tdtd;
+    }
+    
+    /**
+     * A static method creating HTML 4.0 DTD
+     * @return
+     */
+    public static DTD getHTML40DTD () {
+        //Fetching HTML 3.2 DTD
+        DTD dtd4 = getDefaultDTD();
+        Element span=dtd4.getElement("span");
+        //Adding HTML 4.0 tags
+        dtd4.defineElement("acronym", span.getType(), false, false, span.getContent(), null, null, span.getAttributes());
+        dtd4.defineElement("abr", span.getType(), false, false, span.getContent(), null, null, span.getAttributes());
+        return dtd4;
     }
     
     /**
