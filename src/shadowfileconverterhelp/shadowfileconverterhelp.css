@@ -1,9 +1,8 @@
-/*
+/**
 * A stylesheet for the Shadow file converter help file
-*/
-/* 
-    Created on : Jul 7, 2015, 8:09:31 PM
-    Author     : Ruslan Feshchenko
+*
+*   Created on : Jul 7, 2015, 8:09:31 PM
+*   Author     : Ruslan Feshchenko
 */
 
 .header {
@@ -14,6 +13,7 @@
     border-bottom-style: solid;
     border-width: 2px;
     border-color: green;
+    padding-bottom: 10px;
 }
 
 .footer {
@@ -21,9 +21,16 @@
     border-width: 2px;
     border-color: blue;
     text-align: center;
-    margin-top: 30px
+    padding-top: 10px;
+    margin-top: 10px;
 }
 
 acronym {
     color: gray;
+    font-family: fantasy;
+}
+
+em {
+    color: red;
+    font-weight: bold;
 }

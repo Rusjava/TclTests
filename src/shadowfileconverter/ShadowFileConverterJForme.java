@@ -52,7 +52,6 @@ import javax.swing.text.Document;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
-import javax.swing.text.html.parser.Element;
 
 /*
  * The program converts binary Shadow ray files to text files and

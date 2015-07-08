@@ -105,11 +105,9 @@ public class OpenHTMLDocument extends HTMLDocument {
             switch (t.toString()) {
                 case "acronym":
                     registerTag(t, new CharacterAction());
-                    a.addAttribute(HTML.Attribute.STYLE, "font: italic bold Ariel, serif;");
                     break;
-                case "abr":
+                case "abbr":
                     registerTag(t, new CharacterAction());
-                    a.addAttribute(HTML.Attribute.STYLE, "font: italic bold Corrier, serif;");
                     break;
             }
             super.handleStartTag(t, a, pos);
