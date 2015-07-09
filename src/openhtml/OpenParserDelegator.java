@@ -95,6 +95,7 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
         //Adding HTML 4.0 tags
         insertElement(dtd4, "acronym", "em");
         insertElement(dtd4, "abbr", "acronym");
+        insertElement(dtd4, "q", "em");
         return dtd4;
     }
 

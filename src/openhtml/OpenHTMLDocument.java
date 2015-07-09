@@ -22,7 +22,6 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML;
-import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
@@ -108,6 +107,10 @@ public class OpenHTMLDocument extends HTMLDocument {
                     break;
                 case "abbr":
                     registerTag(t, new CharacterAction());
+                    break;
+                case "q":
+                    registerTag(t, new CharacterAction());
+                    addContent(new char[] {34}, 0, 1);
                     break;
             }
             super.handleStartTag(t, a, pos);

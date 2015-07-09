@@ -30,7 +30,7 @@ acronym {
     font-family: fantasy;
 }
 
-em {
+em, q {
     color: red;
     font-weight: bold;
 }
