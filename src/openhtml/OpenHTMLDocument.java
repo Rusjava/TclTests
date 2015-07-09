@@ -101,19 +101,63 @@ public class OpenHTMLDocument extends HTMLDocument {
 
         @Override
         public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+            CharacterAction ca = new CharacterAction();
             switch (t.toString()) {
                 case "acronym":
-                    registerTag(t, new CharacterAction());
+                    registerTag(t, ca);
                     break;
                 case "abbr":
-                    registerTag(t, new CharacterAction());
+                    registerTag(t, ca);
                     break;
                 case "q":
-                    registerTag(t, new CharacterAction());
+                    registerTag(t, ca);
                     addContent(new char[] {34}, 0, 1);
+                    break;
+                case "button":
+                    registerTag(t, new ButtonAction());
                     break;
             }
             super.handleStartTag(t, a, pos);
+        }
+        
+        @Override
+        public void handleEndTag(HTML.Tag t, int pos) {
+            super.handleEndTag(t, pos);
+            switch (t.toString()) {
+                case "q":
+                    addContent(new char[] {34}, 0, 1);
+                    break;
+            }
+        }
+        
+        /**
+         * New action for BUTTON HTML tags
+         */
+        public class ButtonAction extends BlockAction {
+            ButtonAction() {
+                super();
+            }
+            
+            /**
+             * Start method
+             * @param t
+             * @param attr
+             */
+            @Override
+            public void start(HTML.Tag t, MutableAttributeSet attr) {
+                new FormAction().start(HTML.Tag.INPUT, attr);
+                super.start(t, attr);
+            }
+            
+            /**
+             * End method
+             * @param t
+             */
+            @Override
+            public void end(HTML.Tag t) {
+                super.end(t);
+                new FormAction().end(HTML.Tag.INPUT);
+            }
         }
     }
 }

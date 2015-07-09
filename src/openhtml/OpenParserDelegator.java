@@ -93,9 +93,10 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
         //Fetching HTML 3.2 DTD
         DTD dtd4 = getDefaultDTD();
         //Adding HTML 4.0 tags
-        insertElement(dtd4, "acronym", "em");
-        insertElement(dtd4, "abbr", "acronym");
-        insertElement(dtd4, "q", "em");
+        insertInlineElement(dtd4, "acronym", "em");
+        insertInlineElement(dtd4, "abbr", "acronym");
+        insertInlineElement(dtd4, "q", "em");
+        insertFormElement(dtd4, "button", "input");
         return dtd4;
     }
 
@@ -125,13 +126,13 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
     }
 
     /**
-     * Inserts a new HTML element into a DTD and updates the Content Model
+     * Inserts a new inline HTML element into a DTD and updates the Content Model
      *
      * @param inDtd model to insert to
      * @param elemName element name to insert
      * @param sampleElemName next element name
      */
-    public static void insertElement(DTD inDtd, String elemName, String sampleElemName) {
+    protected static void insertInlineElement(DTD inDtd, String elemName, String sampleElemName) {
         //Getting the next element
         Element nextElem = inDtd.getElement(sampleElemName);
         //Adding tag to the DTD
@@ -192,5 +193,21 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
         ContentModel model = td.getElement(parentElemName).getContent();
         ((ContentModel) ((ContentModel) model.content).content).next
                 = new ContentModel(0, elem, ((ContentModel) ((ContentModel) model.content).content).next);
+    }
+    
+    /**
+     * Inserts a new form HTML element into a DTD and updates the Content Model
+     *
+     * @param inDtd model to insert to
+     * @param elemName element name to insert
+     * @param sampleElemName next element name
+     */
+    protected static void insertFormElement(DTD inDtd, String elemName, String sampleElemName) {
+        //Getting the next element
+        Element nextElem = inDtd.getElement(sampleElemName);
+        //Adding tag to the DTD
+        Element el = inDtd.defineElement(elemName, DTD.MODEL, false, false, nextElem.getContent(), null, null, nextElem.atts);
+        //Updating content models of all parent elements
+        insertElementInContentModel(el, "form", inDtd);
     }
 }
