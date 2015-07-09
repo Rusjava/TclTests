@@ -18,9 +18,12 @@ package openhtml;
 
 import java.net.URL;
 import java.util.List;
+import javax.swing.ButtonModel;
+import javax.swing.DefaultButtonModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -136,8 +139,7 @@ public class OpenHTMLDocument extends HTMLDocument {
         public class ButtonAction extends BlockAction {
             ButtonAction() {
                 super();
-            }
-            
+            }           
             /**
              * Start method
              * @param t
@@ -145,10 +147,11 @@ public class OpenHTMLDocument extends HTMLDocument {
              */
             @Override
             public void start(HTML.Tag t, MutableAttributeSet attr) {
-                new FormAction().start(HTML.Tag.INPUT, attr);
+                ButtonModel model = new DefaultButtonModel();
+                model.setArmed(true);
+                attr.addAttribute(StyleConstants.ModelAttribute, model);
                 super.start(t, attr);
-            }
-            
+            }           
             /**
              * End method
              * @param t
@@ -156,7 +159,6 @@ public class OpenHTMLDocument extends HTMLDocument {
             @Override
             public void end(HTML.Tag t) {
                 super.end(t);
-                new FormAction().end(HTML.Tag.INPUT);
             }
         }
     }

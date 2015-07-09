@@ -96,7 +96,8 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
         insertInlineElement(dtd4, "acronym", "em");
         insertInlineElement(dtd4, "abbr", "acronym");
         insertInlineElement(dtd4, "q", "em");
-        insertFormElement(dtd4, "button", "input");
+        insertInlineElement(dtd4, "button", "div");
+        //insertElementInContentModel(dtd4.getElement("button"), "div", dtd4);
         return dtd4;
     }
 
@@ -134,9 +135,9 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
      */
     protected static void insertInlineElement(DTD inDtd, String elemName, String sampleElemName) {
         //Getting the next element
-        Element nextElem = inDtd.getElement(sampleElemName);
+        Element sampleElem = inDtd.getElement(sampleElemName);
         //Adding tag to the DTD
-        Element el = inDtd.defineElement(elemName, DTD.MODEL, false, false, nextElem.getContent(), null, null, nextElem.atts);
+        Element el = inDtd.defineElement(elemName, DTD.MODEL, false, false, sampleElem.getContent(), null, null, sampleElem.atts);
         //Updating content models of all parent elements
         insertElementInContentModel(el, "span", inDtd);
         insertElementInContentModel(el, "em", inDtd);
@@ -180,7 +181,6 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
         insertElementInContentModel(el, "li", inDtd);
         insertElementInContentModel(el, "form", inDtd);
         //insertElementInContentModel(el, "iframe", inDtd);
-        System.out.println(inDtd.getElement("bdo").getContent());
     }
     /**
      * Inserts an element into content model
@@ -204,9 +204,9 @@ public class OpenParserDelegator extends HTMLEditorKit.Parser {
      */
     protected static void insertFormElement(DTD inDtd, String elemName, String sampleElemName) {
         //Getting the next element
-        Element nextElem = inDtd.getElement(sampleElemName);
+        Element sampleElem = inDtd.getElement(sampleElemName);
         //Adding tag to the DTD
-        Element el = inDtd.defineElement(elemName, DTD.MODEL, false, false, nextElem.getContent(), null, null, nextElem.atts);
+        Element el = inDtd.defineElement(elemName, DTD.MODEL, false, false, sampleElem.getContent(), null, null, sampleElem.atts);
         //Updating content models of all parent elements
         insertElementInContentModel(el, "form", inDtd);
     }
