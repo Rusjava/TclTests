@@ -436,7 +436,9 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             return;
         }
         //Getting HTML document
-        HTMLDocument doc = (HTMLDocument) textArea.getDocument(); 
+        HTMLDocument doc = (HTMLDocument) textArea.getDocument();
+        
+        textArea.addHyperlinkListener(hevt -> {System.out.println("Click");});
         //Creating a scroll pane
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

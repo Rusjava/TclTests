@@ -31,20 +31,28 @@ version: 0.1
                 preserving their structure. The converter can also convert these text files back into the 
                 binary Shadow format.</p>
         </div>
-        <div>
+        <div class="content">
             <h2 class="header">How to perform conversion</h2>
             <p>From the drop down menu choose the direction of conversion: from a binary <code>SHADOW</code> file to 
-                text or from text files to binary <code>SHADOW</code> files. Press <em>START</em> button and choose a source and 
+                a text file or from a text file to a binary <code>SHADOW</code> file. Press <em>START</em> button and choose a source and 
                 destination files. The conversion process begins and its progress can be observed looking at
                 the progress bar. The process can be interrupted by pressing the <em>STOP</em> button.
             </p>
             <h2 class="header">Changing conversion parameters</h2>
             <p>Select <i>Options -> Parameter...</i> and enter the maximum number of rays to process and the first 
-                and last columns to write into the text files.
+                and last columns to write into the text file. The last option is only available if conversion from
+                binary files to text files is selected.
+            </p>
+            <h2 class="header">Changing skin</h2>
+            <p>Select <i>Options -> Look&mp;Feel...</i> and choose a new Look &amp; Feel.
+            </p>
+            <h2 class="header">Running scripts</h2>
+            <p>Select <i>Options -> Scripts...</i> and in the window that appears type a new script in <code>Tcl</code> language
+                to manipulate data in <code>SHADOW</code> files.
             </p>
         </div>
         <div class="controls">
-            <form action="">
+            <form action="#">
                 <p>
                     <input type="submit" value="Back" name="back">
                     <input type="submit" value="Next" name="next">

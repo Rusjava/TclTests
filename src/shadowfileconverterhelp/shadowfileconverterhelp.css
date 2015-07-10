@@ -7,6 +7,7 @@
 
 .header {
     text-align: center;
+    text-decoration: underline;
 }
 
 .intro {
@@ -25,6 +26,14 @@
     margin-top: 10px;
 }
 
+.content {
+    
+}
+
 .controls {
+
+}
+
+.first {
 
 }
