@@ -17,9 +17,7 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
-import openhtml.OpenParserDelegator;
-import openhtml.OpenHTMLDocument;
-import openhtml.OpenHTMLFactory;
+import openhtml.OpenHTMLEditorKit;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -41,17 +39,12 @@ import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.parser.DTD;
 import java.awt.event.ItemEvent;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.Document;
-import javax.swing.text.ViewFactory;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.StyleSheet;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -435,35 +428,9 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         textArea.setPreferredSize(new Dimension(600, 400));
         textArea.setEditable(false);
 
-        //Creating default (HTML 3.2) DTD object
-        final DTD dtd = OpenParserDelegator.getHTML40DTD();
-        
         //Setting up the new parser delegator of the HTMLEditorKit to OpenParserDelegator
-        HTMLEditorKit kit = new HTMLEditorKit() {
-            final ViewFactory factory;
-            {
-                factory = new OpenHTMLFactory();
-            }
-            @Override
-            protected Parser getParser() {
-                return new OpenParserDelegator(dtd);
-            }           
-            @Override
-            public Document createDefaultDocument() {
-                StyleSheet styles = getStyleSheet();
-                StyleSheet ss = new StyleSheet();
-                ss.addStyleSheet(styles);
-                HTMLDocument doc = new OpenHTMLDocument(ss);
-                doc.setParser(getParser());
-                doc.setAsynchronousLoadPriority(4);
-                doc.setTokenThreshold(100);
-                return doc;
-            }          
-            @Override
-            public ViewFactory getViewFactory () {
-                return factory;
-            }
-        };
+        HTMLEditorKit kit = new OpenHTMLEditorKit();
+           
         //Setting new HTMLEditorKit   
         textArea.setEditorKitForContentType("text/html", kit);
 
