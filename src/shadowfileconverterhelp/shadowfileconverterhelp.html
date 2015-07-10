@@ -27,27 +27,27 @@ version: 0.1
     <body>
         <div class="intro">
             <h2 class="header">Introduction</h2>
-            <p>The Shadow file converter transforms binary <acronym>SHADOW</acronym> files such as <acronym>BEGIN.DAT</acronym> to text files 
+            <p>The Shadow file converter transforms binary <code>SHADOW</code> files such as <code>BEGIN.DAT</code> to text files 
                 preserving their structure. The converter can also convert these text files back into the 
                 binary Shadow format.</p>
         </div>
         <div>
             <h2 class="header">How to perform conversion</h2>
-            <p>From the drop down menu choose the direction of conversion: from the binary <acronym>SHADOW</acronym> files to 
-                text or from text files to binary <em>SHADOW</em> files. Press Start button and choose a source and 
+            <p>From the drop down menu choose the direction of conversion: from a binary <code>SHADOW</code> file to 
+                text or from text files to binary <code>SHADOW</code> files. Press <em>START</em> button and choose a source and 
                 destination files. The conversion process begins and its progress can be observed looking at
-                the progress bar. The process can be interrupted by pressing the Stop button.
+                the progress bar. The process can be interrupted by pressing the <em>STOP</em> button.
             </p>
             <h2 class="header">Changing conversion parameters</h2>
-            <p>Select <q>Options -> Parameter...</q> and enter the maximum number of rays to process and the first 
+            <p>Select <i>Options -> Parameter...</i> and enter the maximum number of rays to process and the first 
                 and last columns to write into the text files.
             </p>
         </div>
-        <div style="height: 100px;">
+        <div class="controls">
             <form action="">
                 <p>
-                    <button type="submit"><span style="color: green;">Back</span></button>
-                    <button type="submit"><span style="color: green;">Next</span></button>
+                    <input type="submit" value="Back" name="back">
+                    <input type="submit" value="Next" name="next">
                 </p>
             </form>
         </div>

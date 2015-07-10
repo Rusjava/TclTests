@@ -17,7 +17,6 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
-import openhtml.OpenHTMLEditorKit;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -38,13 +37,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.text.html.HTMLEditorKit;
 import java.awt.event.ItemEvent;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.html.HTMLDocument;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -423,16 +422,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      * Displaying help from a html resource file
      */
     private void HelpJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HelpJMenuItemActionPerformed
-        // TODO add your handling code here:
+        // Creating JEditorPane to display the help file
         JEditorPane textArea = new JEditorPane();
         textArea.setPreferredSize(new Dimension(600, 400));
-        textArea.setEditable(false);
-
-        //Setting up the new parser delegator of the HTMLEditorKit to OpenParserDelegator
-        HTMLEditorKit kit = new OpenHTMLEditorKit();
-           
-        //Setting new HTMLEditorKit   
-        textArea.setEditorKitForContentType("text/html", kit);
+        textArea.setEditable(false);   
 
         //Reading HTML help file
         try {
@@ -442,6 +435,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+        //Getting HTML document
+        HTMLDocument doc = (HTMLDocument) textArea.getDocument(); 
         //Creating a scroll pane
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
