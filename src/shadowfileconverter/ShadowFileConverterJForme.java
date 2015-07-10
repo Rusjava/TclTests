@@ -43,7 +43,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.FormSubmitEvent;
+import javax.swing.text.html.HTML.Attribute;
+import javax.swing.text.MutableAttributeSet;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -425,7 +430,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         // Creating JEditorPane to display the help file
         JEditorPane textArea = new JEditorPane();
         textArea.setPreferredSize(new Dimension(600, 400));
-        textArea.setEditable(false);   
+        textArea.setEditable(false);
 
         //Reading HTML help file
         try {
@@ -435,10 +440,21 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        //Getting HTML document
-        HTMLDocument doc = (HTMLDocument) textArea.getDocument();
-        
-        textArea.addHyperlinkListener(hevt -> {System.out.println("Click");});
+        //Getting HTML document and kit
+        final HTMLDocument doc = (HTMLDocument) textArea.getDocument();
+        HTMLEditorKit kit = (HTMLEditorKit) textArea.getEditorKit();
+        kit.setAutoFormSubmission(false);
+        doc.getStyleSheet().addRule("#i1 {height: 200px}");
+        doc.getStyleSheet().addRule("#i1 h2 {font-size: 14px}");
+        doc.getStyleSheet().addRule("#i1 p {font-size: 11px}");
+        doc.getStyleSheet().addRule("#i1 p code {font-size: 11px}");
+        textArea.addHyperlinkListener(hevt -> {
+            if (hevt instanceof javax.swing.text.html.FormSubmitEvent) {
+                System.out.println(((FormSubmitEvent) hevt).getData());
+                System.out.println(doc.getElement("i1").getAttributes().getAttribute(Attribute.CLASS));
+                
+            }
+        });
         //Creating a scroll pane
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
