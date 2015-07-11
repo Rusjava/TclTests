@@ -22,13 +22,13 @@ version: 0.1
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="shadowfileconverterhelp.css" type="text/css" rel="stylesheet">
-        <title>How to use Shadow file converter</title>
+        <title>How to use the Shadow file converter</title>
     </head>
     <body>
         <div id="int" class="intro">
             <h2 class="header">Introduction</h2>
-            <p>The Shadow file converter transforms binary <code>SHADOW</code> files such as <code>BEGIN.DAT</code> to text files 
-                preserving their structure. The converter can also convert these text files back into the 
+            <p>The Shadow file converter transforms binary <code>SHADOW</code> files containing ray sets such as <code>BEGIN.DAT</code>
+                to text files preserving their structure. The converter can also convert these text files back into the 
                 binary Shadow format.</p>
         </div>
         <div class="content">
@@ -36,27 +36,27 @@ version: 0.1
                 <h2 class="header">How to perform conversion</h2>
                 <p id="par">From the drop down menu choose the direction of conversion: from a binary <code>SHADOW</code> file to 
                     a text file or from a text file to a binary <code>SHADOW</code> file. Press <em>START</em> button and choose a source and 
-                    destination files. The conversion process begins and its progress can be observed looking at
-                    the progress bar. The process can be interrupted by pressing the <em>STOP</em> button.
+                    destination files. The conversion process begins and its progress can be observed by looking at
+                    the progress bar. The process can be interrupted by pressing the <em>STOP</em> button (former <em>START</em> button).
                 </p>
             </div>
             <div id="i1">
                 <h2 class="header">Changing conversion parameters</h2>
-                <p>Select <em>Options -> Parameter...</em> and enter the maximum number of rays to process and the first 
-                    and last columns to write into the text file. The last option is only available if conversion from
-                    binary files to text files is selected.
+                <p>Select <em>Options -> Parameter...</em> and in the new window enter the maximum number of rays to process and the first 
+                    and last columns to write into the text file. The last option is only available if the conversion from
+                    binary files to text files is selected in the main program window.
                 </p>
             </div>
             <div id="i2">
                 <h2 class="header">Adjusting Look &amp; Feel</h2>
                 <p>Select <em>Options -> Look&amp;Feel...</em> and choose a new Look &amp; Feel. There options are available:
-                    default, which is <code>Metal</code> Look &amp; Feel; <code>System</code> Look &amp; Feel; and 
+                    default, which is the <code>Metal</code> Look &amp; Feel; <code>System</code> Look &amp; Feel; and 
                     <code>Nimbus</code> Look &amp; Feel.
                 </p>
             </div>
             <div id="i3">
                 <h2 class="header">Running scripts</h2>
-                <p>Select <em>Options -> Scripts...</em> and in the window that appears type a new script in <code>Tcl</code> language
+                <p>Select <em>Options -> Scripts...</em> and in the window that appears type a new script in a subset of <code>Tcl</code> language
                     to manipulate the data in <code>SHADOW</code> files.
                 </p>
             </div>
@@ -70,7 +70,7 @@ version: 0.1
         <div class="controls">
             <form action="#">
                 <p>
-                    <input type="submit" value="Back" name="back">
+                    <input type="submit" value="Previous" name="back">
                     <input type="submit" value="Next" name="next">
                 </p>
             </form>

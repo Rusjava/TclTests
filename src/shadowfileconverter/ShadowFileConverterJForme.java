@@ -81,7 +81,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         LFGroup.add(DefaultJRadioButtonMenuItem);
         LFGroup.add(SystemJRadioButtonMenuItem);
         LFGroup.add(NimbusJRadioButtonMenuItem);
-        UIManager.addPropertyChangeListener(e -> SwingUtilities.updateComponentTreeUI(getContentPane()));
+        UIManager.addPropertyChangeListener(e -> SwingUtilities.updateComponentTreeUI(this));
     }
 
     /**
@@ -276,7 +276,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private void actionJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionJButtonActionPerformed
         // TODO add your handling code here:
         if (working) {
-            //Cancel worker
+            //Cancel Swingworker
             worker.cancel(true);
             return;
         }
@@ -287,7 +287,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         ((TitledBorder) ProgressbarJPanel.getBorder()).setTitle("Conversion progress");
         ProgressbarJPanel.repaint();
         /*
-         * Create a new instance of worker
+         * Create a new instance of Swingworker
          */
         worker = new SwingWorker<Integer, Void>() {
             @Override
@@ -307,7 +307,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     rFile = shadowFileRead.getFile();
                     wFile = shadowFileWrite.getFile();
                     for (int i = 0; i < nrays; i++) {
-                        // If canceled return
+                        // If canceled, return
                         if (isCancelled()) {
                             return processedRays;
                         }
@@ -433,8 +433,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         textArea.setPreferredSize(new Dimension(600, 400));
         textArea.setEditable(false);
         int PART_NUMBER = 5;
-        int[] currentPart = new int[1];
-        currentPart[0] = 0;
+        int[] currentPart = {0};
         String[] strParts = new String[PART_NUMBER];
         String lastTag = "</div>";
         String firstTagBegin = "<div id=\"i";
@@ -461,11 +460,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             if (hevt instanceof javax.swing.text.html.FormSubmitEvent) {
                 //Determining which button was pressed and incrementing or decrementing the index
                 int prevInd = currentPart[0];
-                if (((FormSubmitEvent) hevt).getData().equals("back=Back")) {
-                    currentPart[0] = (--currentPart[0] + PART_NUMBER) % PART_NUMBER;
-                } else {
-                    currentPart[0] = ++currentPart[0] % PART_NUMBER;
-                }
+                currentPart[0] = ((FormSubmitEvent) hevt).getData().equals("back=Back") ? 
+                        (--currentPart[0] + PART_NUMBER) % PART_NUMBER : ++currentPart[0] % PART_NUMBER;
                 HTMLDocument doc = (HTMLDocument) textArea.getDocument();
                 //Changing content based on the updated index
                 try {
