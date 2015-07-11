@@ -391,7 +391,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     private void ParametersJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ParametersJMenuItemActionPerformed
         // TODO add your handling code here:
-        //Cteating JPanels for beginning and ending column numbers
+        //Creating JPanels for beginning and ending column numbers
         JPanel outerpanel = new JPanel();
         outerpanel.setBorder(BorderFactory.createTitledBorder(null,
                 "Exported columns", TitledBorder.LEFT, TitledBorder.ABOVE_TOP));
@@ -439,7 +439,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         String firstTagBegin = "<div id=\"i";
         String firstTagEnd = "\">";
 
-        //Registering Property listerner to perform some actions when a document has loaded
+        //Registering PropertyChangeListerner to perform some actions when a document has loaded
         textArea.addPropertyChangeListener(pevt -> {
             if (pevt.getPropertyName().equals("page")) {
                 //Getting the HTML document 
@@ -455,7 +455,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             }
         });
 
-        //Registering a nwe hypertext link listerner for form submit events
+        //Registering a new hypertext link listerner for form submit events
         textArea.addHyperlinkListener(hevt -> {
             if (hevt instanceof javax.swing.text.html.FormSubmitEvent) {
                 //Determining which button was pressed and incrementing or decrementing the index
