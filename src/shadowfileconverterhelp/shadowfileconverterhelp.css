@@ -11,10 +11,11 @@
 }
 
 .intro {
-    border-bottom-style: solid;
+    border-style: ridge;
     border-width: 2px;
     border-color: blue;
-    padding-bottom: 10px;
+    padding: 10px;
+    padding-top: 0px;
     margin-bottom: 10px;
 }
 
@@ -30,17 +31,15 @@
 .content {
     border-style: ridge;
     border-color: gray;
-    border-width: 3px;
+    border-width: 2px;
+    padding: 10px;
+    padding-top: 0px;
+}
+
+.content div {
+    height: 120px;
 }
 
 .controls {
     text-align:center;
-}
-
-.hidden, .hidden p, .hidden p code, .hidden h2 {
-    font-size: 0px;
-}
-
-.hidden {
-    height: 0px;
 }

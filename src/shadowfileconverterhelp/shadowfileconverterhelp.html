@@ -25,14 +25,14 @@ version: 0.1
         <title>How to use Shadow file converter</title>
     </head>
     <body>
-        <div class="intro">
+        <div id="int" class="intro">
             <h2 class="header">Introduction</h2>
             <p>The Shadow file converter transforms binary <code>SHADOW</code> files such as <code>BEGIN.DAT</code> to text files 
                 preserving their structure. The converter can also convert these text files back into the 
                 binary Shadow format.</p>
         </div>
         <div class="content">
-            <div id="i1" class="hidden">
+            <div id="i0">
                 <h2 class="header">How to perform conversion</h2>
                 <p id="par">From the drop down menu choose the direction of conversion: from a binary <code>SHADOW</code> file to 
                     a text file or from a text file to a binary <code>SHADOW</code> file. Press <em>START</em> button and choose a source and 
@@ -40,27 +40,27 @@ version: 0.1
                     the progress bar. The process can be interrupted by pressing the <em>STOP</em> button.
                 </p>
             </div>
-            <div class="hidden">
+            <div id="i1">
                 <h2 class="header">Changing conversion parameters</h2>
                 <p>Select <em>Options -> Parameter...</em> and enter the maximum number of rays to process and the first 
                     and last columns to write into the text file. The last option is only available if conversion from
                     binary files to text files is selected.
                 </p>
             </div>
-            <div class="hidden">
+            <div id="i2">
                 <h2 class="header">Adjusting Look &amp; Feel</h2>
                 <p>Select <em>Options -> Look&amp;Feel...</em> and choose a new Look &amp; Feel. There options are available:
                     default, which is <code>Metal</code> Look &amp; Feel; <code>System</code> Look &amp; Feel; and 
                     <code>Nimbus</code> Look &amp; Feel.
                 </p>
             </div>
-            <div class="hidden">
+            <div id="i3">
                 <h2 class="header">Running scripts</h2>
                 <p>Select <em>Options -> Scripts...</em> and in the window that appears type a new script in <code>Tcl</code> language
                     to manipulate the data in <code>SHADOW</code> files.
                 </p>
             </div>
-            <div class="hidden">
+            <div id="i4">
                 <h2 class="header">Displaying help</h2>
                 <p>Select <em>Help -> Help topics...</em> to show this help file. Select <em>Help -> About...</em> to view information about 
                     this program. 

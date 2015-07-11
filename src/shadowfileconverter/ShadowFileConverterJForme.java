@@ -38,6 +38,8 @@ import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import java.awt.event.ItemEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
@@ -47,8 +49,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.FormSubmitEvent;
+import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTML.Attribute;
-import javax.swing.text.MutableAttributeSet;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -431,30 +433,80 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         JEditorPane textArea = new JEditorPane();
         textArea.setPreferredSize(new Dimension(600, 400));
         textArea.setEditable(false);
+        int PART_NUMBER = 5;
+        int[] currentPart = new int[1];
+        currentPart[0] = 0;
+        String[] strParts = new String[PART_NUMBER];
+        String lastTag = "</div>";
+        String firstTagBegin = "<div id=\"i";
+        String firstTagEnd = "\">";
 
-        //Reading HTML help file
+        //Registering Property listerner to perform some actions when a document has loaded
+        textArea.addPropertyChangeListener(pevt -> {
+            if (pevt.getPropertyName().equals("page")) {
+                //Getting the HTML document 
+                HTMLDocument doc = (HTMLDocument) textArea.getDocument();
+                try {
+                    //Hiding all changeble parts except the first part
+                    doc.setInnerHTML(doc.getElement("i0").getParentElement(), strParts[currentPart[0]]);
+                } catch (BadLocationException | IOException ex) {
+                    Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //Disabling automatic handling of form submission events
+                ((HTMLEditorKit) textArea.getEditorKit()).setAutoFormSubmission(false);
+            }
+        });
+        
+        //Registering a nwe hypertext link listerner for form submit events
+        textArea.addHyperlinkListener(hevt -> {
+            if (hevt instanceof javax.swing.text.html.FormSubmitEvent) {
+                //Determining which button was pressed and incrementing or decrementing the index
+                int prevInd = currentPart[0];
+                if (((FormSubmitEvent) hevt).getData().equals("back=Back")) {
+                    currentPart[0] = (--currentPart[0] + PART_NUMBER) % PART_NUMBER;
+                } else {
+                    currentPart[0] = ++currentPart[0] % PART_NUMBER;
+                }
+                HTMLDocument doc = (HTMLDocument) textArea.getDocument();
+                //Changing content based on the updated index
+                try {
+                    doc.setInnerHTML(doc.getElement("i" + prevInd).getParentElement(), strParts[currentPart[0]]);
+                } catch (BadLocationException | IOException ex) {
+                    Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
+        //Reading the HTML help file
         try {
-            textArea.setPage(ShadowFileConverterJForme.class.getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html"));
+            textArea.setPage(ShadowFileConverterJForme.class.
+                    getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html"));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        //Getting HTML document and kit
-        final HTMLDocument doc = (HTMLDocument) textArea.getDocument();
-        HTMLEditorKit kit = (HTMLEditorKit) textArea.getEditorKit();
-        kit.setAutoFormSubmission(false);
-        doc.getStyleSheet().addRule("#i1 {height: 200px}");
-        doc.getStyleSheet().addRule("#i1 h2 {font-size: 14px}");
-        doc.getStyleSheet().addRule("#i1 p {font-size: 11px}");
-        doc.getStyleSheet().addRule("#i1 p code {font-size: 11px}");
-        textArea.addHyperlinkListener(hevt -> {
-            if (hevt instanceof javax.swing.text.html.FormSubmitEvent) {
-                System.out.println(((FormSubmitEvent) hevt).getData());
-                System.out.println(doc.getElement("i1").getAttributes().getAttribute(Attribute.CLASS));
-                
+
+        //Reading the help file into a stringbuilder
+        StringBuilder builder = new StringBuilder();
+        try (BufferedReader stream = new BufferedReader(new InputStreamReader(ShadowFileConverterJForme.class.
+                getResourceAsStream("/shadowfileconverterhelp/shadowfileconverterhelp.html")))) {
+            for (String line = stream.readLine(); line != null; line = stream.readLine()) {
+                builder.append(line).append("\n");
             }
-        });
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        
+        //Separating strings with changeble parts of the HTML
+        for (int i = 0; i < PART_NUMBER - 1; i++) {
+            int ind = builder.indexOf(firstTagBegin + i + firstTagEnd);
+            strParts[i] = builder.substring(ind, builder.indexOf(lastTag, ind) + 6);
+        }
+        strParts[PART_NUMBER - 1] = builder.substring(builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd),
+                builder.indexOf(lastTag, builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd)) + 6);  
+
         //Creating a scroll pane
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
