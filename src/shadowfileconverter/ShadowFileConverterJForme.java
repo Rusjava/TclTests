@@ -45,12 +45,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.FormSubmitEvent;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTML.Attribute;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -456,7 +455,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 ((HTMLEditorKit) textArea.getEditorKit()).setAutoFormSubmission(false);
             }
         });
-        
+
         //Registering a nwe hypertext link listerner for form submit events
         textArea.addHyperlinkListener(hevt -> {
             if (hevt instanceof javax.swing.text.html.FormSubmitEvent) {
@@ -476,7 +475,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 }
             }
         });
-        
+
         //Reading the HTML help file
         try {
             textArea.setPage(ShadowFileConverterJForme.class.
@@ -498,22 +497,20 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-        
+
         //Separating strings with changeble parts of the HTML
         for (int i = 0; i < PART_NUMBER - 1; i++) {
             int ind = builder.indexOf(firstTagBegin + i + firstTagEnd);
             strParts[i] = builder.substring(ind, builder.indexOf(lastTag, ind) + 6);
         }
         strParts[PART_NUMBER - 1] = builder.substring(builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd),
-                builder.indexOf(lastTag, builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd)) + 6);  
+                builder.indexOf(lastTag, builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd)) + 6);
 
-        //Creating a scroll pane
+        //Creating a scroll pane and label
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getViewport().add(textArea, BorderLayout.CENTER);
-        Object[] message = {
-            "Program description", scrollPane
-        };
+        Object[] message = {new JLabel("Program description",  SwingConstants.CENTER), scrollPane};
         //Showing help
         JOptionPane.showMessageDialog(null, message, "Help", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_HelpJMenuItemActionPerformed

@@ -17,6 +17,7 @@
     padding: 10px;
     padding-top: 0px;
     margin-bottom: 10px;
+    background-color: aqua;
 }
 
 .footer {
@@ -33,13 +34,21 @@
     border-color: gray;
     border-width: 2px;
     padding: 10px;
-    padding-top: 0px;
+    background-color: orange;
 }
 
 .content div {
     height: 120px;
 }
 
+.content h2 {
+    padding-top: 0px;
+}
+
 .controls {
     text-align:center;
+}
+
+em {
+    color: blue;
 }
