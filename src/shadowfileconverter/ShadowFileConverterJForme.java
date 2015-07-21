@@ -17,7 +17,9 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
+import tclinterpreter.TclInterpreter;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.GridLayout;
@@ -54,8 +56,13 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -79,7 +86,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private SwingWorker<Integer, Void> worker;
     private boolean working = false;
     JFormattedTextField maxRayNumberBox, beginColumn, endColumn;
-    String script = null;
+    TclInterpreter interpreter;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -90,6 +97,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         maxRayNumberBox = getIntegerFormattedTextField(100000, 1, 10000000);
         beginColumn = getIntegerFormattedTextField(1, 1, ShadowFiles.MAX_NCOL);
         endColumn = getIntegerFormattedTextField(18, 1, ShadowFiles.MAX_NCOL);
+        interpreter = new TclInterpreter();
         initComponents();
         ButtonGroup LFGroup = new ButtonGroup();
         LFGroup.add(DefaultJRadioButtonMenuItem);
@@ -436,11 +444,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     }//GEN-LAST:event_ParametersJMenuItemActionPerformed
 
     private void ScriptJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptJMenuItemActionPerformed
-        // Defining text area
-        JTextArea scriptArea = new JTextArea("set outputRays inputRays", 20, 60);
+        // Defining a text area
+        JTextArea scriptArea = new JTextArea("set outputRays inputRays\nputs inputRays", 20, 60);
         scriptArea.setLineWrap(false);
         scriptArea.setWrapStyleWord(true);
-        
+
         //Adding undo and redo keys to the input map
         scriptArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK), UndoAction.ID);
         scriptArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK), RedoAction.ID);
@@ -453,7 +461,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         uAction.setRedoAction(rAction);
         rAction.setUndoAction(uAction);
         doc.addUndoableEditListener(uManager);
-        
+
+        //Setting up highlighting of keywords
+        setHighlight(scriptArea, 0, doc.getLength() - 1);
+
         //Adding a listerner that reinstates undo when it becomes possible and disables redo action
         doc.addUndoableEditListener(ev -> {
             ActionMap map = scriptArea.getActionMap();
@@ -461,6 +472,30 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 uAction.set();
             }
             rAction.unset();
+        });
+
+        //Adding document listerner to highlight keywords
+        doc.addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                highlight(e);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                highlight(e);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                highlight(e);
+            }
+
+            //Highliting the keywords
+            void highlight(DocumentEvent e) {
+                removeHighlight(scriptArea, e.getOffset(), e.getOffset() + e.getLength() - 1);
+                setHighlight(scriptArea, e.getOffset(), e.getOffset() + e.getLength() - 1);
+            }
         });
 
         //Creating a scroll pane and label
@@ -471,8 +506,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         //Showing help and reading the result
         int option = JOptionPane.showConfirmDialog(null, message, "Script", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            script = scriptArea.getText();
-            System.out.println(script);
+            interpreter.setScript(scriptArea.getText());
         }
 
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed
@@ -632,10 +666,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> new ShadowFileConverterJForme().setVisible(true));
     }
 
-    /*
+    /**
      * New action class for a simple UndoAction
      */
-    class UndoAction extends AbstractAction {
+    public class UndoAction extends AbstractAction {
 
         UndoManager uManager;
         JComponent comp;
@@ -644,6 +678,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         /*
          * Constructor
          */
+
         public UndoAction(UndoManager uManager, JComponent comp) {
             super(ID);
             this.uManager = uManager;
@@ -665,26 +700,34 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             comp.getActionMap().put(RedoAction.ID, rAction);
         }
 
-        //Setting up this object as an undo action
+        /**
+         * Setting up this object as an undo action
+         */
         public void set() {
             comp.getActionMap().put(ID, this);
         }
-        
-        //Unsetting up this object as a redo action
+
+        /**
+         * Unsetting up this object as a redo action
+         */
         public void unset() {
             comp.getActionMap().put(ID, new DefaultEditorKit.BeepAction());
         }
-        
-        //Setting the corresponding redo action
+
+        /**
+         * Setting the corresponding redo action
+         *
+         * @param rAction
+         */
         public void setRedoAction(RedoAction rAction) {
             this.rAction = rAction;
         }
     }
 
-    /*
+    /**
      * New action class for a simple RedoAction
      */
-    class RedoAction extends AbstractAction {
+    public class RedoAction extends AbstractAction {
 
         UndoManager uManager;
         JComponent comp;
@@ -693,6 +736,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         /*
          * Constructor
          */
+
         public RedoAction(UndoManager uManager, JComponent comp) {
             super(ID);
             this.uManager = uManager;
@@ -714,14 +758,66 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             comp.getActionMap().put(UndoAction.ID, uAction);
         }
 
-        //Unsetting up this object as a redo action
+        /**
+         * Unsetting up this object as a redo action
+         */
         public void unset() {
             comp.getActionMap().put(ID, new DefaultEditorKit.BeepAction());
         }
-        
-        //Setting the corresponding undo action
+
+        /**
+         * Setting the corresponding undo action
+         *
+         * @param uAction
+         */
         public void setUndoAction(UndoAction uAction) {
             this.uAction = uAction;
+        }
+    }
+
+    /**
+     * Highlights keywords in a given part of text
+     *
+     * @param scriptArea
+     * @param start
+     * @param end
+     */
+    protected void setHighlight(JTextComponent scriptArea, int start, int end) {
+        PlainDocument doc = (PlainDocument) scriptArea.getDocument();
+        int nStart, nEnd, kLen;
+        try {
+            String text = doc.getText(0, doc.getLength() - 1);
+            for (String keyWord : TclInterpreter.KEY_WORDS) {
+                kLen = keyWord.length();
+                nStart = start - kLen < 0 ? 0 : start - kLen;
+                nEnd = end + kLen > doc.getLength() - 1 ? doc.getLength() - 1 : end + kLen;
+                for (int i = text.indexOf(keyWord, nStart); i != -1 && i < nEnd; i = text.indexOf(keyWord, i + kLen)) {
+                    scriptArea.getHighlighter().addHighlight(i, i + kLen, new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN));
+                }
+            }
+        } catch (BadLocationException ex) {
+            Logger.getLogger(ShadowFileConverterJForme.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Removes highlighted keywords in a given part of text
+     *
+     * @param scriptArea
+     * @param start
+     * @param end
+     */
+    protected void removeHighlight(JTextComponent scriptArea, int start, int end) {
+        PlainDocument doc = (PlainDocument) scriptArea.getDocument();
+        int nStart, kLen;
+        for (String keyWord : TclInterpreter.KEY_WORDS) {
+            kLen = keyWord.length();
+            nStart = start - kLen < 0 ? 0 : start - kLen;
+            for (Highlighter.Highlight highlight : scriptArea.getHighlighter().getHighlights()) {
+                if (!(highlight.getStartOffset() < nStart)) {
+                    scriptArea.getHighlighter().removeHighlight(highlight);
+                }
+            }
         }
     }
 
