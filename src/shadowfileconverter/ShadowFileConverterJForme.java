@@ -438,6 +438,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         String lastTag = "</div>";
         String firstTagBegin = "<div id=\"i";
         String firstTagEnd = "\">";
+        StringBuilder builder = new StringBuilder();
 
         //Registering PropertyChangeListerner to perform some actions when a document has loaded
         textArea.addPropertyChangeListener(pevt -> {
@@ -457,7 +458,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
 
         //Registering a new hypertext link listerner for form submit events
         textArea.addHyperlinkListener(hevt -> {
-            if (hevt instanceof javax.swing.text.html.FormSubmitEvent) {
+            if (hevt instanceof FormSubmitEvent) {
                 //Determining which button was pressed and incrementing or decrementing the index
                 int prevInd = currentPart[0];
                 currentPart[0] = ((FormSubmitEvent) hevt).getData().equals("back=Back") ? 
@@ -478,12 +479,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html"));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                   JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        
         //Reading the help file into a stringbuilder
-        StringBuilder builder = new StringBuilder();
         try (BufferedReader stream = new BufferedReader(new InputStreamReader(ShadowFileConverterJForme.class.
                 getResourceAsStream("/shadowfileconverterhelp/shadowfileconverterhelp.html")))) {
             for (String line = stream.readLine(); line != null; line = stream.readLine()) {
@@ -493,6 +493,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+        
 
         //Separating strings with changeble parts of the HTML
         for (int i = 0; i < PART_NUMBER - 1; i++) {
@@ -501,6 +502,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         }
         strParts[PART_NUMBER - 1] = builder.substring(builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd),
                 builder.indexOf(lastTag, builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd)) + 6);
+        
 
         //Creating a scroll pane and label
         JScrollPane scrollPane = new JScrollPane();
