@@ -19,7 +19,9 @@ package shadowfileconverter;
 import static TextUtilities.MyTextUtilities.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
@@ -38,6 +40,7 @@ import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Locale;
@@ -45,11 +48,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.JComponent;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.FormSubmitEvent;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -66,6 +79,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private SwingWorker<Integer, Void> worker;
     private boolean working = false;
     JFormattedTextField maxRayNumberBox, beginColumn, endColumn;
+    String script = null;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -422,7 +436,45 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     }//GEN-LAST:event_ParametersJMenuItemActionPerformed
 
     private void ScriptJMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ScriptJMenuItemActionPerformed
-        // TODO add your handling code here:
+        // Defining text area
+        JTextArea scriptArea = new JTextArea("set outputRays inputRays", 20, 60);
+        scriptArea.setLineWrap(false);
+        scriptArea.setWrapStyleWord(true);
+        
+        //Adding undo and redo keys to the input map
+        scriptArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK), UndoAction.ID);
+        scriptArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK), RedoAction.ID);
+
+        //Setting up an undoable edit manager and actions
+        UndoManager uManager = new UndoManager();
+        PlainDocument doc = (PlainDocument) scriptArea.getDocument();
+        UndoAction uAction = new UndoAction(uManager, scriptArea);
+        RedoAction rAction = new RedoAction(uManager, scriptArea);
+        uAction.setRedoAction(rAction);
+        rAction.setUndoAction(uAction);
+        doc.addUndoableEditListener(uManager);
+        
+        //Adding a listerner that reinstates undo when it becomes possible and disables redo action
+        doc.addUndoableEditListener(ev -> {
+            ActionMap map = scriptArea.getActionMap();
+            if (uManager.canUndo() && map.get(UndoAction.ID) instanceof DefaultEditorKit.BeepAction) {
+                uAction.set();
+            }
+            rAction.unset();
+        });
+
+        //Creating a scroll pane and label
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getViewport().add(scriptArea, BorderLayout.CENTER);
+        Object[] message = {new JLabel("Type script:", SwingConstants.CENTER), scrollPane};
+        //Showing help and reading the result
+        int option = JOptionPane.showConfirmDialog(null, message, "Script", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            script = scriptArea.getText();
+            System.out.println(script);
+        }
+
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed
     /*
      * Displaying help from a html resource file
@@ -461,8 +513,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             if (hevt instanceof FormSubmitEvent) {
                 //Determining which button was pressed and incrementing or decrementing the index
                 int prevInd = currentPart[0];
-                currentPart[0] = ((FormSubmitEvent) hevt).getData().equals("back=Back") ? 
-                        (--currentPart[0] + PART_NUMBER) % PART_NUMBER : ++currentPart[0] % PART_NUMBER;
+                currentPart[0] = ((FormSubmitEvent) hevt).getData().equals("back=Back")
+                        ? (--currentPart[0] + PART_NUMBER) % PART_NUMBER : ++currentPart[0] % PART_NUMBER;
                 HTMLDocument doc = (HTMLDocument) textArea.getDocument();
                 //Changing content based on the updated index
                 try {
@@ -479,10 +531,10 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                     getResource("/shadowfileconverterhelp/shadowfileconverterhelp.html"));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
-                   JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         //Reading the help file into a stringbuilder
         try (BufferedReader stream = new BufferedReader(new InputStreamReader(ShadowFileConverterJForme.class.
                 getResourceAsStream("/shadowfileconverterhelp/shadowfileconverterhelp.html")))) {
@@ -493,7 +545,6 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Error in the help file!", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-        
 
         //Separating strings with changeble parts of the HTML
         for (int i = 0; i < PART_NUMBER - 1; i++) {
@@ -502,13 +553,12 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         }
         strParts[PART_NUMBER - 1] = builder.substring(builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd),
                 builder.indexOf(lastTag, builder.indexOf(firstTagBegin + (PART_NUMBER - 1) + firstTagEnd)) + 6);
-        
 
         //Creating a scroll pane and label
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getViewport().add(textArea, BorderLayout.CENTER);
-        Object[] message = {new JLabel("Program description",  SwingConstants.CENTER), scrollPane};
+        Object[] message = {new JLabel("Program description", SwingConstants.CENTER), scrollPane};
         //Showing help
         JOptionPane.showMessageDialog(null, message, "Help", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_HelpJMenuItemActionPerformed
@@ -580,6 +630,99 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         Locale.setDefault(new Locale("en", "US"));
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new ShadowFileConverterJForme().setVisible(true));
+    }
+
+    /*
+     * New action class for a simple UndoAction
+     */
+    class UndoAction extends AbstractAction {
+
+        UndoManager uManager;
+        JComponent comp;
+        RedoAction rAction;
+        public static final String ID = "Undo";
+        /*
+         * Constructor
+         */
+        public UndoAction(UndoManager uManager, JComponent comp) {
+            super(ID);
+            this.uManager = uManager;
+            this.comp = comp;
+            comp.getActionMap().put(ID, new DefaultEditorKit.BeepAction());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                uManager.undo();
+            } catch (CannotUndoException ex) {
+                System.out.println("Unable to undo: " + ex);
+            }
+            //Replacing undoAction with a BeepAction if further undoing is impossible
+            if (!uManager.canUndo()) {
+                unset();
+            }
+            comp.getActionMap().put(RedoAction.ID, rAction);
+        }
+
+        //Setting up this object as an undo action
+        public void set() {
+            comp.getActionMap().put(ID, this);
+        }
+        
+        //Unsetting up this object as a redo action
+        public void unset() {
+            comp.getActionMap().put(ID, new DefaultEditorKit.BeepAction());
+        }
+        
+        //Setting the corresponding redo action
+        public void setRedoAction(RedoAction rAction) {
+            this.rAction = rAction;
+        }
+    }
+
+    /*
+     * New action class for a simple RedoAction
+     */
+    class RedoAction extends AbstractAction {
+
+        UndoManager uManager;
+        JComponent comp;
+        UndoAction uAction;
+        public static final String ID = "Redo";
+        /*
+         * Constructor
+         */
+        public RedoAction(UndoManager uManager, JComponent comp) {
+            super(ID);
+            this.uManager = uManager;
+            this.comp = comp;
+            comp.getActionMap().put(ID, new DefaultEditorKit.BeepAction());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                uManager.redo();
+            } catch (CannotRedoException ex) {
+                System.out.println("Unable to redo: " + ex);
+            }
+            //Replacing redoAction with a BeepAction if further redoing is impossible
+            if (!uManager.canRedo()) {
+                unset();
+            }
+            comp.getActionMap().put(UndoAction.ID, uAction);
+        }
+
+        //Unsetting up this object as a redo action
+        public void unset() {
+            comp.getActionMap().put(ID, new DefaultEditorKit.BeepAction());
+        }
+        
+        //Setting the corresponding undo action
+        public void setUndoAction(UndoAction uAction) {
+            this.uAction = uAction;
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
