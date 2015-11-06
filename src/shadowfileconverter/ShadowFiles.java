@@ -194,7 +194,7 @@ public class ShadowFiles implements Closeable {
     }
 
     /**
-     * Writes binary data for one ray or the file heading
+     * Synchronized method that writes binary data for one ray or the file heading
      *
      * @param rayData double array of 18 numbers representing 18 columns of ray
      * data
@@ -220,7 +220,7 @@ public class ShadowFiles implements Closeable {
     }
 
     /**
-     * Reads binary data of one ray or of the file heading
+     * Synchronized method that reads binary data of one ray or of the file heading
      *
      * @param rayData double array of 18 numbers representing 18 columns of ray
      * data
