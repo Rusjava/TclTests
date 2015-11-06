@@ -200,7 +200,7 @@ public class ShadowFiles implements Closeable {
      * data
      * @throws java.io.IOException
      */
-    public void write(double[] rayData) throws IOException {
+    public synchronized void write(double[] rayData) throws IOException {
         int nwrite = Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
@@ -231,7 +231,7 @@ public class ShadowFiles implements Closeable {
      * @throws shadowfileconverter.ShadowFiles.FileIsCorruptedException thrown
      * when the record can not be interpreted
      */
-    public void read(double[] rayData) throws EOFException, IOException, EndOfLineException, FileIsCorruptedException {
+    public synchronized void read(double[] rayData) throws EOFException, IOException, EndOfLineException, FileIsCorruptedException {
         int nread = Math.min(rayData.length, ncol);
         rayCounter++;
         if (binary) {
