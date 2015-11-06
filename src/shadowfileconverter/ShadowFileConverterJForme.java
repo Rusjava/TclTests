@@ -376,11 +376,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                 } catch (InterruptedException | CancellationException ex) {
 
                 } catch (ExecutionException ex) {
-                    if (ex.getCause() instanceof InvocationTargetException) {
-
-                    } else {
-
-                    }
+                    
                 }
                 working = false;
                 actionJButton.setText("Start");
