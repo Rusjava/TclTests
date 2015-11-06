@@ -336,7 +336,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
                         shadowFileRead.read(ray);
                         if (!direction) {
                             for (int k = 0; k < maxCol - minCol + 1; k++) {
-                                truncray[k] = ray[minCol + k];
+                                truncray[k] = ray[minCol - 1 + k];
                             }
                             shadowFileWrite.write(truncray);
                         } else {
