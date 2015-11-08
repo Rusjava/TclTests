@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -804,7 +803,6 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      * @param end
      */
     protected void removeHighlight(JTextComponent scriptArea, int start, int end) {
-        PlainDocument doc = (PlainDocument) scriptArea.getDocument();
         int nStart, kLen;
         for (String keyWord : TclInterpreter.KEY_WORDS) {
             kLen = keyWord.length();
