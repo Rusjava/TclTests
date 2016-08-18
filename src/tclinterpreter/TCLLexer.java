@@ -70,7 +70,24 @@ public class TCLLexer {
      * @return the next character
      */
     protected char peek() {
-        return script.charAt(pos + 1);
+        if (pos < script.length() - 1) {
+            return script.charAt(pos + 1);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * What was the previous character?
+     *
+     * @return the previous character
+     */
+    protected char retropeek() {
+        if (pos > 0) {
+            return script.charAt(pos - 1);
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -91,7 +108,7 @@ public class TCLLexer {
         String number = "";
         number += currentchar;
         /*
-          This is a number if didgit, dot and exponetial characters are present     
+         This is a number if didgit, dot and exponetial characters are present     
          */
         while (Character.isDigit(currentchar)
                 || currentchar == '.'
@@ -134,27 +151,42 @@ public class TCLLexer {
     }
 
     /**
+     * Reading the string between quotes of curly braces with ends of lines skipped
+     *
+     * @return
+     */
+    protected String readString() {
+        String string = "";
+        string += currentchar;
+        while (currentchar != '"' && currentchar != '}') {
+            advancePosition();
+            if (currentchar !='\n' && currentchar !='\t') {
+                string += currentchar;
+            }
+        }
+        return string;
+    }
+
+    /**
      * Getting the next TCL token
      *
      * @return
      */
     public TCLTokenType getToken() {
         /*
-        Skipping any leading white space
+         Skipping any leading white space
          */
         if (Character.isWhitespace(currentchar)) {
             skipSpace();
         }
         /*
-        What is the next token
+         What is the next token
          */
         if (currentchar == 0) {
             return TCLTokenType.EOF;
         } else if (Character.isDigit(currentchar)) {
-            advancePosition();
             return TCLTokenType.NUMBER.setValue(readNumber());
         } else if (Character.isLetter(currentchar) || currentchar == '_') {
-            advancePosition();
             return TCLTokenType.NAME.setValue(readName());
         } else if (currentchar == '+') {
             advancePosition();
@@ -204,14 +236,18 @@ public class TCLLexer {
         } else if (currentchar == '\n') {
             advancePosition();
             return TCLTokenType.EOL;
+        } else if (retropeek() == '"' || retropeek() == '{') {
+            return TCLTokenType.STRING.setValue(readString());
         }
         return null;
     }
+
     /**
      * Returning the Tcl script
-     * @return 
+     *
+     * @return
      */
-    public String getScript () {
+    public String getScript() {
         return script;
     }
 }

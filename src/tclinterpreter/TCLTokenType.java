@@ -45,6 +45,7 @@ public enum TCLTokenType {
     NAME("id"),
     EOL("\n"),
     DOLLAR("$"),
+    STRING("STR"),
     EOF("eof");
 
     private String value;
