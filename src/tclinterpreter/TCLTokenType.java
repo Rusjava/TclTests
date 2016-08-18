@@ -39,10 +39,12 @@ public enum TCLTokenType {
     RIGHTCURL("right_curly_bracket"),
     PUTS("output"),
     EXPR("expression"),
-    UNSET("deletion"),
+    UNSET("delete"),
     SET("assign"),
     SEMI("semicolon"),
-    NAME("name"),
+    NAME("id"),
+    EOL("\n"),
+    DOLLAR("$"),
     EOF("eof");
 
     private String value;
@@ -68,7 +70,7 @@ public enum TCLTokenType {
      * @return  
      */
     public TCLTokenType setValue(String v) {
-        if (this == NUMBER) {
+        if (this == NUMBER || this == NAME) {
             value = v;
         }
         return this;

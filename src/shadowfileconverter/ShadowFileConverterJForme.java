@@ -17,7 +17,6 @@
 package shadowfileconverter;
 
 import static TextUtilities.MyTextUtilities.*;
-import tclinterpreter.TclInterpreter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,6 +44,7 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
@@ -69,6 +69,10 @@ import javax.swing.text.html.FormSubmitEvent;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+
+import tclinterpreter.TCLTokenType;
+import tclinterpreter.TclInterpreter;
+import tclinterpreter.TCLLexer;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -96,7 +100,6 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         maxRayNumberBox = getIntegerFormattedTextField(100000, 1, 10000000);
         beginColumn = getIntegerFormattedTextField(1, 1, ShadowFiles.MAX_NCOL);
         endColumn = getIntegerFormattedTextField(18, 1, ShadowFiles.MAX_NCOL);
-        interpreter = new TclInterpreter();
         initComponents();
         ButtonGroup LFGroup = new ButtonGroup();
         LFGroup.add(DefaultJRadioButtonMenuItem);
@@ -501,7 +504,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         //Showing help and reading the result
         int option = JOptionPane.showConfirmDialog(null, message, "Script", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            interpreter.setScript(scriptArea.getText());
+            interpreter=new TclInterpreter(new TCLLexer(scriptArea.getText()));
         }
 
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed
@@ -782,11 +785,11 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         int nStart, nEnd, kLen;
         try {
             String text = doc.getText(0, doc.getLength() - 1);
-            for (String keyWord : TclInterpreter.KEY_WORDS) {
-                kLen = keyWord.length();
+            for (Entry<String, TCLTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
+                kLen = keyWordEntry.getKey().length();
                 nStart = start - kLen < 0 ? 0 : start - kLen;
                 nEnd = end + kLen > doc.getLength() - 1 ? doc.getLength() - 1 : end + kLen;
-                for (int i = text.indexOf(keyWord, nStart); i != -1 && i < nEnd; i = text.indexOf(keyWord, i + kLen)) {
+                for (int i = text.indexOf(keyWordEntry.getKey(), nStart); i != -1 && i < nEnd; i = text.indexOf(keyWordEntry.getKey(), i + kLen)) {
                     scriptArea.getHighlighter().addHighlight(i, i + kLen, new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN));
                 }
             }
@@ -804,8 +807,8 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     protected void removeHighlight(JTextComponent scriptArea, int start, int end) {
         int nStart, kLen;
-        for (String keyWord : TclInterpreter.KEY_WORDS) {
-            kLen = keyWord.length();
+        for (Entry<String, TCLTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
+            kLen = keyWordEntry.getKey().length();
             nStart = start - kLen < 0 ? 0 : start - kLen;
             for (Highlighter.Highlight highlight : scriptArea.getHighlighter().getHighlights()) {
                 if (!(highlight.getStartOffset() < nStart)) {

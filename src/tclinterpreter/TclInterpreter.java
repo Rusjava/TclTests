@@ -17,6 +17,9 @@
 
 package tclinterpreter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
  * This class interpretes Tcl scripts
  *
@@ -26,37 +29,47 @@ package tclinterpreter;
 public class TclInterpreter {
 
     /**
-     * Tcl keywords
+     * A map for Tcl keywords
      */
-    public static final String[] KEY_WORDS = {"set", "unset", "puts", "expr"};
+    public static final Map<String, TCLTokenType> KEY_WORDS = new HashMap<> ();
+    
+    /**
+     * Initializing keywords map
+     */
+    static {
+        KEY_WORDS.put("set", TCLTokenType.SET);
+        KEY_WORDS.put("unset", TCLTokenType.UNSET);
+        KEY_WORDS.put("expr", TCLTokenType.EXPR);
+        KEY_WORDS.put("puts", TCLTokenType.PUTS);
+    }
 
     /**
      * Current script 
      */
-    protected String script = "";
+    protected TCLLexer lex;
     
     /**
-     * Default constructor
+     * Constructor, which sets up the interpreter with an attached lexer
+     * @param lex
      */
-    public TclInterpreter () {
+    public TclInterpreter(TCLLexer lex) {
         super();
-    }
-    
-    /**
-     * Constructor, which sets up script
-     * @param script
-     */
-    public TclInterpreter(String script) {
-        super();
-        this.script=script;
+        this.lex=lex;
+        
     }
     
     /**
      * Method, which sets up script
-     * @param script
+     * @param lex
      */
-    public void setScript (String script) {
-        this.script=script;
-        System.out.println(script);
+    public void setLex (TCLLexer lex) {
+        this.lex=lex;
+        System.out.println(lex.getScript());
+    }
+    /**
+     * Parsing the script
+     */
+    public void parse () {
+        
     }
 }
