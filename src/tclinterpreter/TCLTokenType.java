@@ -19,7 +19,7 @@ package tclinterpreter;
 /**
  * An enumeration for token types
  *
- * @author вапрол
+ * @author Ruslan Feshchenko
  * @version 0.1
  */
 public enum TCLTokenType {
@@ -42,7 +42,8 @@ public enum TCLTokenType {
     UNSET("deletion"),
     SET("assign"),
     SEMI("semicolon"),
-    NAME("name");
+    NAME("name"),
+    EOF("eof");
 
     private String value;
     /*
@@ -58,16 +59,18 @@ public enum TCLTokenType {
      *
      * @return
      */
-    public String type() {
+    public String getValue() {
         return value;
     }
     /**
      * Setting value for numbers only
      * @param v 
+     * @return  
      */
-    public void setValue(String v) {
+    public TCLTokenType setValue(String v) {
         if (this == NUMBER) {
             value = v;
         }
+        return this;
     }
 }

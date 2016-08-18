@@ -55,7 +55,7 @@ public class TCLLexer {
     /**
      * Advance position by one
      */
-    protected void advance() {
+    protected void advancePosition() {
         pos++;
         if (pos < script.length()) {
             currentchar = script.charAt(pos);
@@ -71,5 +71,61 @@ public class TCLLexer {
      */
     protected char peek() {
         return script.charAt(pos + 1);
+    }
+
+    /**
+     * Skipping white space
+     */
+    protected void skipSpace() {
+        while (Character.isWhitespace(currentchar) && currentchar != 0) {
+            advancePosition();
+        }
+    }
+    /**
+     * Reading a real number from the script
+     * @return 
+     */
+    protected String readNumber () {
+        String number="";
+                number+=currentchar;
+         /*
+          This is a number if didgit, dot and exponetial characters are present     
+         */     
+        while (Character.isDigit(currentchar) || 
+                currentchar=='.' || 
+                (Character.toLowerCase(currentchar)=='e' && 
+                (peek()=='-') || peek()=='+')) {
+            advancePosition();  
+            number+=currentchar;
+         if (Character.toLowerCase(currentchar)=='e') {
+            advancePosition();  
+            number+=currentchar; 
+         }        
+        }
+        return number;
+    }
+    
+    /**
+     * Getting the next TCL token
+     *
+     * @return
+     */
+    public TCLTokenType getToken() {
+        /*
+        Skipping any leading white space
+        */
+        if (Character.isWhitespace(currentchar)) {
+            skipSpace();
+        }
+        /*
+        What is the next token
+        */
+        if (currentchar == 0) {
+            return TCLTokenType.EOF;
+        } else if (Character.isDigit(currentchar)) {
+            advancePosition();
+            return TCLTokenType.NUMBER.setValue(readNumber());
+        }
+        return null;
     }
 }
