@@ -52,8 +52,30 @@ public class TclParser {
      */
     protected void advanceToken(TCLTokenType token) throws TclParserError {
         if (lexer.getToken() != token) {
-            throw new TclParserError ("Parser error");
+            throw new TclParserError("Parser error");
         }
+    }
+
+    /**
+     * Reading the command and creating the corresponding node
+     * 
+     * @return
+     * @throws TclParserError
+     */
+    protected TCLNodeType getCommand() throws TclParserError {
+        TCLNodeType node = TCLNodeType.COMMAND;
+        advanceToken(TCLTokenType.NAME);
+        return node;
+    }
+
+    /**
+     * Parsing the script and creating the node tree
+     *
+     * @return
+     */
+    public TCLNodeType parse() {
+        TCLNodeType node = TCLNodeType.PROGRAM;
+        return node;
     }
 
     /**
