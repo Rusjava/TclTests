@@ -51,31 +51,67 @@ public class TclParser {
      * @throws tclinterpreter.TclParser.TclParserError
      */
     protected void advanceToken(TCLTokenType token) throws TclParserError {
-        if (lexer.getToken() != token) {
+        currenttoken = lexer.getToken();
+        if (currenttoken != token) {
             throw new TclParserError("Parser error");
         }
     }
 
     /**
+     * Advancing to the next token. Returning false if wrong token
+     *
+     * @param token
+     * @return
+     */
+    protected boolean advanceAndCompareToken(TCLTokenType token) {
+        return lexer.getToken() == token;
+    }
+
+    /**
      * Reading the command and creating the corresponding node
-     * 
+     *
      * @return
      * @throws TclParserError
      */
     protected TCLNodeType getCommand() throws TclParserError {
         TCLNodeType node = TCLNodeType.COMMAND;
         advanceToken(TCLTokenType.NAME);
+        node.setValue(currenttoken.getValue());
+        while (currenttoken != TCLTokenType.EOL) {
+            try {
+                advanceToken(TCLTokenType.EOL);
+            } catch (TclParserError error) {
+                if (currenttoken == TCLTokenType.NAME) {
+                    node.getChildren().add(TCLNodeType.OPERAND.
+                            setValue(currenttoken.getValue()));
+                } else if (currenttoken == TCLTokenType.STRING) {
+                    node.getChildren().add(TCLNodeType.OPERAND.
+                            setValue(currenttoken.getValue()));
+                }
+            }
+        }
         return node;
     }
 
     /**
-     * Parsing the script and creating the node tree
+     * Parsing the script and creating the node tree consisting of commands
      *
      * @return
+     * @throws tclinterpreter.TclParser.TclParserError
      */
-    public TCLNodeType parse() {
+    public TCLNodeType parse() throws TclParserError {
         TCLNodeType node = TCLNodeType.PROGRAM;
-        return node;
+        try {
+            while (true) {
+                node.getChildren().add(getCommand());
+                advanceToken(TCLTokenType.EOL);
+            }
+        } catch (TclParserError error) {
+            if (currenttoken == TCLTokenType.EOF) {
+                return node;
+            }
+            throw error;
+        }
     }
 
     /**

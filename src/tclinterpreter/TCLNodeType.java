@@ -33,7 +33,7 @@ public enum TCLNodeType {
     COMMAND("CMD"),
     QSTRING("QS"),
     BSTRING("BS"),
-    VAR("VAR");
+    OPERAND("OP");
 
     private String value;
     private final List<TCLNodeType> children;
@@ -61,9 +61,11 @@ public enum TCLNodeType {
      * Setting the node's value
      *
      * @param value
+     * @return 
      */
-    public void setValue(String value) {
+    public TCLNodeType setValue(String value) {
         this.value = value;
+        return this;
     }
 
     /**

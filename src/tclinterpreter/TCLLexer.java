@@ -41,6 +41,11 @@ public class TCLLexer {
      * Current symbol at position of pos
      */
     protected char currentchar = 0;
+    
+    /**
+     * Flag indicating that the lexer is inside quotation
+     */
+    protected boolean qflag;
 
     /**
      * Constructor
@@ -144,8 +149,7 @@ public class TCLLexer {
      * Reading end of line symbol
      */
     protected void readEOL() {
-        while (currentchar == '\n'
-                || currentchar == '\t') {
+        while (currentchar == '\n' || currentchar == '\t') {
             advancePosition();
         }
     }
@@ -158,11 +162,13 @@ public class TCLLexer {
     protected String readString() {
         String string = "";
         string += currentchar;
-        while (currentchar != '"' && currentchar != '}') {
+        while (currentchar != '"' && currentchar != '}' && currentchar != '\n') {
             advancePosition();
-            if (currentchar !='\n' && currentchar !='\t') {
+            if ((currentchar !='\\' || peek() !='\n')
+                 && (currentchar !='\n' || retropeek() !='\\')
+                 && (currentchar !='\t' || retropeek() !='\n')   ) {
                 string += currentchar;
-            }
+            }        
         }
         return string;
     }
@@ -224,19 +230,21 @@ public class TCLLexer {
         } else if (currentchar == '}') {
             advancePosition();
             return TCLTokenType.RIGHTCURL;
-        } else if (currentchar == '"') {
+        } else if (currentchar == '"' && !qflag) {
             advancePosition();
+            qflag=true;
             return TCLTokenType.LEFTQ;
-        } else if (currentchar == '"') {
+        } else if (currentchar == '"' && qflag) {
             advancePosition();
+            qflag=false;
             return TCLTokenType.RIGHTQ;
         } else if (currentchar == ';') {
             advancePosition();
             return TCLTokenType.SEMI;
         } else if (currentchar == '\n') {
-            advancePosition();
+            readEOL();
             return TCLTokenType.EOL;
-        } else if (retropeek() == '"' || retropeek() == '{') {
+        } else if ((retropeek() == '"' && qflag) || retropeek() == '{') {
             return TCLTokenType.STRING.setValue(readString());
         }
         return null;
