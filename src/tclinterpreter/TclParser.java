@@ -72,7 +72,7 @@ public class TclParser {
      */
     protected void advanceToken(TCLTokenType token1, TCLTokenType token2) throws TclParserError {
         currenttoken = lexer.getToken();
-        if (currenttoken != token1 || currenttoken != token2) {
+        if (currenttoken != token1 && currenttoken != token2) {
             throw new TclParserError("Parser error", currenttoken);
         }
     }
@@ -101,6 +101,9 @@ public class TclParser {
             try {
                 advanceToken(TCLTokenType.EOL, TCLTokenType.SEMI);
             } catch (TclParserError error) {
+                /*
+                    A name as an operand
+                */
                 if (currenttoken == TCLTokenType.NAME) {
                     node.getChildren().add(TCLNodeType.OPERAND.
                             setValue(currenttoken.getValue()));
@@ -112,6 +115,7 @@ public class TclParser {
                         advanceToken(TCLTokenType.STRING);
                         node.getChildren().add(TCLNodeType.OPERAND.
                                 setValue(currenttoken.getValue()));
+                        advanceToken(TCLTokenType.RIGHTCURL);
                     } catch (TclParserError innererror) {
                         if (currenttoken == TCLTokenType.RIGHTCURL) {
                             node.getChildren().add(TCLNodeType.OPERAND.
@@ -120,8 +124,7 @@ public class TclParser {
                         } else {
                             throw innererror;
                         }
-                    }
-                    advanceToken(TCLTokenType.RIGHTCURL);
+                    }  
                 } else if (currenttoken == TCLTokenType.LEFTBR) {
                     advanceToken(TCLTokenType.STRING);
                 /*
@@ -132,6 +135,7 @@ public class TclParser {
                         advanceToken(TCLTokenType.STRING);
                         node.getChildren().add(TCLNodeType.OPERAND.
                                 setValue(processstring(currenttoken.getValue())));
+                        advanceToken(TCLTokenType.RIGHTQ);
                     } catch (TclParserError innererror) {
                         if (currenttoken == TCLTokenType.RIGHTQ) {
                             node.getChildren().add(TCLNodeType.OPERAND.
@@ -141,7 +145,6 @@ public class TclParser {
                             throw innererror;
                         }
                     }
-                    advanceToken(TCLTokenType.RIGHTQ);
                 } else {
                     throw error;
                 }
@@ -161,7 +164,6 @@ public class TclParser {
         try {
             while (true) {
                 node.getChildren().add(getCommand());
-                advanceToken(TCLTokenType.EOL);
             }
         } catch (TclParserError error) {
             if (currenttoken == TCLTokenType.EOF) {
