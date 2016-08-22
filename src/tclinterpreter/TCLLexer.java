@@ -197,9 +197,6 @@ public class TCLLexer {
         } else if (currentchar == '+') {
             advancePosition();
             return TCLTokenType.PLUS;
-        } else if (currentchar == '+') {
-            advancePosition();
-            return TCLTokenType.PLUS;
         } else if (currentchar == '-') {
             advancePosition();
             return TCLTokenType.MINUS;

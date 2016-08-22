@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- *An enumeration for Tcl node types
- * 
+ * An enumeration for Tcl node types
+ *
  * @author Ruslan Feshchenko
  * @version 0.1
  */
@@ -61,7 +61,7 @@ public enum TCLNodeType {
      * Setting the node's value
      *
      * @param value
-     * @return 
+     * @return
      */
     public TCLNodeType setValue(String value) {
         this.value = value;
@@ -77,4 +77,14 @@ public enum TCLNodeType {
         return children;
     }
 
+    @Override
+    public String toString() {
+        String str = "node: " + getValue() + " (";
+        List<TCLNodeType> chld = getChildren();
+        for (TCLNodeType node : chld) {
+            str += "node: " + node + "; ";
+        }
+        str += ")";
+        return str;
+    }
 }

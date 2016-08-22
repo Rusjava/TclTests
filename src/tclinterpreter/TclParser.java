@@ -28,10 +28,15 @@ public class TclParser {
      * The current Tcl token
      */
     protected TCLTokenType currenttoken;
+
+    /**
+     * The previous Tcl token
+     */
+    protected TCLTokenType previoustoken = null;
+
     /**
      * The associated TclLexer
      */
-
     protected TCLLexer lexer;
 
     /**
@@ -45,27 +50,42 @@ public class TclParser {
     }
 
     /**
-     * Advancing to the next token. Throwing and exception if wrong token
+     * Advancing to the next token. Throwing and exception if a wrong token
      *
      * @param token
      * @throws tclinterpreter.TclParser.TclParserError
      */
     protected void advanceToken(TCLTokenType token) throws TclParserError {
+        previoustoken = currenttoken;
         currenttoken = lexer.getToken();
         if (currenttoken != token) {
-            throw new TclParserError("Parser error");
+            throw new TclParserError("Parser error", currenttoken);
         }
     }
 
     /**
-     * Advancing to the next token. Returning false if wrong token
+     * Advancing to the next token. Throwing and exception if a wrong token
      *
-     * @param token
+     * @param token1
+     * @param token2
+     * @throws tclinterpreter.TclParser.TclParserError
+     */
+    protected void advanceToken(TCLTokenType token1, TCLTokenType token2) throws TclParserError {
+        currenttoken = lexer.getToken();
+        if (currenttoken != token1 || currenttoken != token2) {
+            throw new TclParserError("Parser error", currenttoken);
+        }
+    }
+
+    /**
+     * Making necessary substitutions in a quote enclosed string
+     * 
+     * @param str
      * @return
      */
-    protected boolean advanceAndCompareToken(TCLTokenType token) {
-        return lexer.getToken() == token;
-    }
+    protected String processstring (String str) {
+         return str;
+     }
 
     /**
      * Reading the command and creating the corresponding node
@@ -77,16 +97,53 @@ public class TclParser {
         TCLNodeType node = TCLNodeType.COMMAND;
         advanceToken(TCLTokenType.NAME);
         node.setValue(currenttoken.getValue());
-        while (currenttoken != TCLTokenType.EOL) {
+        while (currenttoken != TCLTokenType.EOL || currenttoken != TCLTokenType.SEMI) {
             try {
-                advanceToken(TCLTokenType.EOL);
+                advanceToken(TCLTokenType.EOL, TCLTokenType.SEMI);
             } catch (TclParserError error) {
                 if (currenttoken == TCLTokenType.NAME) {
                     node.getChildren().add(TCLNodeType.OPERAND.
                             setValue(currenttoken.getValue()));
-                } else if (currenttoken == TCLTokenType.STRING) {
-                    node.getChildren().add(TCLNodeType.OPERAND.
-                            setValue(currenttoken.getValue()));
+                /*
+                    A string in curly brackets
+                    */   
+                } else if (currenttoken == TCLTokenType.LEFTCURL) {
+                    try {
+                        advanceToken(TCLTokenType.STRING);
+                        node.getChildren().add(TCLNodeType.OPERAND.
+                                setValue(currenttoken.getValue()));
+                    } catch (TclParserError innererror) {
+                        if (currenttoken == TCLTokenType.RIGHTCURL) {
+                            node.getChildren().add(TCLNodeType.OPERAND.
+                                    setValue(""));
+                            break;
+                        } else {
+                            throw innererror;
+                        }
+                    }
+                    advanceToken(TCLTokenType.RIGHTCURL);
+                } else if (currenttoken == TCLTokenType.LEFTBR) {
+                    advanceToken(TCLTokenType.STRING);
+                /*
+                    A string in quotes
+                    */    
+                } else if (currenttoken == TCLTokenType.LEFTQ) {
+                     try {
+                        advanceToken(TCLTokenType.STRING);
+                        node.getChildren().add(TCLNodeType.OPERAND.
+                                setValue(processstring(currenttoken.getValue())));
+                    } catch (TclParserError innererror) {
+                        if (currenttoken == TCLTokenType.RIGHTQ) {
+                            node.getChildren().add(TCLNodeType.OPERAND.
+                                    setValue(""));
+                            break;
+                        } else {
+                            throw innererror;
+                        }
+                    }
+                    advanceToken(TCLTokenType.RIGHTQ);
+                } else {
+                    throw error;
                 }
             }
         }
@@ -117,18 +174,26 @@ public class TclParser {
     /**
      * A class for Tcl parser errors
      */
-    static class TclParserError extends Exception {
+    public static class TclParserError extends Exception {
 
         String message;
+        TCLTokenType token;
 
         /**
          * Constructor
          *
          * @param message
+         * @param token
          */
-        public TclParserError(String message) {
+        public TclParserError(String message, TCLTokenType token) {
             super();
             this.message = message;
+            this.token = token;
+        }
+
+        @Override
+        public String toString() {
+            return message + " (token: " + token.getValue() + ");";
         }
     }
 }
