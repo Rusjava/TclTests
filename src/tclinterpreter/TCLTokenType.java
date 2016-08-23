@@ -49,12 +49,13 @@ public enum TCLTokenType {
     EOF("eof");
 
     private String value;
+    private final String type;
     /*
      Constructor
      */
 
     private TCLTokenType(String type) {
-        this.value = type;
+        this.type = type;
     }
 
     /**
@@ -65,15 +66,20 @@ public enum TCLTokenType {
     public String getValue() {
         return value;
     }
+
     /**
      * Setting value for numbers only
-     * @param v 
-     * @return  
+     *
+     * @param v
+     * @return
      */
     public TCLTokenType setValue(String v) {
-        if (this == NUMBER || this == NAME) {
-            value = v;
-        }
+        value = v;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "TokenType: " + type + ", TokenValue: " + getValue();
     }
 }

@@ -27,7 +27,7 @@ public class TclParser {
     /**
      * The current Tcl token
      */
-    protected TCLTokenType currenttoken;
+    protected TCLTokenType currenttoken = null;
 
     /**
      * The previous Tcl token
@@ -46,7 +46,6 @@ public class TclParser {
      */
     public TclParser(TCLLexer lexer) {
         this.lexer = lexer;
-        currenttoken = lexer.getToken();
     }
 
     /**
@@ -97,7 +96,7 @@ public class TclParser {
         TCLNodeType node = TCLNodeType.COMMAND;
         advanceToken(TCLTokenType.NAME);
         node.setValue(currenttoken.getValue());
-        while (currenttoken != TCLTokenType.EOL || currenttoken != TCLTokenType.SEMI) {
+        while (currenttoken != TCLTokenType.EOL && currenttoken != TCLTokenType.SEMI) {
             try {
                 advanceToken(TCLTokenType.EOL, TCLTokenType.SEMI);
             } catch (TclParserError error) {
@@ -125,6 +124,9 @@ public class TclParser {
                             throw innererror;
                         }
                     }  
+                /*
+                    A command in brackets
+                    */    
                 } else if (currenttoken == TCLTokenType.LEFTBR) {
                     advanceToken(TCLTokenType.STRING);
                 /*

@@ -139,8 +139,8 @@ public class TCLLexer {
         while (Character.isDigit(currentchar)
                 || Character.isLetter(currentchar)
                 || currentchar == '_') {
-            advancePosition();
             name += currentchar;
+            advancePosition();    
         }
         return name;
     }
@@ -188,9 +188,7 @@ public class TCLLexer {
         /*
          What is the next token
          */
-        if (currentchar == 0) {
-            return TCLTokenType.EOF;
-        } else if (Character.isDigit(currentchar)) {
+        if (Character.isDigit(currentchar)) {
             return TCLTokenType.NUMBER.setValue(readNumber());
         } else if (Character.isLetter(currentchar) || currentchar == '_') {
             return TCLTokenType.NAME.setValue(readName());
@@ -243,6 +241,8 @@ public class TCLLexer {
             return TCLTokenType.EOL;
         } else if ((retropeek() == '"' && qflag) || retropeek() == '{') {
             return TCLTokenType.STRING.setValue(readString());
+        } else if (currentchar == 0) {
+            return TCLTokenType.EOF;
         }
         return null;
     }

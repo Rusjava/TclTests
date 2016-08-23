@@ -35,7 +35,8 @@ public enum TCLNodeType {
     BSTRING("BS"),
     OPERAND("OP");
 
-    private String value;
+    private final String type;
+    private String value = "";
     private final List<TCLNodeType> children;
 
     /**
@@ -43,8 +44,8 @@ public enum TCLNodeType {
      *
      * @param value
      */
-    private TCLNodeType(String value) {
-        this.value = value;
+    private TCLNodeType(String type) {
+        this.type = type;
         this.children = new ArrayList<>();
     }
 
@@ -79,10 +80,10 @@ public enum TCLNodeType {
 
     @Override
     public String toString() {
-        String str = "node: " + getValue() + " (";
+        String str = "nodeType: " + type + ", " + "nodeValue: " + getValue() + " (";
         List<TCLNodeType> chld = getChildren();
         for (TCLNodeType node : chld) {
-            str += "node: " + node + "; ";
+            str += node + "; ";
         }
         str += ")";
         return str;
