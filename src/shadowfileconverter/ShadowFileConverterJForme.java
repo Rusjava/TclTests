@@ -70,7 +70,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
-import tclinterpreter.TCLTokenType;
+import tclinterpreter.TclTokenType;
 import tclinterpreter.TclInterpreter;
 import tclinterpreter.TCLLexer;
 
@@ -785,7 +785,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         int nStart, nEnd, kLen;
         try {
             String text = doc.getText(0, doc.getLength() - 1);
-            for (Entry<String, TCLTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
+            for (Entry<String, TclTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
                 kLen = keyWordEntry.getKey().length();
                 nStart = start - kLen < 0 ? 0 : start - kLen;
                 nEnd = end + kLen > doc.getLength() - 1 ? doc.getLength() - 1 : end + kLen;
@@ -807,7 +807,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     protected void removeHighlight(JTextComponent scriptArea, int start, int end) {
         int nStart, kLen;
-        for (Entry<String, TCLTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
+        for (Entry<String, TclTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
             kLen = keyWordEntry.getKey().length();
             nStart = start - kLen < 0 ? 0 : start - kLen;
             for (Highlighter.Highlight highlight : scriptArea.getHighlighter().getHighlights()) {

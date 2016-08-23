@@ -174,11 +174,11 @@ public class TCLLexer {
     }
 
     /**
-     * Getting the next TCL token
+     * Getting the next Tcl token
      *
      * @return
      */
-    public TCLTokenType getToken() {
+    public TclToken getToken() {
         /*
          Skipping any leading white space
          */
@@ -189,60 +189,60 @@ public class TCLLexer {
          What is the next token
          */
         if (Character.isDigit(currentchar)) {
-            return TCLTokenType.NUMBER.setValue(readNumber());
+            return new TclToken(TclTokenType.REALNUMBER).setValue(readNumber());
         } else if (Character.isLetter(currentchar) || currentchar == '_') {
-            return TCLTokenType.NAME.setValue(readName());
+            return new TclToken(TclTokenType.NAME).setValue(readName());
         } else if (currentchar == '+') {
             advancePosition();
-            return TCLTokenType.PLUS;
+            return new TclToken(TclTokenType.PLUS);
         } else if (currentchar == '-') {
             advancePosition();
-            return TCLTokenType.MINUS;
+            return new TclToken(TclTokenType.MINUS);
         } else if (currentchar == '*') {
             advancePosition();
-            return TCLTokenType.MUL;
+            return new TclToken(TclTokenType.MUL);
         } else if (currentchar == '/') {
             advancePosition();
-            return TCLTokenType.DIV;
+            return new TclToken(TclTokenType.DIV);
         } else if (currentchar == '(') {
             advancePosition();
-            return TCLTokenType.LEFTPAR;
+            return new TclToken(TclTokenType.LEFTPAR);
         } else if (currentchar == ')') {
             advancePosition();
-            return TCLTokenType.RIGHTPAR;
+            return new TclToken(TclTokenType.RIGHTPAR);
         } else if (currentchar == '[') {
             advancePosition();
-            return TCLTokenType.LEFTBR;
+            return new TclToken(TclTokenType.LEFTBR);
         } else if (currentchar == ']') {
             advancePosition();
-            return TCLTokenType.RIGHTBR;
+            return new TclToken(TclTokenType.RIGHTBR);
         } else if (currentchar == '+') {
             advancePosition();
-            return TCLTokenType.PLUS;
+            return new TclToken(TclTokenType.PLUS);
         } else if (currentchar == '{') {
             advancePosition();
-            return TCLTokenType.LEFTCURL;
+            return new TclToken(TclTokenType.LEFTCURL);
         } else if (currentchar == '}') {
             advancePosition();
-            return TCLTokenType.RIGHTCURL;
+            return new TclToken(TclTokenType.RIGHTCURL);
         } else if (currentchar == '"' && !qflag) {
             advancePosition();
             qflag=true;
-            return TCLTokenType.LEFTQ;
+            return new TclToken(TclTokenType.LEFTQ);
         } else if (currentchar == '"' && qflag) {
             advancePosition();
             qflag=false;
-            return TCLTokenType.RIGHTQ;
+            return new TclToken(TclTokenType.RIGHTQ);
         } else if (currentchar == ';') {
             advancePosition();
-            return TCLTokenType.SEMI;
+            return new TclToken(TclTokenType.SEMI);
         } else if (currentchar == '\n') {
             readEOL();
-            return TCLTokenType.EOL;
+            return new TclToken(TclTokenType.EOL);
         } else if ((retropeek() == '"' && qflag) || retropeek() == '{') {
-            return TCLTokenType.STRING.setValue(readString());
+            return new TclToken(TclTokenType.STRING).setValue(readString());
         } else if (currentchar == 0) {
-            return TCLTokenType.EOF;
+            return new TclToken(TclTokenType.EOF);
         }
         return null;
     }

@@ -31,16 +31,16 @@ public class TclInterpreter {
     /**
      * A map for Tcl keywords
      */
-    public static final Map<String, TCLTokenType> KEY_WORDS = new HashMap<> ();
+    public static final Map<String, TclTokenType> KEY_WORDS = new HashMap<> ();
     
     /**
      * Initializing keywords map
      */
     static {
-        KEY_WORDS.put("set", TCLTokenType.SET);
-        KEY_WORDS.put("unset", TCLTokenType.UNSET);
-        KEY_WORDS.put("expr", TCLTokenType.EXPR);
-        KEY_WORDS.put("puts", TCLTokenType.PUTS);
+        KEY_WORDS.put("set", TclTokenType.SET);
+        KEY_WORDS.put("unset", TclTokenType.UNSET);
+        KEY_WORDS.put("expr", TclTokenType.EXPR);
+        KEY_WORDS.put("puts", TclTokenType.PUTS);
     }
 
     /**
