@@ -46,6 +46,7 @@ public enum TclTokenType {
     EOL("\n"),
     DOLLAR("$"),
     STRING("STR"),
+    WHITESPACE("SPACE"),
     EOF("eof");
     
     private final String type;

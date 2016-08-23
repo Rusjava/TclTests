@@ -180,22 +180,34 @@ public class TclLexer {
      */
     public TclToken getToken() {
         /*
-         Skipping any leading white space
-         */
-        if (Character.isWhitespace(currentchar)) {
-            skipSpace();
-        }
-        /*
          What is the next token
          */
-        if (Character.isDigit(currentchar)) {
+        if (Character.isWhitespace(currentchar)) {
+            /*
+            Skipping whitespace and returning the whitespace token
+            */
+            skipSpace();
+            return new TclToken(TclTokenType.WHITESPACE);
+        } else if (Character.isDigit(currentchar)) {
+            /*
+            Returning the real number token
+            */
             return new TclToken(TclTokenType.REALNUMBER).setValue(readNumber());
         } else if (Character.isLetter(currentchar) || currentchar == '_') {
+            /*
+            Returning the name token
+            */
             return new TclToken(TclTokenType.NAME).setValue(readName());
         } else if (currentchar == '+') {
+            /*
+            Returning the plus op token
+            */
             advancePosition();
             return new TclToken(TclTokenType.PLUS);
         } else if (currentchar == '-') {
+            /*
+            Returning the minus op token
+            */
             advancePosition();
             return new TclToken(TclTokenType.MINUS);
         } else if (currentchar == '*') {
