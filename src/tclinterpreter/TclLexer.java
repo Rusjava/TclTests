@@ -41,7 +41,7 @@ public class TclLexer {
      * Current symbol at position of pos
      */
     protected char currentchar = 0;
-    
+
     /**
      * Flag indicating that the lexer is inside quotation
      */
@@ -140,7 +140,7 @@ public class TclLexer {
                 || Character.isLetter(currentchar)
                 || currentchar == '_') {
             name += currentchar;
-            advancePosition();    
+            advancePosition();
         }
         return name;
     }
@@ -155,20 +155,20 @@ public class TclLexer {
     }
 
     /**
-     * Reading the string between quotes of curly braces with ends of lines skipped
+     * Reading the string between quotes of curly braces with ends of lines
+     * skipped
      *
      * @return
      */
     protected String readString() {
         String string = "";
-        string += currentchar;
-        while (currentchar != '"' && currentchar != '}' && currentchar != '\n') {
-            advancePosition();
-            if ((currentchar !='\\' || peek() !='\n')
-                 && (currentchar !='\n' || retropeek() !='\\')
-                 && (currentchar !='\t' || retropeek() !='\n')   ) {
+        while (currentchar != '"' && currentchar != '}') {
+            if ((currentchar != '\\' || peek() != '\n')
+                    && (currentchar != '\n' || retropeek() != '\\')
+                    && (currentchar != '\t' || retropeek() != '\n')) {
                 string += currentchar;
-            }        
+            }
+            advancePosition();
         }
         return string;
     }
@@ -182,32 +182,21 @@ public class TclLexer {
         /*
          What is the next token
          */
-        if (Character.isWhitespace(currentchar)) {
+        if (Character.isDigit(currentchar)) {
             /*
-            Skipping whitespace and returning the whitespace token
-            */
-            skipSpace();
-            return new TclToken(TclTokenType.WHITESPACE);
-        } else if (Character.isDigit(currentchar)) {
-            /*
-            Returning the real number token
-            */
+             Returning a real number token
+             */
             return new TclToken(TclTokenType.REALNUMBER).setValue(readNumber());
-        } else if (Character.isLetter(currentchar) || currentchar == '_') {
-            /*
-            Returning the name token
-            */
-            return new TclToken(TclTokenType.NAME).setValue(readName());
         } else if (currentchar == '+') {
             /*
-            Returning the plus op token
-            */
+             Returning a plus op token
+             */
             advancePosition();
             return new TclToken(TclTokenType.PLUS);
         } else if (currentchar == '-') {
             /*
-            Returning the minus op token
-            */
+             Returning a minus op token
+             */
             advancePosition();
             return new TclToken(TclTokenType.MINUS);
         } else if (currentchar == '*') {
@@ -239,11 +228,11 @@ public class TclLexer {
             return new TclToken(TclTokenType.RIGHTCURL);
         } else if (currentchar == '"' && !qflag) {
             advancePosition();
-            qflag=true;
+            qflag = true;
             return new TclToken(TclTokenType.LEFTQ);
         } else if (currentchar == '"' && qflag) {
             advancePosition();
-            qflag=false;
+            qflag = false;
             return new TclToken(TclTokenType.RIGHTQ);
         } else if (currentchar == ';') {
             advancePosition();
@@ -251,8 +240,22 @@ public class TclLexer {
         } else if (currentchar == '\n') {
             readEOL();
             return new TclToken(TclTokenType.EOL);
+        } else if (Character.isWhitespace(currentchar)) {
+            /*
+             Skipping whitespace and returning a whitespace token
+             */
+            skipSpace();
+            return new TclToken(TclTokenType.WHITESPACE);
         } else if ((retropeek() == '"' && qflag) || retropeek() == '{') {
+            /*
+             Reading and returning a string of symbols
+             */
             return new TclToken(TclTokenType.STRING).setValue(readString());
+        } else if (Character.isLetter(currentchar) || currentchar == '_') {
+            /*
+             Returning a name token
+             */
+            return new TclToken(TclTokenType.NAME).setValue(readName());
         } else if (currentchar == 0) {
             return new TclToken(TclTokenType.EOF);
         }

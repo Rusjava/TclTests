@@ -58,21 +58,24 @@ public class TclParser {
         previoustoken = currenttoken;
         currenttoken = lexer.getToken();
         if (currenttoken.type != type) {
-            throw new TclParserError("Parser error", currenttoken);
+            throw new TclParserError("Parser error", currenttoken.type, type);
         }
     }
 
     /**
      * Advancing to the next token. Throwing and exception if a wrong token
      *
-     * @param type1
-     * @param type2
+     * @param types
      * @throws tclinterpreter.TclParser.TclParserError
      */
-    protected void advanceToken(TclTokenType type1, TclTokenType type2) throws TclParserError {
+    protected void advanceToken(TclTokenType[] types) throws TclParserError {
         currenttoken = lexer.getToken();
-        if (currenttoken.type != type1 && currenttoken.type != type2) {
-            throw new TclParserError("Parser error", currenttoken);
+        boolean flag = true;
+        for (TclTokenType type : types) {
+            flag = flag && currenttoken.type != type;
+        }
+        if (flag) {
+            throw new TclParserError("Parser error", currenttoken.type, types[0]);
         }
     }
 
@@ -94,70 +97,74 @@ public class TclParser {
      */
     protected TclNode getCommand() throws TclParserError {
         TclNode node = new TclNode(TclNodeType.COMMAND);
-        advanceToken(TclTokenType.NAME, TclTokenType.WHITESPACE);
-        if (currenttoken.type == TclTokenType.WHITESPACE) {
+        advanceToken(new TclTokenType[]{TclTokenType.NAME, TclTokenType.WHITESPACE, TclTokenType.EOL});
+        if (currenttoken.type != TclTokenType.NAME) {
+            advanceToken(new TclTokenType[]{TclTokenType.NAME, TclTokenType.WHITESPACE});
+        }
+        if (currenttoken.type != TclTokenType.NAME) {
             advanceToken(TclTokenType.NAME);
         }
         node.setValue(currenttoken.getValue());
-        while (currenttoken.type != TclTokenType.EOL && currenttoken.type != TclTokenType.SEMI) {
-            try {
-                /*
-                 Skipping whitespace
-                 */
-                advanceToken(TclTokenType.WHITESPACE);
-            } catch (TclParserError error) {
-                /*
-                 A name as an operand
-                 */
-                if (currenttoken.type == TclTokenType.NAME) {
-                    node.getChildren().add(new TclNode(TclNodeType.OPERAND).
-                            setValue(currenttoken.getValue()));
+
+        try {
+            /*
+             Getting operands
+             */
+            while (true) {
+                try {
                     /*
-                     A string in curly brackets
+                     Skipping whitespace
                      */
-                } else if (currenttoken.type == TclTokenType.LEFTCURL) {
-                    try {
-                        advanceToken(TclTokenType.STRING);
+                    advanceToken(TclTokenType.WHITESPACE);
+                } catch (TclParserError error) {
+                    if (currenttoken.type == TclTokenType.NAME) {
+                        /*
+                         A name as an operand
+                         */
                         node.getChildren().add(new TclNode(TclNodeType.OPERAND).
                                 setValue(currenttoken.getValue()));
-                        advanceToken(TclTokenType.RIGHTCURL);
-                    } catch (TclParserError innererror) {
-                        if (currenttoken.type == TclTokenType.RIGHTCURL) {
+                    } else if (currenttoken.type == TclTokenType.LEFTCURL) {
+                        /*
+                         A string in curly brackets
+                         */
+                        advanceToken(new TclTokenType[]{TclTokenType.STRING, TclTokenType.RIGHTCURL});
+                        if (currenttoken.type == TclTokenType.STRING) {
+                            node.getChildren().add(new TclNode(TclNodeType.OPERAND).
+                                    setValue(currenttoken.getValue()));
+                            advanceToken(TclTokenType.RIGHTCURL);
+                        } else {
                             node.getChildren().add(new TclNode(TclNodeType.OPERAND).
                                     setValue(""));
-                            break;
-                        } else {
-                            throw innererror;
                         }
-                    }
-                    /*
-                     A command in brackets
-                     */
-                } else if (currenttoken.type == TclTokenType.LEFTBR) {
-                    advanceToken(TclTokenType.STRING);
-                    /*
-                     A string in quotes
-                     */
-                } else if (currenttoken.type == TclTokenType.LEFTQ) {
-                    try {
+                    } else if (currenttoken.type == TclTokenType.LEFTBR) {
+                        /*
+                         A command in brackets
+                         */
                         advanceToken(TclTokenType.STRING);
-                        node.getChildren().add(new TclNode(TclNodeType.OPERAND).
-                                setValue(processstring(currenttoken.getValue())));
-                        advanceToken(TclTokenType.RIGHTQ);
-                    } catch (TclParserError innererror) {
-                        if (currenttoken.type == TclTokenType.RIGHTQ) {
+
+                    } else if (currenttoken.type == TclTokenType.LEFTQ) {
+                        /*
+                         A string in quotes
+                         */
+                        advanceToken(new TclTokenType[]{TclTokenType.STRING, TclTokenType.RIGHTQ});
+                        if (currenttoken.type == TclTokenType.STRING) {
+                            node.getChildren().add(new TclNode(TclNodeType.OPERAND).
+                                    setValue(processstring(currenttoken.getValue())));
+                            advanceToken(TclTokenType.RIGHTQ);
+                        } else {
                             node.getChildren().add(new TclNode(TclNodeType.OPERAND).
                                     setValue(""));
-                            break;
-                        } else {
-                            throw innererror;
                         }
+                    } else {
+                        throw error;
                     }
-                } else if (currenttoken.type == TclTokenType.EOL || currenttoken.type == TclTokenType.SEMI) {
-
-                } else {
-                    throw error;
                 }
+            }
+        } catch (TclParserError outererror) {
+            if (currenttoken.type == TclTokenType.EOL || currenttoken.type == TclTokenType.SEMI) {
+
+            } else {
+                throw outererror;
             }
         }
         return node;
@@ -189,23 +196,25 @@ public class TclParser {
     public static class TclParserError extends Exception {
 
         String message;
-        TclToken token;
+        TclTokenType ctokentype, etokentype;
 
         /**
          * Constructor
          *
          * @param message
-         * @param token
+         * @param ctokentype
+         * @param etokentype
          */
-        public TclParserError(String message, TclToken token) {
+        public TclParserError(String message, TclTokenType ctokentype, TclTokenType etokentype) {
             super();
             this.message = message;
-            this.token = token;
+            this.ctokentype = ctokentype;
+            this.etokentype = etokentype;
         }
 
         @Override
         public String toString() {
-            return message + " (token: " + token.type + ");";
+            return message + ", Found " + ctokentype + ", Expected " + etokentype;
         }
     }
 }
