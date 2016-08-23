@@ -5,9 +5,13 @@
  */
 package tcltests;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import tclinterpreter.*;
+
 /**
  *
- * @author вапрол
+ * @author Samsung
  */
 public class TclTests {
 
@@ -16,6 +20,12 @@ public class TclTests {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        TclParser parser = new TclParser(new TCLLexer("set name1 n45;"));
+        try {
+            System.out.println(parser.parse());
+        } catch (TclParser.TclParserError ex) {
+            Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
 }
