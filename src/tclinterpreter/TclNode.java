@@ -31,7 +31,7 @@ public class TclNode {
     /**
      * The node type
      */
-    public TCLNodeType type;
+    public TclNodeType type;
 
     /**
      * The string value for the node
@@ -47,7 +47,7 @@ public class TclNode {
      * Constructor
      * @param type
      */
-    public TclNode (TCLNodeType type) {
+    public TclNode (TclNodeType type) {
         this.type=type;
         this.children = new ArrayList<>();
     }

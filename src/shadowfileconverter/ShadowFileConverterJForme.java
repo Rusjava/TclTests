@@ -72,7 +72,7 @@ import javax.swing.undo.UndoManager;
 
 import tclinterpreter.TclTokenType;
 import tclinterpreter.TclInterpreter;
-import tclinterpreter.TCLLexer;
+import tclinterpreter.TclLexer;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -504,7 +504,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         //Showing help and reading the result
         int option = JOptionPane.showConfirmDialog(null, message, "Script", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            interpreter=new TclInterpreter(new TCLLexer(scriptArea.getText()));
+            interpreter=new TclInterpreter(new TclLexer(scriptArea.getText()));
         }
 
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed

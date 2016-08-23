@@ -46,13 +46,13 @@ public class TclInterpreter {
     /**
      * Current script 
      */
-    protected TCLLexer lex;
+    protected TclLexer lex;
     
     /**
      * Constructor, which sets up the interpreter with an attached lexer
      * @param lex
      */
-    public TclInterpreter(TCLLexer lex) {
+    public TclInterpreter(TclLexer lex) {
         super();
         this.lex=lex;
         
@@ -62,7 +62,7 @@ public class TclInterpreter {
      * Method, which sets up script
      * @param lex
      */
-    public void setLex (TCLLexer lex) {
+    public void setLex (TclLexer lex) {
         this.lex=lex;
         System.out.println(lex.getScript());
     }
