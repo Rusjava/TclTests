@@ -16,9 +16,6 @@
  */
 package tclinterpreter;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * An enumeration for Tcl node types
  *
@@ -36,8 +33,6 @@ public enum TCLNodeType {
     OPERAND("OP");
 
     private final String type;
-    private String value = "";
-    private final List<TCLNodeType> children;
 
     /**
      * Constructor
@@ -46,46 +41,10 @@ public enum TCLNodeType {
      */
     private TCLNodeType(String type) {
         this.type = type;
-        this.children = new ArrayList<>();
-    }
-
-    /**
-     * Returning value of the node
-     *
-     * @return
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Setting the node's value
-     *
-     * @param value
-     * @return
-     */
-    public TCLNodeType setValue(String value) {
-        this.value = value;
-        return this;
-    }
-
-    /**
-     * Returning a list with node's children
-     *
-     * @return
-     */
-    public List getChildren() {
-        return children;
     }
 
     @Override
     public String toString() {
-        String str = "nodeType: " + type + ", " + "nodeValue: " + getValue() + " (";
-        List<TCLNodeType> chld = getChildren();
-        for (TCLNodeType node : chld) {
-            str += node + "; ";
-        }
-        str += ")";
-        return str;
+        return "NodeType: " + type;
     }
 }

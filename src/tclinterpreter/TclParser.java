@@ -92,8 +92,8 @@ public class TclParser {
      * @return
      * @throws TclParserError
      */
-    protected TCLNodeType getCommand() throws TclParserError {
-        TCLNodeType node = TCLNodeType.COMMAND;
+    protected TclNode getCommand() throws TclParserError {
+        TclNode node = new TclNode(TCLNodeType.COMMAND);
         advanceToken(TclTokenType.NAME);
         node.setValue(currenttoken.getValue());
         while (currenttoken.type != TclTokenType.EOL && currenttoken.type != TclTokenType.SEMI) {
@@ -104,7 +104,7 @@ public class TclParser {
                     A name as an operand
                 */
                 if (currenttoken.type == TclTokenType.NAME) {
-                    node.getChildren().add(TCLNodeType.OPERAND.
+                    node.getChildren().add(new TclNode(TCLNodeType.OPERAND).
                             setValue(currenttoken.getValue()));
                 /*
                     A string in curly brackets
@@ -112,12 +112,12 @@ public class TclParser {
                 } else if (currenttoken.type == TclTokenType.LEFTCURL) {
                     try {
                         advanceToken(TclTokenType.STRING);
-                        node.getChildren().add(TCLNodeType.OPERAND.
+                        node.getChildren().add(new TclNode(TCLNodeType.OPERAND).
                                 setValue(currenttoken.getValue()));
                         advanceToken(TclTokenType.RIGHTCURL);
                     } catch (TclParserError innererror) {
                         if (currenttoken.type == TclTokenType.RIGHTCURL) {
-                            node.getChildren().add(TCLNodeType.OPERAND.
+                            node.getChildren().add(new TclNode(TCLNodeType.OPERAND).
                                     setValue(""));
                             break;
                         } else {
@@ -135,12 +135,12 @@ public class TclParser {
                 } else if (currenttoken.type == TclTokenType.LEFTQ) {
                      try {
                         advanceToken(TclTokenType.STRING);
-                        node.getChildren().add(TCLNodeType.OPERAND.
+                        node.getChildren().add(new TclNode(TCLNodeType.OPERAND).
                                 setValue(processstring(currenttoken.getValue())));
                         advanceToken(TclTokenType.RIGHTQ);
                     } catch (TclParserError innererror) {
                         if (currenttoken.type == TclTokenType.RIGHTQ) {
-                            node.getChildren().add(TCLNodeType.OPERAND.
+                            node.getChildren().add(new TclNode(TCLNodeType.OPERAND).
                                     setValue(""));
                             break;
                         } else {
@@ -161,8 +161,8 @@ public class TclParser {
      * @return
      * @throws tclinterpreter.TclParser.TclParserError
      */
-    public TCLNodeType parse() throws TclParserError {
-        TCLNodeType node = TCLNodeType.PROGRAM;
+    public TclNode parse() throws TclParserError {
+        TclNode node = new TclNode(TCLNodeType.PROGRAM);
         try {
             while (true) {
                 node.getChildren().add(getCommand());
