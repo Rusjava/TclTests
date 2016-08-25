@@ -1,8 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Ruslan Feshchenko
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package tcltests;
 
 import java.util.logging.Level;
@@ -11,7 +23,8 @@ import tclinterpreter.*;
 
 /**
  *
- * @author Samsung
+ * @author Ruslan Feshchenko
+ * @version 0.1
  */
 public class TclTests {
 
@@ -20,7 +33,7 @@ public class TclTests {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        TclParser parser = new TclParser(new TclLexer("set name1 n45; set name2 n450;"));
+        TclParser parser = new TclParser(new TclLexer("set name1 n45;\n\t set name2 \"gh \\\n\t n450\";"));
         try {
             System.out.println(parser.parse());
         } catch (TclParser.TclParserError ex) {
