@@ -155,6 +155,15 @@ public class TclLexer {
     }
 
     /**
+     * Skipping end of line and whitespace after slash
+     */
+    protected void skipEOL() {
+        do {
+            advancePosition();
+        } while (Character.isWhitespace(currentchar));
+    }
+
+    /**
      * Reading the string between quotes of curly braces with ends of lines
      * skipped
      *
@@ -162,12 +171,11 @@ public class TclLexer {
      */
     protected String readString() {
         String string = "";
-        while (currentchar != '"' && currentchar != '}') {
-            if ((currentchar != '\\' || peek() != '\n')
-                    && (currentchar != '\n' || retropeek() != '\\')
-                    && (currentchar != '\t' || retropeek() != '\n')) {
-                string += currentchar;
+        while ((currentchar != '"' || !qflag) && (currentchar != '}' || qflag)) {
+            if (currentchar == '\\' && peek() == '\n') {
+                skipEOL();
             }
+            string += currentchar;
             advancePosition();
         }
         return string;
@@ -182,6 +190,12 @@ public class TclLexer {
         /*
          What is the next token
          */
+        if (currentchar == '\\' && peek() == '\n') {
+            /*
+             Skipping escape end of line
+             */
+            skipEOL();
+        }
         if (Character.isDigit(currentchar)) {
             /*
              Returning a real number token
@@ -200,44 +214,77 @@ public class TclLexer {
             advancePosition();
             return new TclToken(TclTokenType.MINUS);
         } else if (currentchar == '*') {
+            /*
+             Returning a multiplication op token
+             */
             advancePosition();
             return new TclToken(TclTokenType.MUL);
         } else if (currentchar == '/') {
+            /*
+             Returning a division op token
+             */
             advancePosition();
             return new TclToken(TclTokenType.DIV);
         } else if (currentchar == '(') {
+            /*
+             Returning a left paranthesis op token
+             */
             advancePosition();
             return new TclToken(TclTokenType.LEFTPAR);
         } else if (currentchar == ')') {
+            /*
+             Returning a right paranthesis op token
+             */
             advancePosition();
             return new TclToken(TclTokenType.RIGHTPAR);
         } else if (currentchar == '[') {
+            /*
+             Returning a left bracket token
+             */
             advancePosition();
             return new TclToken(TclTokenType.LEFTBR);
         } else if (currentchar == ']') {
+            /*
+             Returning a right bracket token
+             */
             advancePosition();
             return new TclToken(TclTokenType.RIGHTBR);
-        } else if (currentchar == '+') {
-            advancePosition();
-            return new TclToken(TclTokenType.PLUS);
         } else if (currentchar == '{') {
+            /*
+             Returning a left brace token
+             */
             advancePosition();
             return new TclToken(TclTokenType.LEFTCURL);
         } else if (currentchar == '}') {
+            /*
+             Returning a right brace token
+             */
             advancePosition();
             return new TclToken(TclTokenType.RIGHTCURL);
         } else if (currentchar == '"' && !qflag) {
+            /*
+             Returning a left quote token
+             */
             advancePosition();
             qflag = true;
             return new TclToken(TclTokenType.LEFTQ);
         } else if (currentchar == '"' && qflag) {
+            /*
+             Returning a right quote token
+             */
             advancePosition();
             qflag = false;
             return new TclToken(TclTokenType.RIGHTQ);
         } else if (currentchar == ';') {
+            /*
+             Returning a semi-colon token
+             */
             advancePosition();
             return new TclToken(TclTokenType.SEMI);
         } else if (currentchar == '\n') {
+            /*
+             Returning an end of line token
+             */
             readEOL();
             return new TclToken(TclTokenType.EOL);
         } else if (Character.isWhitespace(currentchar)) {
@@ -257,6 +304,9 @@ public class TclLexer {
              */
             return new TclToken(TclTokenType.NAME).setValue(readName());
         } else if (currentchar == 0) {
+            /*
+             Returning an end of file token
+             */
             return new TclToken(TclTokenType.EOF);
         }
         return null;

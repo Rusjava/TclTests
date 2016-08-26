@@ -177,7 +177,7 @@ public class TclParser {
      * @throws tclinterpreter.TclParser.TclParserError
      */
     public TclNode parse() throws TclParserError {
-        TclNode node = new TclNode(TclNodeType.PROGRAM);
+        TclNode node = new TclNode(TclNodeType.PROGRAM).setValue("test script");
         try {
             while (true) {
                 node.getChildren().add(getCommand());

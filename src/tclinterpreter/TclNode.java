@@ -77,7 +77,7 @@ public class TclNode {
      *
      * @return
      */
-    public List getChildren() {
+    public List<TclNode> getChildren() {
         return children;
     }
 

@@ -47,6 +47,7 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CancellationException;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -73,6 +74,8 @@ import javax.swing.undo.UndoManager;
 import tclinterpreter.TclTokenType;
 import tclinterpreter.TclInterpreter;
 import tclinterpreter.TclLexer;
+import tclinterpreter.TclNode;
+import tclinterpreter.TclParser;
 
 /*
  * The program converts binary Shadow ray files to text files and
@@ -504,7 +507,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         //Showing help and reading the result
         int option = JOptionPane.showConfirmDialog(null, message, "Script", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            interpreter=new TclInterpreter(new TclLexer(scriptArea.getText()));
+            interpreter=new TclInterpreter(new TclParser(new TclLexer(scriptArea.getText())));
         }
 
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed
@@ -785,7 +788,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         int nStart, nEnd, kLen;
         try {
             String text = doc.getText(0, doc.getLength() - 1);
-            for (Entry<String, TclTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
+            for (Entry<String, Consumer<TclNode>> keyWordEntry: TclInterpreter.COMMANDS.entrySet()) {
                 kLen = keyWordEntry.getKey().length();
                 nStart = start - kLen < 0 ? 0 : start - kLen;
                 nEnd = end + kLen > doc.getLength() - 1 ? doc.getLength() - 1 : end + kLen;
@@ -807,7 +810,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
      */
     protected void removeHighlight(JTextComponent scriptArea, int start, int end) {
         int nStart, kLen;
-        for (Entry<String, TclTokenType> keyWordEntry: TclInterpreter.KEY_WORDS.entrySet()) {
+        for (Entry<String, Consumer<TclNode>> keyWordEntry: TclInterpreter.COMMANDS.entrySet()) {
             kLen = keyWordEntry.getKey().length();
             nStart = start - kLen < 0 ? 0 : start - kLen;
             for (Highlighter.Highlight highlight : scriptArea.getHighlighter().getHighlights()) {

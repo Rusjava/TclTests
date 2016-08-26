@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package tclinterpreter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 /*
  * This class interpretes Tcl scripts
@@ -31,45 +33,130 @@ public class TclInterpreter {
     /**
      * A map for Tcl keywords
      */
-    public static final Map<String, TclTokenType> KEY_WORDS = new HashMap<> ();
-    
+    public static final Map<String, Consumer<TclNode>> COMMANDS = new HashMap<>();
+
+    /**
+     * A map for variables
+     */
+    protected final Map<String, String> VARS = new HashMap<>();
+
+    /**
+     * A string for the script output
+     */
+    protected StringBuilder output = new StringBuilder("Tcl> ");
+
     /**
      * Initializing keywords map
      */
-    static {
-        KEY_WORDS.put("set", TclTokenType.SET);
-        KEY_WORDS.put("unset", TclTokenType.UNSET);
-        KEY_WORDS.put("expr", TclTokenType.EXPR);
-        KEY_WORDS.put("puts", TclTokenType.PUTS);
+    {
+        /*
+         'Set' command definition
+         */
+        COMMANDS.put("set", node -> {
+            String key;
+            try {
+                key = VARS.keySet().stream().filter(cmd -> {
+                    return cmd.equals(node.getChildren().get(0).getValue());
+                }).findFirst().get();
+            } catch (NoSuchElementException ex) {
+                VARS.put(node.getChildren().get(0).getValue(), node.getChildren().get(1).getValue());
+                return;
+            }
+            VARS.replace(key, node.getChildren().get(1).getValue());
+
+        });
+        /*
+         'Unset' command definition
+         */
+        COMMANDS.put("unset", node -> {
+            String key;
+            try {
+                key = VARS.keySet().stream().filter(cmd -> {
+                    return cmd.equals(node.getChildren().get(0).getValue());
+                }).findFirst().get();
+            } catch (NoSuchElementException ex) {
+                return;
+            }
+            VARS.remove(key); 
+        });
+
+        /*
+         'Puts' command definition
+         */
+        COMMANDS.put("puts", node -> {
+            output.append("Tcl> ").append(
+                    VARS.get(VARS.keySet().stream().filter(cmd -> {
+                        return cmd.equals(node.getChildren().get(0).getValue());
+                    }).findFirst().get()));
+        });
     }
 
     /**
-     * Current script 
+     * Current parser
      */
-    protected TclLexer lex;
-    
+    protected TclParser parser;
+
     /**
-     * Constructor, which sets up the interpreter with an attached lexer
-     * @param lex
+     * Constructor, which sets up the interpreter with an attached parser
+     *
+     * @param parser
      */
-    public TclInterpreter(TclLexer lex) {
+    public TclInterpreter(TclParser parser) {
         super();
-        this.lex=lex;
-        
+        this.parser = parser;
     }
-    
+
+    /**
+     * Executing a Tcl command
+     *
+     * @param command
+     */
+    protected void executeCommand(TclNode command) {
+        COMMANDS.get(COMMANDS.keySet().stream().filter(cmd -> {
+            return cmd.equals(command.getValue());
+        }).findFirst().get()).accept(command);
+    }
+
     /**
      * Method, which sets up script
-     * @param lex
+     *
+     * @param parser
      */
-    public void setLex (TclLexer lex) {
-        this.lex=lex;
-        System.out.println(lex.getScript());
+    public void setParser(TclParser parser) {
+        this.parser = parser;
     }
+
     /**
-     * Parsing the script
+     * Returning Tcl parser used
+     *
+     * @return
      */
-    public void parse () {
-        
+    public TclParser getParser() {
+        return parser;
+    }
+
+    /**
+     * Running the script
+     *
+     * @return
+     * @throws tclinterpreter.TclParser.TclParserError
+     */
+    public String run() throws TclParser.TclParserError {
+        TclNode root = parser.parse();
+        List<TclNode> chld = root.getChildren();
+        output.append("Executing ").append(root.getValue()).append("\n");
+        for (TclNode node : chld) {
+            executeCommand(node);
+        }
+        return output.toString();
+    }
+
+    /**
+     * Getting the script output string
+     *
+     * @return
+     */
+    public String getOutput() {
+        return output.toString();
     }
 }
