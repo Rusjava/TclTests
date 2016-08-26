@@ -68,7 +68,7 @@ public class TclParser {
      * @param types
      * @throws tclinterpreter.TclParser.TclParserError
      */
-    protected void advanceToken(TclTokenType[] types) throws TclParserError {
+    protected void advanceToken(TclTokenType... types) throws TclParserError {
         currenttoken = lexer.getToken();
         boolean flag = true;
         for (TclTokenType type : types) {

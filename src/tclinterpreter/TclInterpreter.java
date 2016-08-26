@@ -84,6 +84,7 @@ public class TclInterpreter {
          'Puts' command definition
          */
         COMMANDS.put("puts", node -> {
+            String key;   
             output.append("Tcl> ").append(
                     VARS.get(VARS.keySet().stream().filter(cmd -> {
                         return cmd.equals(node.getChildren().get(0).getValue());
