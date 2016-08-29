@@ -46,7 +46,7 @@ public class TclLexer {
      * Flag indicating that the lexer is inside quotation
      */
     protected boolean qflag;
-    
+
     /**
      * Flag indicating that the lexer is inside curly brackets
      */
@@ -115,23 +115,27 @@ public class TclLexer {
      * @return
      */
     protected String readNumber() {
-        String number = "";
-        number += currentchar;
+        StringBuilder number = new StringBuilder("");
         /*
          This is a number if didgit, dot and exponetial characters are present     
          */
         while (Character.isDigit(currentchar)
                 || currentchar == '.'
                 || (Character.toLowerCase(currentchar) == 'e'
-                && (peek() == '-') || peek() == '+')) {
+                && (peek() == '-') || peek() == '+')
+                || currentchar == '\\') {
+            if ((currentchar == '\\' && peek() == '\n')
+                    || (currentchar == '\\' && peek() == '\r')) {
+                skipEOL();
+            }
+            number.append(currentchar);
             advancePosition();
-            number += currentchar;
             if (Character.toLowerCase(currentchar) == 'e') {
                 advancePosition();
-                number += currentchar;
+                number.append(currentchar);
             }
         }
-        return number;
+        return number.toString();
     }
 
     /**
@@ -139,11 +143,39 @@ public class TclLexer {
      *
      * @return
      */
-    protected String readWord() {
+    protected String readName() {
         StringBuilder name = new StringBuilder("");
         while (Character.isDigit(currentchar)
                 || Character.isLetter(currentchar)
                 || currentchar == '_') {
+            if (currentchar == '\\') {
+               if (peek() == '\n' || peek() == '\r') {
+                   skipEOL();
+               } else {
+                   advancePosition();
+               }
+            }
+            name.append(currentchar);
+            advancePosition();
+        }
+        return name.toString();
+    }
+
+    /**
+     * Reading Tcl words
+     *
+     * @return
+     */
+    protected String readWord() {
+        StringBuilder name = new StringBuilder("");
+        while (!Character.isWhitespace(currentchar) && currentchar != '[') {
+            if (currentchar == '\\') {
+               if (peek() == '\n' || peek() == '\r') {
+                   skipEOL();
+               } else {
+                   advancePosition();
+               }
+            }
             name.append(currentchar);
             advancePosition();
         }
@@ -167,7 +199,7 @@ public class TclLexer {
             advancePosition();
         } while (Character.isWhitespace(currentchar));
     }
-    
+
     /**
      * Skipping escaped special character
      */
@@ -187,7 +219,7 @@ public class TclLexer {
         String string = "";
         while ((currentchar != '"' || !qflag) && (currentchar != '}' || !curlyflag)
                 && currentchar != ']') {
-            if ((currentchar == '\\' && peek() == '\n') 
+            if ((currentchar == '\\' && peek() == '\n')
                     || (currentchar == '\\' && peek() == '\r')) {
                 skipEOL();
             }
@@ -206,13 +238,13 @@ public class TclLexer {
         /*
          What is the next token
          */
-        if ((currentchar == '\\' && peek() == '\n') 
-                    || (currentchar == '\\' && peek() == '\r')) {
+        if ((currentchar == '\\' && peek() == '\n')
+                || (currentchar == '\\' && peek() == '\r')) {
             /*
              Skipping escape end of line
              */
-                skipEOL();
-            }
+            skipEOL();
+        }
         if (currentchar == '{') {
             /*
              Returning a left brace token
@@ -259,7 +291,8 @@ public class TclLexer {
              */
             skipSpace();
             return new TclToken(TclTokenType.WHITESPACE);
-        } if (currentchar == '[') {
+        }
+        if (currentchar == '[') {
             /*
              Returning a left bracket token
              */
@@ -283,8 +316,8 @@ public class TclLexer {
             /*
              Returning a name token
              */
-            return new TclToken(TclTokenType.WORD).setValue(readWord());
-        } else if ((retropeek() == '"' && qflag) 
+            return new TclToken(TclTokenType.NAME).setValue(readName());
+        } else if ((retropeek() == '"' && qflag)
                 || retropeek() == '{' || retropeek() == '[') {
             /*
              Reading and returning a string of symbols
@@ -298,17 +331,17 @@ public class TclLexer {
         } else {
             /*
              Returning UNKNOWN token in all other cases
-            */
-           return new TclToken(TclTokenType.UNKNOWN);
+             */
+            return new TclToken(TclTokenType.UNKNOWN);
         }
     }
-    
+
     /**
      * Analysis of numerical expressions
-     * 
+     *
      * @return
      */
-    public TclToken getExprToken () {
+    public TclToken getExprToken() {
         if (Character.isDigit(currentchar)) {
             /*
              Returning a real number token

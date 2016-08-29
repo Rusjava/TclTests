@@ -97,15 +97,18 @@ public class TclParser {
      */
     protected TclNode getCommand() throws TclParserError {
         TclNode node = new TclNode(TclNodeType.COMMAND);
-        advanceToken(new TclTokenType[]{TclTokenType.WORD, TclTokenType.WHITESPACE, TclTokenType.EOL});
-        if (currenttoken.type != TclTokenType.WORD) {
-            advanceToken(new TclTokenType[]{TclTokenType.WORD, TclTokenType.WHITESPACE});
+        TclNode operand = null;
+        advanceToken(TclTokenType.NAME, TclTokenType.WHITESPACE, TclTokenType.EOL);
+        if (currenttoken.type != TclTokenType.NAME) {
+            advanceToken(TclTokenType.NAME, TclTokenType.WHITESPACE);
         }
-        if (currenttoken.type != TclTokenType.WORD) {
-            advanceToken(TclTokenType.WORD);
+        if (currenttoken.type != TclTokenType.NAME) {
+            advanceToken(TclTokenType.NAME);
         }
         node.setValue(currenttoken.getValue());
-
+        /**
+         * Cycling over arguments
+         */
         try {
             /*
              Getting operands
@@ -113,46 +116,59 @@ public class TclParser {
             while (true) {
                 try {
                     /*
-                     Skipping whitespace
+                     Skipping whitespace tokens
                      */
                     advanceToken(TclTokenType.WHITESPACE);
                 } catch (TclParserError error) {
+                    if (previoustoken.type == TclTokenType.WHITESPACE 
+                            || previoustoken == null) {
+                        operand = new TclNode(TclNodeType.OPERAND).setValue(currenttoken.getValue());
+                        node.getChildren().add(operand);
+                    }
                     if (currenttoken.type == TclTokenType.WORD) {
+                        /*
+                         A variable substitution
+                         */
+                        operand.getChildren().add(new TclNode(TclNodeType.WORD).
+                                setValue(currenttoken.getValue()));
+                    } else if (currenttoken.type == TclTokenType.DOLLAR) {
                         /*
                          A name as an operand
                          */
-                        node.getChildren().add(new TclNode(TclNodeType.OPERAND).
+                        advanceToken(TclTokenType.NAME);
+                        operand.getChildren().add(new TclNode(TclNodeType.NAME).
                                 setValue(currenttoken.getValue()));
                     } else if (currenttoken.type == TclTokenType.LEFTCURL) {
                         /*
                          A string in curly brackets
                          */
-                        advanceToken(new TclTokenType[]{TclTokenType.STRING, TclTokenType.RIGHTCURL});
+                        advanceToken(TclTokenType.STRING, TclTokenType.RIGHTCURL);
                         if (currenttoken.type == TclTokenType.STRING) {
-                            node.getChildren().add(new TclNode(TclNodeType.OPERAND).
+                            operand.getChildren().add(new TclNode(TclNodeType.BSTRING).
                                     setValue(currenttoken.getValue()));
                             advanceToken(TclTokenType.RIGHTCURL);
                         } else {
-                            node.getChildren().add(new TclNode(TclNodeType.OPERAND).
+                            operand.getChildren().add(new TclNode(TclNodeType.BSTRING).
                                     setValue(""));
                         }
                     } else if (currenttoken.type == TclTokenType.LEFTBR) {
                         /*
-                         A command in brackets
+                         Commands in brackets
                          */
                         advanceToken(TclTokenType.STRING);
-
+                        operand.getChildren().add(new TclNode(TclNodeType.PROGRAM).
+                                    setValue(processstring(currenttoken.getValue())));
                     } else if (currenttoken.type == TclTokenType.LEFTQ) {
                         /*
                          A string in quotes
                          */
-                        advanceToken(new TclTokenType[]{TclTokenType.STRING, TclTokenType.RIGHTQ});
+                        advanceToken(TclTokenType.STRING, TclTokenType.RIGHTQ);
                         if (currenttoken.type == TclTokenType.STRING) {
-                            node.getChildren().add(new TclNode(TclNodeType.OPERAND).
+                            operand.getChildren().add(new TclNode(TclNodeType.QSTRING).
                                     setValue(processstring(currenttoken.getValue())));
                             advanceToken(TclTokenType.RIGHTQ);
                         } else {
-                            node.getChildren().add(new TclNode(TclNodeType.OPERAND).
+                            operand.getChildren().add(new TclNode(TclNodeType.QSTRING).
                                     setValue(""));
                         }
                     } else {

@@ -30,7 +30,9 @@ public enum TclNodeType {
     COMMAND("CMD"),
     QSTRING("QS"),
     BSTRING("BS"),
-    OPERAND("OP");
+    OPERAND("OP"),
+    NAME("id"),
+    WORD("word");
 
     private final String type;
 
