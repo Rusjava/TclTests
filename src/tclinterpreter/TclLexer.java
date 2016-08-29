@@ -46,6 +46,11 @@ public class TclLexer {
      * Flag indicating that the lexer is inside quotation
      */
     protected boolean qflag;
+    
+    /**
+     * Flag indicating that the lexer is inside curly brackets
+     */
+    protected boolean curlyflag;
 
     /**
      * Constructor
@@ -134,22 +139,22 @@ public class TclLexer {
      *
      * @return
      */
-    protected String readName() {
-        String name = "";
+    protected String readWord() {
+        StringBuilder name = new StringBuilder("");
         while (Character.isDigit(currentchar)
                 || Character.isLetter(currentchar)
                 || currentchar == '_') {
-            name += currentchar;
+            name.append(currentchar);
             advancePosition();
         }
-        return name;
+        return name.toString();
     }
 
     /**
      * Reading end of line symbol
      */
     protected void readEOL() {
-        while (currentchar == '\n' || currentchar == '\t') {
+        while (Character.isWhitespace(currentchar)) {
             advancePosition();
         }
     }
@@ -158,6 +163,15 @@ public class TclLexer {
      * Skipping end of line and whitespace after slash
      */
     protected void skipEOL() {
+        do {
+            advancePosition();
+        } while (Character.isWhitespace(currentchar));
+    }
+    
+    /**
+     * Skipping escaped special character
+     */
+    protected void skipEscaped() {
         do {
             advancePosition();
         } while (Character.isWhitespace(currentchar));
@@ -171,8 +185,10 @@ public class TclLexer {
      */
     protected String readString() {
         String string = "";
-        while ((currentchar != '"' || !qflag) && (currentchar != '}' || qflag)) {
-            if (currentchar == '\\' && peek() == '\n') {
+        while ((currentchar != '"' || !qflag) && (currentchar != '}' || !curlyflag)
+                && currentchar != ']') {
+            if ((currentchar == '\\' && peek() == '\n') 
+                    || (currentchar == '\\' && peek() == '\r')) {
                 skipEOL();
             }
             string += currentchar;
@@ -190,12 +206,109 @@ public class TclLexer {
         /*
          What is the next token
          */
-        if (currentchar == '\\' && peek() == '\n') {
+        if ((currentchar == '\\' && peek() == '\n') 
+                    || (currentchar == '\\' && peek() == '\r')) {
             /*
              Skipping escape end of line
              */
-            skipEOL();
+                skipEOL();
+            }
+        if (currentchar == '{') {
+            /*
+             Returning a left brace token
+             */
+            curlyflag = true;
+            advancePosition();
+            return new TclToken(TclTokenType.LEFTCURL);
+        } else if (currentchar == '}') {
+            /*
+             Returning a right brace token
+             */
+            curlyflag = false;
+            advancePosition();
+            return new TclToken(TclTokenType.RIGHTCURL);
+        } else if (currentchar == '"' && !qflag) {
+            /*
+             Returning a left quote token
+             */
+            advancePosition();
+            qflag = true;
+            return new TclToken(TclTokenType.LEFTQ);
+        } else if (currentchar == '"' && qflag) {
+            /*
+             Returning a right quote token
+             */
+            advancePosition();
+            qflag = false;
+            return new TclToken(TclTokenType.RIGHTQ);
+        } else if (currentchar == ';') {
+            /*
+             Returning a semi-colon token
+             */
+            advancePosition();
+            return new TclToken(TclTokenType.SEMI);
+        } else if (currentchar == '\n' || currentchar == '\r') {
+            /*
+             Returning an end of line token
+             */
+            readEOL();
+            return new TclToken(TclTokenType.EOL);
+        } else if (Character.isWhitespace(currentchar)) {
+            /*
+             Skipping whitespace and returning a whitespace token
+             */
+            skipSpace();
+            return new TclToken(TclTokenType.WHITESPACE);
+        } if (currentchar == '[') {
+            /*
+             Returning a left bracket token
+             */
+            advancePosition();
+            return new TclToken(TclTokenType.LEFTBR);
+        } else if (currentchar == ']') {
+            /*
+             Returning a right bracket token
+             */
+            advancePosition();
+            return new TclToken(TclTokenType.RIGHTBR);
+        } else if (currentchar == '$') {
+            /*
+             Returning a dollar token
+             */
+            advancePosition();
+            return new TclToken(TclTokenType.DOLLAR);
+        } else if ((currentchar == '_'
+                || Character.isDigit(currentchar) || Character.isLetter(currentchar))
+                && retropeek() == 'S') {
+            /*
+             Returning a name token
+             */
+            return new TclToken(TclTokenType.WORD).setValue(readWord());
+        } else if ((retropeek() == '"' && qflag) 
+                || retropeek() == '{' || retropeek() == '[') {
+            /*
+             Reading and returning a string of symbols
+             */
+            return new TclToken(TclTokenType.STRING).setValue(readString());
+        } else if (currentchar == 0) {
+            /*
+             Returning an end of file token
+             */
+            return new TclToken(TclTokenType.EOF);
+        } else {
+            /*
+             Returning UNKNOWN token in all other cases
+            */
+           return new TclToken(TclTokenType.UNKNOWN);
         }
+    }
+    
+    /**
+     * Analysis of numerical expressions
+     * 
+     * @return
+     */
+    public TclToken getExprToken () {
         if (Character.isDigit(currentchar)) {
             /*
              Returning a real number token
@@ -237,79 +350,13 @@ public class TclLexer {
              */
             advancePosition();
             return new TclToken(TclTokenType.RIGHTPAR);
-        } else if (currentchar == '[') {
+        } else {
             /*
-             Returning a left bracket token
+             Returning an unknown token
              */
             advancePosition();
-            return new TclToken(TclTokenType.LEFTBR);
-        } else if (currentchar == ']') {
-            /*
-             Returning a right bracket token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.RIGHTBR);
-        } else if (currentchar == '{') {
-            /*
-             Returning a left brace token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.LEFTCURL);
-        } else if (currentchar == '}') {
-            /*
-             Returning a right brace token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.RIGHTCURL);
-        } else if (currentchar == '"' && !qflag) {
-            /*
-             Returning a left quote token
-             */
-            advancePosition();
-            qflag = true;
-            return new TclToken(TclTokenType.LEFTQ);
-        } else if (currentchar == '"' && qflag) {
-            /*
-             Returning a right quote token
-             */
-            advancePosition();
-            qflag = false;
-            return new TclToken(TclTokenType.RIGHTQ);
-        } else if (currentchar == ';') {
-            /*
-             Returning a semi-colon token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.SEMI);
-        } else if (currentchar == '\n') {
-            /*
-             Returning an end of line token
-             */
-            readEOL();
-            return new TclToken(TclTokenType.EOL);
-        } else if (Character.isWhitespace(currentchar)) {
-            /*
-             Skipping whitespace and returning a whitespace token
-             */
-            skipSpace();
-            return new TclToken(TclTokenType.WHITESPACE);
-        } else if ((retropeek() == '"' && qflag) || retropeek() == '{') {
-            /*
-             Reading and returning a string of symbols
-             */
-            return new TclToken(TclTokenType.STRING).setValue(readString());
-        } else if (Character.isLetter(currentchar) || currentchar == '_') {
-            /*
-             Returning a name token
-             */
-            return new TclToken(TclTokenType.NAME).setValue(readName());
-        } else if (currentchar == 0) {
-            /*
-             Returning an end of file token
-             */
-            return new TclToken(TclTokenType.EOF);
+            return new TclToken(TclTokenType.UNKNOWN);
         }
-        return null;
     }
 
     /**

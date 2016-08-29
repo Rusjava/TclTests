@@ -97,12 +97,12 @@ public class TclParser {
      */
     protected TclNode getCommand() throws TclParserError {
         TclNode node = new TclNode(TclNodeType.COMMAND);
-        advanceToken(new TclTokenType[]{TclTokenType.NAME, TclTokenType.WHITESPACE, TclTokenType.EOL});
-        if (currenttoken.type != TclTokenType.NAME) {
-            advanceToken(new TclTokenType[]{TclTokenType.NAME, TclTokenType.WHITESPACE});
+        advanceToken(new TclTokenType[]{TclTokenType.WORD, TclTokenType.WHITESPACE, TclTokenType.EOL});
+        if (currenttoken.type != TclTokenType.WORD) {
+            advanceToken(new TclTokenType[]{TclTokenType.WORD, TclTokenType.WHITESPACE});
         }
-        if (currenttoken.type != TclTokenType.NAME) {
-            advanceToken(TclTokenType.NAME);
+        if (currenttoken.type != TclTokenType.WORD) {
+            advanceToken(TclTokenType.WORD);
         }
         node.setValue(currenttoken.getValue());
 
@@ -117,7 +117,7 @@ public class TclParser {
                      */
                     advanceToken(TclTokenType.WHITESPACE);
                 } catch (TclParserError error) {
-                    if (currenttoken.type == TclTokenType.NAME) {
+                    if (currenttoken.type == TclTokenType.WORD) {
                         /*
                          A name as an operand
                          */

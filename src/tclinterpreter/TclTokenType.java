@@ -37,17 +37,14 @@ public enum TclTokenType {
     RIGHTQ("rightquote"),
     LEFTCURL("leftcurlybracket"),
     RIGHTCURL("rightcurlybracket"),
-    PUTS("output"),
-    EXPR("expression"),
-    UNSET("delete"),
-    SET("assign"),
     SEMI("semicolon"),
-    NAME("id"),
+    WORD("id"),
     EOL("\n"),
     DOLLAR("$"),
     STRING("str"),
     WHITESPACE("space"),
-    EOF("eof");
+    EOF("eof"),
+    UNKNOWN("unknown");
     
     private final String type;
     /*
