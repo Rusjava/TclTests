@@ -32,20 +32,20 @@ public class TclTests {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        /*TclParser parser = new TclParser(new TclLexer("set name1 \\\n n45;\n\t set name2 \"gh \\\n\t n450\";"));
-         try {
-         System.out.println(parser.parse());
-         } catch (TclParser.TclParserError ex) {
-         Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
-         }*/
-        TclInterpreter inter = new TclInterpreter(new TclParser(
-                new TclLexer("set name1 \"n45 fg\";  unset name1; puts name1;")));
+        TclParser parser = new TclParser(new TclLexer("set name1 \\\n n45;\n\t set name2 \"gh \\\n\t n450\";"));
         try {
-            //System.out.println(inter.getParser().parse());
-            System.out.println(inter.run());
+            System.out.println(parser.parse());
         } catch (TclParser.TclParserError ex) {
             Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
         }
+        /*TclInterpreter inter = new TclInterpreter(new TclParser(
+         new TclLexer("set name1 \"n45 fg\";  unset name1; puts name1;")));
+         try {
+         //System.out.println(inter.getParser().parse());
+         System.out.println(inter.run());
+         } catch (TclParser.TclParserError ex) {
+         Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
+         }*/
     }
 
 }
