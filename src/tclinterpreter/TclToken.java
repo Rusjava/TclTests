@@ -42,6 +42,7 @@ public class TclToken {
      */
     public TclToken(TclTokenType type) {
         this.type = type;
+        this.value = type.name();
     }
 
     /**

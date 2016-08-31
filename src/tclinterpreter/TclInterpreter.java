@@ -59,10 +59,10 @@ public class TclInterpreter {
                     return cmd.equals(node.getChildren().get(0).getValue());
                 }).findFirst().get();
             } catch (NoSuchElementException ex) {
-                VARS.put(node.getChildren().get(0).getValue(), node.getChildren().get(1).getValue());
+                VARS.put(readOPNode(node.getChildren().get(0)), readOPNode(node.getChildren().get(1)));
                 return;
             }
-            VARS.replace(key, node.getChildren().get(1).getValue());
+            VARS.replace(key, readOPNode(node.getChildren().get(1)));
 
         });
         /*
@@ -77,18 +77,16 @@ public class TclInterpreter {
             } catch (NoSuchElementException ex) {
                 return;
             }
-            VARS.remove(key); 
+            VARS.remove(key);
         });
 
         /*
          'Puts' command definition
          */
         COMMANDS.put("puts", node -> {
-            String key;   
-            output.append("Tcl> ").append(
-                    VARS.get(VARS.keySet().stream().filter(cmd -> {
-                        return cmd.equals(node.getChildren().get(0).getValue());
-                    }).findFirst().get()));
+            output.append("Tcl> ")
+                    .append(readOPNode(node.getChildren().get(0)))
+                    .append("\n");
         });
     }
 
@@ -116,6 +114,31 @@ public class TclInterpreter {
         COMMANDS.get(COMMANDS.keySet().stream().filter(cmd -> {
             return cmd.equals(command.getValue());
         }).findFirst().get()).accept(command);
+    }
+
+    /**
+     * Evaluating the value of the operand
+     *
+     * @param node
+     * @return
+     */
+    protected String readOPNode(TclNode node) {
+        StringBuilder str = new StringBuilder("");
+        for (TclNode child : node.getChildren()) {
+            if (child.type == TclNodeType.NAME) {
+                str.append(
+                        VARS.get(VARS.keySet().stream().filter(cmd -> {
+                            return cmd.equals(child.getValue());
+                        }).findFirst().get()));
+            } else if (child.type == TclNodeType.QSTRING) {
+                str.append(child.getValue());
+            } else if (child.type == TclNodeType.PROGRAM) {
+                str.append("[").append(child.getValue()).append("]");
+            } else if (child.type == TclNodeType.WORD) {
+                str.append(child.getValue());
+            } 
+        }
+        return str.toString();
     }
 
     /**

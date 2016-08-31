@@ -85,7 +85,7 @@ public class TclParser {
      * @param str
      * @return
      */
-    protected String processstring(String str) {
+    protected String evalString(String str) {
         return str;
     }
 
@@ -98,14 +98,18 @@ public class TclParser {
     protected TclNode getCommand() throws TclParserError {
         TclNode node = new TclNode(TclNodeType.COMMAND);
         TclNode operand = null;
-        advanceToken(TclTokenType.NAME, TclTokenType.WHITESPACE, TclTokenType.EOL);
-        if (currenttoken.type != TclTokenType.NAME) {
-            advanceToken(TclTokenType.NAME, TclTokenType.WHITESPACE);
-        }
-        if (currenttoken.type != TclTokenType.NAME) {
-            advanceToken(TclTokenType.NAME);
+        /*
+        Any should begin with a word with a possible leading whitespace
+        */
+        advanceToken(TclTokenType.WORD, TclTokenType.WHITESPACE, TclTokenType.EOL);
+        if (currenttoken.type != TclTokenType.WORD) {
+            advanceToken(TclTokenType.WORD);
         }
         node.setValue(currenttoken.getValue());
+        /*
+        There should be a whitespace after the command name
+        */
+        advanceToken(TclTokenType.WHITESPACE);
         /**
          * Cycling over arguments
          */
@@ -120,8 +124,10 @@ public class TclParser {
                      */
                     advanceToken(TclTokenType.WHITESPACE);
                 } catch (TclParserError error) {
-                    if (previoustoken.type == TclTokenType.WHITESPACE 
-                            || previoustoken == null) {
+                    /*
+                    Creating a new operand node after whitespace
+                    */
+                    if (previoustoken.type == TclTokenType.WHITESPACE) {
                         operand = new TclNode(TclNodeType.OPERAND).setValue(currenttoken.getValue());
                         node.getChildren().add(operand);
                     }
@@ -144,20 +150,26 @@ public class TclParser {
                          */
                         advanceToken(TclTokenType.STRING, TclTokenType.RIGHTCURL);
                         if (currenttoken.type == TclTokenType.STRING) {
-                            operand.getChildren().add(new TclNode(TclNodeType.BSTRING).
+                            operand.getChildren().add(new TclNode(TclNodeType.CURLYSTRING).
                                     setValue(currenttoken.getValue()));
                             advanceToken(TclTokenType.RIGHTCURL);
                         } else {
-                            operand.getChildren().add(new TclNode(TclNodeType.BSTRING).
+                            operand.getChildren().add(new TclNode(TclNodeType.CURLYSTRING).
                                     setValue(""));
                         }
                     } else if (currenttoken.type == TclTokenType.LEFTBR) {
                         /*
                          Commands in brackets
                          */
-                        advanceToken(TclTokenType.STRING);
-                        operand.getChildren().add(new TclNode(TclNodeType.PROGRAM).
-                                    setValue(processstring(currenttoken.getValue())));
+                        advanceToken(TclTokenType.STRING, TclTokenType.RIGHTBR);
+                        if (currenttoken.type == TclTokenType.STRING) {
+                            operand.getChildren().add(new TclNode(TclNodeType.PROGRAM).
+                                    setValue(currenttoken.getValue()));
+                            advanceToken(TclTokenType.RIGHTBR);
+                        } else {
+                            operand.getChildren().add(new TclNode(TclNodeType.PROGRAM).
+                                    setValue(""));
+                        }
                     } else if (currenttoken.type == TclTokenType.LEFTQ) {
                         /*
                          A string in quotes
@@ -165,7 +177,7 @@ public class TclParser {
                         advanceToken(TclTokenType.STRING, TclTokenType.RIGHTQ);
                         if (currenttoken.type == TclTokenType.STRING) {
                             operand.getChildren().add(new TclNode(TclNodeType.QSTRING).
-                                    setValue(processstring(currenttoken.getValue())));
+                                    setValue(evalString(currenttoken.getValue())));
                             advanceToken(TclTokenType.RIGHTQ);
                         } else {
                             operand.getChildren().add(new TclNode(TclNodeType.QSTRING).

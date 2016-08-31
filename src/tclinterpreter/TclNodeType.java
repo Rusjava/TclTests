@@ -29,7 +29,7 @@ public enum TclNodeType {
     PROGRAM("PROG"),
     COMMAND("CMD"),
     QSTRING("QS"),
-    BSTRING("BS"),
+    CURLYSTRING("CS"),
     OPERAND("OP"),
     NAME("id"),
     WORD("word");

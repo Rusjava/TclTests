@@ -168,7 +168,8 @@ public class TclLexer {
      */
     protected String readWord() {
         StringBuilder name = new StringBuilder("");
-        while (!Character.isWhitespace(currentchar) && currentchar != '[') {
+        while (!Character.isWhitespace(currentchar) && currentchar != '[' 
+                && currentchar != ';' && currentchar != '$') {
             if (currentchar == '\\') {
                if (peek() == '\n' || peek() == '\r') {
                    skipEOL();
@@ -310,9 +311,8 @@ public class TclLexer {
              */
             advancePosition();
             return new TclToken(TclTokenType.DOLLAR);
-        } else if ((currentchar == '_'
-                || Character.isDigit(currentchar) || Character.isLetter(currentchar))
-                && retropeek() == 'S') {
+        } else if ((currentchar == '_' || Character.isLetter(currentchar))
+                && retropeek() == '$') {
             /*
              Returning a name token
              */
@@ -323,6 +323,12 @@ public class TclLexer {
              Reading and returning a string of symbols
              */
             return new TclToken(TclTokenType.STRING).setValue(readString());
+        } else if ((currentchar == '_'
+                || Character.isDigit(currentchar) || Character.isLetter(currentchar))) {
+            /*
+             Returning a Tclword token
+             */
+            return new TclToken(TclTokenType.WORD).setValue(readWord());
         } else if (currentchar == 0) {
             /*
              Returning an end of file token
