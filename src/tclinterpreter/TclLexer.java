@@ -23,12 +23,6 @@ package tclinterpreter;
  * @version 0.1
  */
 public class TclLexer {
-
-    /**
-     * Tcl keywords
-     */
-    public static final String[] KEY_WORDS = {"set", "unset", "puts", "expr"};
-
     /**
      * TCL script
      */

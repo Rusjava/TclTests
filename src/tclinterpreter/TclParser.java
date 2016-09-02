@@ -16,6 +16,9 @@
  */
 package tclinterpreter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A class for the Tcl parser which converts the token stream into a tree
  *
@@ -80,13 +83,15 @@ public class TclParser {
     }
 
     /**
-     * Making necessary substitutions in a quote enclosed string
+     * Parsing quote enclosed string and returning a list of Tcl nodes
      *
      * @param str
      * @return
      */
-    protected String evalString(String str) {
-        return str;
+    protected List<TclNode> parseString(String str) {
+        List<TclNode> nodeList=new ArrayList<>();
+        TclNode node=new TclNode(TclNodeType.QSTRING);
+        return nodeList;
     }
 
     /**
@@ -176,8 +181,7 @@ public class TclParser {
                          */
                         advanceToken(TclTokenType.STRING, TclTokenType.RIGHTQ);
                         if (currenttoken.type == TclTokenType.STRING) {
-                            operand.getChildren().add(new TclNode(TclNodeType.QSTRING).
-                                    setValue(evalString(currenttoken.getValue())));
+                            operand.getChildren().addAll(parseString(currenttoken.getValue()));
                             advanceToken(TclTokenType.RIGHTQ);
                         } else {
                             operand.getChildren().add(new TclNode(TclNodeType.QSTRING).
