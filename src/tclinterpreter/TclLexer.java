@@ -22,19 +22,7 @@ package tclinterpreter;
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-public class TclLexer {
-    /**
-     * TCL script
-     */
-    protected String script = null;
-    /**
-     * Current position in script
-     */
-    protected int pos = 0;
-    /**
-     * Current symbol at position of pos
-     */
-    protected char currentchar = 0;
+public class TclLexer extends AbstractTclLexer {
 
     /**
      * Flag indicating that the lexer is inside quotation
@@ -52,46 +40,7 @@ public class TclLexer {
      * @param script a TCL script to interpret
      */
     public TclLexer(String script) {
-        this.script = script;
-        currentchar = script.charAt(pos);
-    }
-
-    /**
-     * Advance position by one
-     */
-    protected void advancePosition() {
-        pos++;
-        if (pos < script.length()) {
-            currentchar = script.charAt(pos);
-        } else {
-            currentchar = 0;
-        }
-    }
-
-    /**
-     * What is the next character?
-     *
-     * @return the next character
-     */
-    protected char peek() {
-        if (pos < script.length() - 1) {
-            return script.charAt(pos + 1);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * What was the previous character?
-     *
-     * @return the previous character
-     */
-    protected char retropeek() {
-        if (pos > 0) {
-            return script.charAt(pos - 1);
-        } else {
-            return 0;
-        }
+        super(script);
     }
 
     /**
@@ -196,15 +145,6 @@ public class TclLexer {
     }
 
     /**
-     * Skipping escaped special character
-     */
-    protected void skipEscaped() {
-        do {
-            advancePosition();
-        } while (Character.isWhitespace(currentchar));
-    }
-
-    /**
      * Reading the string between quotes of curly braces with ends of lines
      * skipped
      *
@@ -229,6 +169,7 @@ public class TclLexer {
      *
      * @return
      */
+    @Override
     public TclToken getToken() {
         /*
          What is the next token
@@ -392,12 +333,4 @@ public class TclLexer {
         }
     }
 
-    /**
-     * Returning the Tcl script
-     *
-     * @return
-     */
-    public String getScript() {
-        return script;
-    }
 }

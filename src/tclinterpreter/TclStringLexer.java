@@ -14,36 +14,61 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package tclinterpreter;
 
 /**
- * A special lexer for quote enclosed strings
- * 
+ * A special lexer for quoted enclosed strings
+ *
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-public class TclStringLexer {
-    /**
-     * TCL script
-     */
-    protected String script = null;  
-    /**
-     * Current position in script
-     */
-    protected int pos = 0;
-    /**
-     * Current symbol at position of pos
-     */
-    protected char currentchar = 0;
-    
-    /**
-     * Constructor
-     *
-     * @param script a TCL script to interpret
-     */
+public class TclStringLexer extends AbstractTclLexer {
+
     public TclStringLexer(String script) {
-        this.script = script;
-        currentchar = script.charAt(pos);
+        super(script);
+    }
+
+    /**
+     * Reading alphanumerical names from the script
+     *
+     * @return
+     */
+    protected String readName() {
+        StringBuilder name = new StringBuilder("");
+        while (Character.isDigit(currentchar)
+                || Character.isLetter(currentchar)
+                || currentchar == '_') {
+            if (currentchar == '\\') {
+                advancePosition();
+            }
+            name.append(currentchar);
+            advancePosition();
+        }
+        return name.toString();
+    }
+
+    @Override
+    public TclToken getToken() {
+        /*
+         What is the next token
+         */
+        if (currentchar == '[') {
+            advancePosition();
+            return new TclToken(TclTokenType.LEFTBR);
+        } else if (currentchar == ']') {
+            advancePosition();
+            return new TclToken(TclTokenType.RIGHTBR);
+        } else if (currentchar == '$') {
+            advancePosition();
+            return new TclToken(TclTokenType.DOLLAR);
+        } else if ((currentchar == '_' || Character.isLetter(currentchar))
+                && retropeek() == '$') {
+            /*
+             Returning a name token
+             */
+            return new TclToken(TclTokenType.NAME).setValue(readName());
+        } else {
+            return new TclToken(TclTokenType.STRING);
+        }
     }
 }
