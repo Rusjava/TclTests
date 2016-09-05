@@ -118,12 +118,12 @@ public class TclStringLexer extends AbstractTclLexer {
             /*
              Reading and returning a string of symbols
              */
-            return new TclToken(TclTokenType.STRING).setValue(readString());
+            return new TclToken(TclTokenType.EOF);
         } else {
             /*
              Reading and returning EOF
              */
-            return new TclToken(TclTokenType.EOF);
+            return new TclToken(TclTokenType.STRING).setValue(readString());
         }
     }
 }

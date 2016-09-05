@@ -35,23 +35,43 @@ public class TclStringParser extends AbstractTclParser {
     @Override
     public TclNode parse() throws TclParserError {
         TclNode node = new TclNode(TclNodeType.QSTRING).setValue(lexer.getScript());
-        while (currenttoken.type != TclTokenType.EOF) {
-            if (currenttoken.type != TclTokenType.LEFTBR) {
-                /*
-                 Commands in brackets
-                 */
-                advanceToken(TclTokenType.STRING, TclTokenType.RIGHTBR);
-                if (currenttoken.type == TclTokenType.STRING) {
-                    node.getChildren().add(new TclNode(TclNodeType.PROGRAM).
+        do {
+            try {
+                advanceToken(TclTokenType.EOF);
+            } catch (TclParserError error) {
+                if (currenttoken.type == TclTokenType.LEFTBR) {
+                    /*
+                     Commands in brackets
+                     */
+                    advanceToken(TclTokenType.STRING, TclTokenType.RIGHTBR);
+                    if (currenttoken.type == TclTokenType.STRING) {
+                        node.getChildren().add(new TclNode(TclNodeType.PROGRAM).
+                                setValue(currenttoken.getValue()));
+                        advanceToken(TclTokenType.RIGHTBR);
+                    } else {
+                        node.getChildren().add(new TclNode(TclNodeType.PROGRAM).
+                                setValue(""));
+                    }
+                } else if (currenttoken.type == TclTokenType.DOLLAR) {
+                    /*
+                     A name substitution
+                     */
+                    advanceToken(TclTokenType.NAME);
+                    node.getChildren().add(new TclNode(TclNodeType.NAME).
                             setValue(currenttoken.getValue()));
-                    advanceToken(TclTokenType.RIGHTBR);
+                } else if (currenttoken.type == TclTokenType.STRING) {
+                    /*
+                     A string without substitutions
+                     */
+                    node.getChildren().add(new TclNode(TclNodeType.QSTRING).
+                            setValue(currenttoken.getValue()));
                 } else {
-                    node.getChildren().add(new TclNode(TclNodeType.PROGRAM).
-                            setValue(""));
+                    throw new TclParserError("Unknown token within a string",
+                            currenttoken.type, TclTokenType.STRING);
                 }
             }
-        }
+            
+        } while (currenttoken.type != TclTokenType.EOF);
         return node;
     }
-
 }

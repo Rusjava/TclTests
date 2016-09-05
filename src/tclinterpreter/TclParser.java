@@ -46,6 +46,9 @@ public class TclParser extends AbstractTclParser {
     protected List<TclNode> parseString(String str) throws TclParserError {
         AbstractTclParser strparser = new TclStringParser(new TclStringLexer(str));
         return strparser.parse().getChildren();
+        /*List<TclNode> lst=new ArrayList<> ();
+        lst.add(new TclNode(TclNodeType.QSTRING).setValue(str));
+        return lst;*/
     }
 
     /**
