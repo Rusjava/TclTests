@@ -26,7 +26,8 @@ public class TclStringLexer extends AbstractTclLexer {
 
     /**
      * Constructor
-     * @param script 
+     *
+     * @param script
      */
     public TclStringLexer(String script) {
         super(script);
@@ -50,7 +51,7 @@ public class TclStringLexer extends AbstractTclLexer {
         }
         return name.toString();
     }
-    
+
     /**
      * Reading the substring that is not a name or command
      *
@@ -64,7 +65,7 @@ public class TclStringLexer extends AbstractTclLexer {
         }
         return string;
     }
-    
+
     /**
      * Reading a command string
      *
@@ -86,20 +87,20 @@ public class TclStringLexer extends AbstractTclLexer {
          */
         if (currentchar == '[') {
             /*
-            Reading the beginning of the command substitutiion
-            */
+             Reading the beginning of the command substitutiion
+             */
             advancePosition();
             return new TclToken(TclTokenType.LEFTBR);
         } else if (currentchar == ']') {
             /*
-            Reading the end of the command substitutiion
-            */
+             Reading the end of the command substitutiion
+             */
             advancePosition();
             return new TclToken(TclTokenType.RIGHTBR);
         } else if (currentchar == '$') {
             /*
-            Reading the beginning of the variable substitutiion
-            */
+             Reading the beginning of the variable substitutiion
+             */
             advancePosition();
             return new TclToken(TclTokenType.DOLLAR);
         } else if ((currentchar == '_' || Character.isLetter(currentchar))
@@ -123,6 +124,6 @@ public class TclStringLexer extends AbstractTclLexer {
              Reading and returning EOF
              */
             return new TclToken(TclTokenType.EOF);
-        } 
+        }
     }
 }

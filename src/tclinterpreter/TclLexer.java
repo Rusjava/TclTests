@@ -92,11 +92,11 @@ public class TclLexer extends AbstractTclLexer {
                 || Character.isLetter(currentchar)
                 || currentchar == '_') {
             if (currentchar == '\\') {
-               if (peek() == '\n' || peek() == '\r') {
-                   skipEOL();
-               } else {
-                   advancePosition();
-               }
+                if (peek() == '\n' || peek() == '\r') {
+                    skipEOL();
+                } else {
+                    advancePosition();
+                }
             }
             name.append(currentchar);
             advancePosition();
@@ -111,14 +111,14 @@ public class TclLexer extends AbstractTclLexer {
      */
     protected String readWord() {
         StringBuilder name = new StringBuilder("");
-        while (!Character.isWhitespace(currentchar) && currentchar != '[' 
+        while (!Character.isWhitespace(currentchar) && currentchar != '['
                 && currentchar != ';' && currentchar != '$') {
             if (currentchar == '\\') {
-               if (peek() == '\n' || peek() == '\r') {
-                   skipEOL();
-               } else {
-                   advancePosition();
-               }
+                if (peek() == '\n' || peek() == '\r') {
+                    skipEOL();
+                } else {
+                    advancePosition();
+                }
             }
             name.append(currentchar);
             advancePosition();
@@ -164,11 +164,6 @@ public class TclLexer extends AbstractTclLexer {
         return string;
     }
 
-    /**
-     * Getting the next Tcl token
-     *
-     * @return
-     */
     @Override
     public TclToken getToken() {
         /*

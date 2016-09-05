@@ -25,22 +25,7 @@ import java.util.List;
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-public class TclParser {
-
-    /**
-     * The current Tcl token
-     */
-    protected TclToken currenttoken = null;
-
-    /**
-     * The previous Tcl token
-     */
-    protected TclToken previoustoken = null;
-
-    /**
-     * The associated TclLexer
-     */
-    protected AbstractTclLexer lexer;
+public class TclParser extends AbstractTclParser {
 
     /**
      * Constructor
@@ -48,38 +33,7 @@ public class TclParser {
      * @param lexer
      */
     public TclParser(AbstractTclLexer lexer) {
-        this.lexer = lexer;
-    }
-
-    /**
-     * Advancing to the next token. Throwing and exception if a wrong token
-     *
-     * @param type
-     * @throws tclinterpreter.TclParser.TclParserError
-     */
-    protected void advanceToken(TclTokenType type) throws TclParserError {
-        previoustoken = currenttoken;
-        currenttoken = lexer.getToken();
-        if (currenttoken.type != type) {
-            throw new TclParserError("Parser error", currenttoken.type, type);
-        }
-    }
-
-    /**
-     * Advancing to the next token. Throwing and exception if a wrong token
-     *
-     * @param types
-     * @throws tclinterpreter.TclParser.TclParserError
-     */
-    protected void advanceToken(TclTokenType... types) throws TclParserError {
-        currenttoken = lexer.getToken();
-        boolean flag = true;
-        for (TclTokenType type : types) {
-            flag = flag && currenttoken.type != type;
-        }
-        if (flag) {
-            throw new TclParserError("Parser error", currenttoken.type, types[0]);
-        }
+        super(lexer);
     }
 
     /**
@@ -90,26 +44,8 @@ public class TclParser {
      * @throws tclinterpreter.TclParser.TclParserError
      */
     protected List<TclNode> parseString(String str) throws TclParserError {
-        List<TclNode> nodeList = new ArrayList<>();
-        AbstractTclLexer strlexer = new TclStringLexer(str);
-        TclNode node = new TclNode(TclNodeType.QSTRING);
-        while (currenttoken.type != TclTokenType.EOF) {
-            if (currenttoken.type != TclTokenType.LEFTBR) {
-                /*
-                 Commands in brackets
-                 */
-                advanceToken(TclTokenType.STRING, TclTokenType.RIGHTBR);
-                if (currenttoken.type == TclTokenType.STRING) {
-                    nodeList.add(new TclNode(TclNodeType.PROGRAM).
-                            setValue(currenttoken.getValue()));
-                    advanceToken(TclTokenType.RIGHTBR);
-                } else {
-                    nodeList.add(new TclNode(TclNodeType.PROGRAM).
-                            setValue(""));
-                }
-            }
-        }
-        return nodeList;
+        AbstractTclParser strparser = new TclStringParser(new TclStringLexer(str));
+        return strparser.parse().getChildren();
     }
 
     /**
@@ -220,12 +156,7 @@ public class TclParser {
         return node;
     }
 
-    /**
-     * Parsing the script and creating the node tree consisting of commands
-     *
-     * @return
-     * @throws tclinterpreter.TclParser.TclParserError
-     */
+    @Override
     public TclNode parse() throws TclParserError {
         TclNode node = new TclNode(TclNodeType.PROGRAM).setValue("test script");
         try {
@@ -237,34 +168,6 @@ public class TclParser {
                 return node;
             }
             throw error;
-        }
-    }
-
-    /**
-     * A class for Tcl parser errors
-     */
-    public static class TclParserError extends Exception {
-
-        String message;
-        TclTokenType ctokentype, etokentype;
-
-        /**
-         * Constructor
-         *
-         * @param message
-         * @param ctokentype
-         * @param etokentype
-         */
-        public TclParserError(String message, TclTokenType ctokentype, TclTokenType etokentype) {
-            super();
-            this.message = message;
-            this.ctokentype = ctokentype;
-            this.etokentype = etokentype;
-        }
-
-        @Override
-        public String toString() {
-            return message + ", Found " + ctokentype + ", Expected " + etokentype;
         }
     }
 }
