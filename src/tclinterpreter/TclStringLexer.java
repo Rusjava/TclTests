@@ -24,6 +24,10 @@ package tclinterpreter;
  */
 public class TclStringLexer extends AbstractTclLexer {
 
+    /**
+     * Constructor
+     * @param script 
+     */
     public TclStringLexer(String script) {
         super(script);
     }
@@ -46,6 +50,34 @@ public class TclStringLexer extends AbstractTclLexer {
         }
         return name.toString();
     }
+    
+    /**
+     * Reading the substring that is not a name or command
+     *
+     * @return
+     */
+    protected String readString() {
+        String string = "";
+        while (currentchar != '[' && currentchar != 0 && currentchar != '$') {
+            string += currentchar;
+            advancePosition();
+        }
+        return string;
+    }
+    
+    /**
+     * Reading a command string
+     *
+     * @return
+     */
+    protected String readCString() {
+        String string = "";
+        while (currentchar != ']' && currentchar != 0) {
+            string += currentchar;
+            advancePosition();
+        }
+        return string;
+    }
 
     @Override
     public TclToken getToken() {
@@ -53,12 +85,21 @@ public class TclStringLexer extends AbstractTclLexer {
          What is the next token
          */
         if (currentchar == '[') {
+            /*
+            Reading the beginning of the command substitutiion
+            */
             advancePosition();
             return new TclToken(TclTokenType.LEFTBR);
         } else if (currentchar == ']') {
+            /*
+            Reading the end of the command substitutiion
+            */
             advancePosition();
             return new TclToken(TclTokenType.RIGHTBR);
         } else if (currentchar == '$') {
+            /*
+            Reading the beginning of the variable substitutiion
+            */
             advancePosition();
             return new TclToken(TclTokenType.DOLLAR);
         } else if ((currentchar == '_' || Character.isLetter(currentchar))
@@ -67,8 +108,21 @@ public class TclStringLexer extends AbstractTclLexer {
              Returning a name token
              */
             return new TclToken(TclTokenType.NAME).setValue(readName());
+        } else if (retropeek() == '[') {
+            /*
+             Reading and returning a string representing a script
+             */
+            return new TclToken(TclTokenType.STRING).setValue(readCString());
+        } else if (currentchar == 0) {
+            /*
+             Reading and returning a string of symbols
+             */
+            return new TclToken(TclTokenType.STRING).setValue(readString());
         } else {
-            return new TclToken(TclTokenType.STRING);
-        }
+            /*
+             Reading and returning EOF
+             */
+            return new TclToken(TclTokenType.EOF);
+        } 
     }
 }

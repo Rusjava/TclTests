@@ -40,14 +40,14 @@ public class TclParser {
     /**
      * The associated TclLexer
      */
-    protected TclLexer lexer;
+    protected AbstractTclLexer lexer;
 
     /**
      * Constructor
      *
      * @param lexer
      */
-    public TclParser(TclLexer lexer) {
+    public TclParser(AbstractTclLexer lexer) {
         this.lexer = lexer;
     }
 
@@ -87,10 +87,28 @@ public class TclParser {
      *
      * @param str
      * @return
+     * @throws tclinterpreter.TclParser.TclParserError
      */
-    protected List<TclNode> parseString(String str) {
-        List<TclNode> nodeList=new ArrayList<>();
-        TclNode node=new TclNode(TclNodeType.QSTRING);
+    protected List<TclNode> parseString(String str) throws TclParserError {
+        List<TclNode> nodeList = new ArrayList<>();
+        AbstractTclLexer strlexer = new TclStringLexer(str);
+        TclNode node = new TclNode(TclNodeType.QSTRING);
+        while (currenttoken.type != TclTokenType.EOF) {
+            if (currenttoken.type != TclTokenType.LEFTBR) {
+                /*
+                 Commands in brackets
+                 */
+                advanceToken(TclTokenType.STRING, TclTokenType.RIGHTBR);
+                if (currenttoken.type == TclTokenType.STRING) {
+                    nodeList.add(new TclNode(TclNodeType.PROGRAM).
+                            setValue(currenttoken.getValue()));
+                    advanceToken(TclTokenType.RIGHTBR);
+                } else {
+                    nodeList.add(new TclNode(TclNodeType.PROGRAM).
+                            setValue(""));
+                }
+            }
+        }
         return nodeList;
     }
 
@@ -104,16 +122,16 @@ public class TclParser {
         TclNode node = new TclNode(TclNodeType.COMMAND);
         TclNode operand = null;
         /*
-        Any should begin with a word with a possible leading whitespace
-        */
+         Any should begin with a word with a possible leading whitespace
+         */
         advanceToken(TclTokenType.WORD, TclTokenType.WHITESPACE, TclTokenType.EOL);
         if (currenttoken.type != TclTokenType.WORD) {
             advanceToken(TclTokenType.WORD);
         }
         node.setValue(currenttoken.getValue());
         /*
-        There should be a whitespace after the command name
-        */
+         There should be a whitespace after the command name
+         */
         advanceToken(TclTokenType.WHITESPACE);
         /**
          * Cycling over arguments
@@ -130,8 +148,8 @@ public class TclParser {
                     advanceToken(TclTokenType.WHITESPACE);
                 } catch (TclParserError error) {
                     /*
-                    Creating a new operand node after whitespace
-                    */
+                     Creating a new operand node after whitespace
+                     */
                     if (previoustoken.type == TclTokenType.WHITESPACE) {
                         operand = new TclNode(TclNodeType.OPERAND).setValue(currenttoken.getValue());
                         node.getChildren().add(operand);
