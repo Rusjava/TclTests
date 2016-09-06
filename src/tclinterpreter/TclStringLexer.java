@@ -17,7 +17,7 @@
 package tclinterpreter;
 
 /**
- * A special lexer for quoted enclosed strings
+ * A special lexer class for quoted enclosed strings
  *
  * @author Ruslan Feshchenko
  * @version 0.1
@@ -57,7 +57,7 @@ public class TclStringLexer extends AbstractTclLexer {
      *
      * @return
      */
-    protected String readString() {
+    protected String readSubString() {
         String string = "";
         while (currentchar != '[' && currentchar != 0 && currentchar != '$') {
             string += currentchar;
@@ -71,13 +71,13 @@ public class TclStringLexer extends AbstractTclLexer {
      *
      * @return
      */
-    protected String readCString() {
-        String string = "";
+    protected String readString() {
+        StringBuilder string = new StringBuilder("");
         while (currentchar != ']' && currentchar != 0) {
-            string += currentchar;
+            string.append(currentchar);
             advancePosition();
         }
-        return string;
+        return string.toString();
     }
 
     @Override
@@ -113,7 +113,7 @@ public class TclStringLexer extends AbstractTclLexer {
             /*
              Reading and returning a string representing a script
              */
-            return new TclToken(TclTokenType.STRING).setValue(readCString());
+            return new TclToken(TclTokenType.STRING).setValue(readString());
         } else if (currentchar == 0) {
             /*
              Reading and returning a string of symbols
@@ -123,7 +123,7 @@ public class TclStringLexer extends AbstractTclLexer {
             /*
              Reading and returning EOF
              */
-            return new TclToken(TclTokenType.STRING).setValue(readString());
+            return new TclToken(TclTokenType.STRING).setValue(readSubString());
         }
     }
 }

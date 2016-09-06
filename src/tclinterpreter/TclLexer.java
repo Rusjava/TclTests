@@ -33,7 +33,12 @@ public class TclLexer extends AbstractTclLexer {
      * Flag indicating that the lexer is inside curly brackets
      */
     protected boolean curlyflag;
-
+    
+    /**
+     * Flag indicating that the lexer is inside brackets
+     */
+    protected boolean brflag;
+    
     /**
      * Constructor
      *
@@ -42,45 +47,7 @@ public class TclLexer extends AbstractTclLexer {
     public TclLexer(String script) {
         super(script);
     }
-
-    /**
-     * Skipping white space
-     */
-    protected void skipSpace() {
-        while (Character.isWhitespace(currentchar) && currentchar != 0) {
-            advancePosition();
-        }
-    }
-
-    /**
-     * Reading a real number from the script
-     *
-     * @return
-     */
-    protected String readNumber() {
-        StringBuilder number = new StringBuilder("");
-        /*
-         This is a number if didgit, dot and exponetial characters are present     
-         */
-        while (Character.isDigit(currentchar)
-                || currentchar == '.'
-                || (Character.toLowerCase(currentchar) == 'e'
-                && (peek() == '-') || peek() == '+')
-                || currentchar == '\\') {
-            if ((currentchar == '\\' && peek() == '\n')
-                    || (currentchar == '\\' && peek() == '\r')) {
-                skipEOL();
-            }
-            number.append(currentchar);
-            advancePosition();
-            if (Character.toLowerCase(currentchar) == 'e') {
-                advancePosition();
-                number.append(currentchar);
-            }
-        }
-        return number.toString();
-    }
-
+           
     /**
      * Reading alphanumerical names from the script
      *
@@ -151,17 +118,17 @@ public class TclLexer extends AbstractTclLexer {
      * @return
      */
     protected String readString() {
-        String string = "";
+        StringBuilder string = new StringBuilder("");
         while ((currentchar != '"' || !qflag) && (currentchar != '}' || !curlyflag)
-                && currentchar != ']') {
+                && (currentchar != ']' || !brflag)) {
             if ((currentchar == '\\' && peek() == '\n')
                     || (currentchar == '\\' && peek() == '\r')) {
                 skipEOL();
             }
-            string += currentchar;
+            string.append(currentchar);
             advancePosition();
         }
-        return string;
+        return string.toString();
     }
 
     @Override
@@ -194,15 +161,15 @@ public class TclLexer extends AbstractTclLexer {
             /*
              Returning a left quote token
              */
-            advancePosition();
             qflag = true;
+            advancePosition();
             return new TclToken(TclTokenType.LEFTQ);
         } else if (currentchar == '"' && qflag) {
             /*
              Returning a right quote token
              */
-            advancePosition();
             qflag = false;
+            advancePosition();
             return new TclToken(TclTokenType.RIGHTQ);
         } else if (currentchar == ';') {
             /*
@@ -220,19 +187,21 @@ public class TclLexer extends AbstractTclLexer {
             /*
              Skipping whitespace and returning a whitespace token
              */
-            skipSpace();
+            skipWhitespace();
             return new TclToken(TclTokenType.WHITESPACE);
         }
         if (currentchar == '[') {
             /*
              Returning a left bracket token
              */
+            brflag = true;
             advancePosition();
             return new TclToken(TclTokenType.LEFTBR);
         } else if (currentchar == ']') {
             /*
              Returning a right bracket token
              */
+            brflag = false;
             advancePosition();
             return new TclToken(TclTokenType.RIGHTBR);
         } else if (currentchar == '$') {
@@ -271,61 +240,4 @@ public class TclLexer extends AbstractTclLexer {
             return new TclToken(TclTokenType.UNKNOWN);
         }
     }
-
-    /**
-     * Analysis of numerical expressions
-     *
-     * @return
-     */
-    public TclToken getExprToken() {
-        if (Character.isDigit(currentchar)) {
-            /*
-             Returning a real number token
-             */
-            return new TclToken(TclTokenType.REALNUMBER).setValue(readNumber());
-        } else if (currentchar == '+') {
-            /*
-             Returning a plus op token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.PLUS);
-        } else if (currentchar == '-') {
-            /*
-             Returning a minus op token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.MINUS);
-        } else if (currentchar == '*') {
-            /*
-             Returning a multiplication op token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.MUL);
-        } else if (currentchar == '/') {
-            /*
-             Returning a division op token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.DIV);
-        } else if (currentchar == '(') {
-            /*
-             Returning a left paranthesis op token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.LEFTPAR);
-        } else if (currentchar == ')') {
-            /*
-             Returning a right paranthesis op token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.RIGHTPAR);
-        } else {
-            /*
-             Returning an unknown token
-             */
-            advancePosition();
-            return new TclToken(TclTokenType.UNKNOWN);
-        }
-    }
-
 }

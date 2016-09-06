@@ -50,8 +50,7 @@ public abstract class AbstractTclLexer {
      * Advance position by one
      */
     protected void advancePosition() {
-        pos++;
-        if (pos < script.length()) {
+        if (++pos < script.length()) {
             currentchar = script.charAt(pos);
         } else {
             currentchar = 0;
@@ -98,6 +97,15 @@ public abstract class AbstractTclLexer {
      */
     public String getScript() {
         return script;
+    }
+
+    /**
+     * Skipping white space
+     */
+    protected void skipWhitespace() {
+        while (Character.isWhitespace(currentchar) && currentchar != 0) {
+            advancePosition();
+        }
     }
     
 }
