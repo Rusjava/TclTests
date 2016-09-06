@@ -33,7 +33,7 @@ public class TclTests {
     public static void main(String[] args) {
         // TODO code application logic here
         TclParser parser = 
-        new TclParser(new TclLexer("set name1 \\\n n45;\n\t set name2 \"gh \\\n\t [puts 12]n450\"; puts $name1$name2[set name3 $name1]; "));
+        new TclParser(new TclLexer("set name1 \\\n n45;\n\t set name2 \"gh$name1 \\\n\t [puts 12]n450\"; puts $name1$name2[set name3 $name1]; "));
         try {
             System.out.println(parser.parse());
         } catch (TclParser.TclParserError ex) {
