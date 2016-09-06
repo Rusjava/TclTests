@@ -32,7 +32,7 @@ public class TclExpressionLexer extends AbstractTclLexer {
     public TclExpressionLexer(String script) {
         super(script);
     }
-    
+
     /**
      * Reading a real number from the script
      *
@@ -46,35 +46,34 @@ public class TclExpressionLexer extends AbstractTclLexer {
         while (Character.isDigit(currentchar)
                 || currentchar == '.'
                 || (Character.toLowerCase(currentchar) == 'e'
-                && (peek() == '-') || peek() == '+')
-                || currentchar == '\\') {
+                && ((peek() == '-') || peek() == '+'))) {
             number.append(currentchar);
             advancePosition();
-            if (Character.toLowerCase(currentchar) == 'e') {
-                advancePosition();
+            if (Character.toLowerCase(retropeek()) == 'e') {
                 number.append(currentchar);
+                advancePosition();
             }
         }
         return number.toString();
     }
-    
+
     @Override
     public TclToken getToken() {
         /*
-        Skipping any whitespace
-        */
+         Skipping any whitespace
+         */
         if (Character.isWhitespace(currentchar)) {
             /*
              Returning a real number token
              */
             skipWhitespace();
-        } 
-        
+        }
+
         if (Character.isDigit(currentchar)) {
             /*
              Returning a real number token
              */
-            return new TclToken(TclTokenType.REALNUMBER).setValue(readNumber());
+            return new TclToken(TclTokenType.NUMBER).setValue(readNumber());
         } else if (currentchar == '+') {
             /*
              Returning a plus op token
@@ -111,6 +110,11 @@ public class TclExpressionLexer extends AbstractTclLexer {
              */
             advancePosition();
             return new TclToken(TclTokenType.RIGHTPAR);
+        } else if (currentchar == 0) {
+            /*
+             Reading and returning end of file
+             */
+            return new TclToken(TclTokenType.EOF);
         } else {
             /*
              Returning an unknown token

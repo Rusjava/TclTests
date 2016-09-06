@@ -116,7 +116,7 @@ public class TclStringLexer extends AbstractTclLexer {
             return new TclToken(TclTokenType.STRING).setValue(readString());
         } else if (currentchar == 0) {
             /*
-             Reading and returning a string of symbols
+             Reading and returning end of file
              */
             return new TclToken(TclTokenType.EOF);
         } else {

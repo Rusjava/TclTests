@@ -17,37 +17,25 @@
 package tclinterpreter;
 
 /**
- * An enumeration for Tcl node types
- *
+ * An enumeration for mathematical operation types
+ * 
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-public enum TclNodeType {
-
-    BINARYOP("BO"),
-    UNARYOP("UO"),
-    NUMBER("number"),
-    PROGRAM("PROG"),
-    COMMAND("CMD"),
-    QSTRING("QS"),
-    CURLYSTRING("CS"),
-    OPERAND("OP"),
-    NAME("id"),
-    WORD("word");
-
-    private final String type;
-
-    /**
-     * Constructor
-     *
-     * @param value
-     */
-    private TclNodeType(String type) {
-        this.type = type;
+public enum MathOperationType {
+    PLUS("+"),
+    MINUS("-"),
+    MULT("*"),
+    DIV("/");
+    
+    private final String opname;
+    
+    private MathOperationType (String op) {
+        this.opname=op;
     }
-
+    
     @Override
     public String toString() {
-        return "NodeType: " + type;
+        return opname;
     }
 }

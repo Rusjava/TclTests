@@ -24,7 +24,7 @@ package tclinterpreter;
  */
 public enum TclTokenType {
 
-    REALNUMBER("number"),
+    NUMBER("number"),
     PLUS("plus"),
     MINUS("minus"),
     MUL("product"),

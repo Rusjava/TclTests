@@ -32,15 +32,121 @@ public class TclExpressionParser extends AbstractTclParser {
         super(lexer);
     }
 
+    /**
+     * Returning a factor of a binary operation
+     *
+     * @return
+     * @throws tclinterpreter.AbstractTclParser.TclParserError
+     */
+    protected TclNode getFactor() throws TclParserError {
+        TclNode node;
+        advanceToken(TclTokenType.NUMBER);
+        System.out.println(currenttoken);
+        node = new TclNode(TclNodeType.NUMBER).setValue(currenttoken.getValue());
+        return node;
+    }
+    
+    /**
+     * Returning an argument of a binary operation
+     *
+     * @return
+     * @throws tclinterpreter.AbstractTclParser.TclParserError
+     */
+    protected TclNode getArgument() throws TclParserError {
+        TclNode fact;
+        TclNode op;
+        /*
+         Is the first token a factor?
+         */
+        fact = getFactor();
+        /*
+         Cycling over the long expression
+         */
+        while (currenttoken.type != TclTokenType.EOF
+                && currenttoken.type != TclTokenType.PLUS
+                        && currenttoken.type != TclTokenType.MINUS) {
+            try {
+                op = getProdOperation();
+                op.getChildren().add(fact);
+                fact = getFactor();
+                op.getChildren().add(fact);
+                fact = op;
+            } catch (TclParserError error) {
+                if (currenttoken.type != TclTokenType.EOF 
+                        && currenttoken.type != TclTokenType.PLUS
+                        && currenttoken.type != TclTokenType.MINUS) {
+                    throw error;
+                }
+            }
+        }
+        return fact;
+    }
+    
+    /**
+     * Returning a binary additive operation node
+     *
+     * @return
+     * @throws tclinterpreter.AbstractTclParser.TclParserError
+     */
+    protected TclNode getAddOperation() throws TclParserError {
+        TclNode node = new TclNode(TclNodeType.BINARYOP);
+        advanceToken(TclTokenType.PLUS, TclTokenType.MINUS);
+        switch (currenttoken.type) {
+            case PLUS:
+                node.setValue("+");
+                break;
+            case MINUS:
+                node.setValue("-");
+                break; 
+        }
+        return node;
+    }
+    
+    /**
+     * Returning a binary product operation node
+     *
+     * @return
+     * @throws tclinterpreter.AbstractTclParser.TclParserError
+     */
+    protected TclNode getProdOperation() throws TclParserError {
+        TclNode node = new TclNode(TclNodeType.BINARYOP);
+        advanceToken(TclTokenType.MUL, TclTokenType.DIV);
+        switch (currenttoken.type) {
+            case MUL:
+                node.setValue("*");
+                break;
+            case DIV:
+                node.setValue("/");
+                break; 
+        }
+        return node;
+    }
+    
     @Override
     public TclNode parse() throws TclParserError {
+        TclNode arg;
+        TclNode op;
         /*
-         Is the next token an openning paranthesis or number?
+         Is the first token an argument?
          */
-        advanceToken(TclTokenType.RIGHTPAR, TclTokenType.REALNUMBER);
-        if (currenttoken.type == TclTokenType.REALNUMBER) {
-            
+        arg = getArgument();
+        /*
+         Cycling over the long expression
+         */
+        while (currenttoken.type != TclTokenType.EOF) {
+            try {
+                op = getAddOperation();
+                op.getChildren().add(arg);
+                arg = getArgument();
+                op.getChildren().add(arg);
+                arg = op;
+            } catch (TclParserError error) {
+                if (currenttoken.type != TclTokenType.EOF) {
+                    throw error;
+                }
+            }
         }
+        return arg;
     }
 
 }

@@ -67,6 +67,6 @@ public class TclToken {
 
     @Override
     public String toString() {
-        return "" + type + ", TokenValue: ";
+        return "" + type + ", TokenValue: " + value;
     }
 }
