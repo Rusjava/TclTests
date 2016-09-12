@@ -16,7 +16,6 @@
  */
 package tclinterpreter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +31,7 @@ public class TclParser extends AbstractTclParser {
      *
      * @param lexer
      */
-    public TclParser(AbstractTclLexer lexer) {
+    public TclParser(TclLexer lexer) {
         super(lexer);
     }
 

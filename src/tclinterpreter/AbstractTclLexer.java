@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package tclinterpreter;
 
 /**
  * Basic abstract class for Tcl lexers
- * 
+ *
  * @author Ruslan Feshchenko
  * @version 0.1
  */
 public abstract class AbstractTclLexer {
+
     /**
      * TCL script
      */
@@ -39,11 +39,16 @@ public abstract class AbstractTclLexer {
 
     /**
      * A general constructor of parsers
+     *
      * @param script
      */
     public AbstractTclLexer(String script) {
         this.script = script;
-        currentchar = script.charAt(pos);
+        if (script.length() > 0) {
+            currentchar = script.charAt(pos);
+        } else {
+            currentchar = 0;
+        }
     }
 
     /**
@@ -107,5 +112,5 @@ public abstract class AbstractTclLexer {
             advancePosition();
         }
     }
-    
+
 }

@@ -21,14 +21,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/*
+/**
  * This class interpretes Tcl scripts
  *
  * @author Ruslan Feshchenko
  * @version 0.1
  */
-public class TclInterpreter {
+public class TclInterpreter extends AbstractTclInterpreter {
 
     /**
      * A map for Tcl keywords
@@ -41,9 +43,13 @@ public class TclInterpreter {
     protected final Map<String, String> VARS = new HashMap<>();
 
     /**
-     * A string for the script output
+     * Constructor, which sets up the interpreter with an attached parser
+     *
+     * @param parser
      */
-    protected StringBuilder output = new StringBuilder("Tcl> ");
+    public TclInterpreter(TclParser parser) {
+        super(parser);
+    }
 
     /**
      * Initializing keywords map
@@ -88,21 +94,21 @@ public class TclInterpreter {
                     .append(readOPNode(node.getChildren().get(0)))
                     .append("\n");
         });
-    }
-
-    /**
-     * Current parser
-     */
-    protected TclParser parser;
-
-    /**
-     * Constructor, which sets up the interpreter with an attached parser
-     *
-     * @param parser
-     */
-    public TclInterpreter(TclParser parser) {
-        super();
-        this.parser = parser;
+        
+        /*
+         'Expr' command definition
+         */
+        COMMANDS.put("expr", node -> {
+            TclExpressionInterpreter inter=new TclExpressionInterpreter(
+                    new TclExpressionParser(new TclExpressionLexer(readOPNode(node.getChildren().get(0)))));
+            try {
+                output.append("Tcl> ")
+                        .append(inter.run())
+                        .append("\n");
+            } catch (AbstractTclParser.TclParserError ex) {
+                Logger.getLogger(TclInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
     }
 
     /**
@@ -132,31 +138,15 @@ public class TclInterpreter {
                         }).findFirst().get()));
             } else if (child.type == TclNodeType.QSTRING) {
                 str.append(child.getValue());
+            } else if (child.type == TclNodeType.CURLYSTRING) {
+                str.append(child.getValue());
             } else if (child.type == TclNodeType.PROGRAM) {
                 str.append("[").append(child.getValue()).append("]");
             } else if (child.type == TclNodeType.WORD) {
                 str.append(child.getValue());
-            } 
+            }
         }
         return str.toString();
-    }
-
-    /**
-     * Method, which sets up script
-     *
-     * @param parser
-     */
-    public void setParser(TclParser parser) {
-        this.parser = parser;
-    }
-
-    /**
-     * Returning Tcl parser used
-     *
-     * @return
-     */
-    public TclParser getParser() {
-        return parser;
     }
 
     /**
@@ -165,6 +155,7 @@ public class TclInterpreter {
      * @return
      * @throws tclinterpreter.TclParser.TclParserError
      */
+    @Override
     public String run() throws TclParser.TclParserError {
         TclNode root = parser.parse();
         List<TclNode> chld = root.getChildren();
@@ -175,12 +166,4 @@ public class TclInterpreter {
         return output.toString();
     }
 
-    /**
-     * Getting the script output string
-     *
-     * @return
-     */
-    public String getOutput() {
-        return output.toString();
-    }
 }

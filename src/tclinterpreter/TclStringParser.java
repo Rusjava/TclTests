@@ -28,7 +28,7 @@ public class TclStringParser extends AbstractTclParser {
      *
      * @param lexer
      */
-    public TclStringParser(AbstractTclLexer lexer) {
+    public TclStringParser(TclStringLexer lexer) {
         super(lexer);
     }
 
