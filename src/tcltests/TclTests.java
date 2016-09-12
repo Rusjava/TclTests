@@ -33,27 +33,36 @@ public class TclTests {
     public static void main(String[] args) {
         // TODO code application logic here
         /*TclParser parser = 
-        new TclParser(new TclLexer("set name1 \\\n n45;\n\t set name2 \"gh$name1 \\\n\t [puts 12]n450\"; puts $name1$name2[set name3 $name1]; "));
-        try {
-            System.out.println(parser.parse());
-        } catch (TclParser.TclParserError ex) {
-            Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-        AbstractTclParser parser = 
-        new TclExpressionParser(new TclExpressionLexer("2.4 + 3.5e-10 - 4.6e+6"));
-        try {
-            System.out.println(parser.parse());
-        } catch (TclParser.TclParserError ex) {
-            Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
-        }
+         new TclParser(new TclLexer("set name1 \\\n n45;\n\t set name2 \"gh$name1 \\\n\t [puts 12]n450\"; puts $name1$name2[set name3 $name1]; "));
+         try {
+         System.out.println(parser.parse());
+         } catch (TclParser.TclParserError ex) {
+         Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
+         }*/
+
+        /*AbstractTclParser parser = 
+         new TclExpressionParser(new TclExpressionLexer("2.4*2 + 3.5e-10* 3.2 - 4.6e+6"));
+         try {
+         System.out.println(parser.parse());
+         } catch (TclParser.TclParserError ex) {
+         Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
+         }*/
+        
         /*TclInterpreter inter = new TclInterpreter(new TclParser(
          new TclLexer("set name1 \\\n n45;\n\t set name2 \"gh \\\n\t n450\"; puts $name2; puts $name1$name2[set name3 $name1]; ")));
          try {
-         //System.out.println(inter.getParser().parse());
          System.out.println(inter.run());
          } catch (TclParser.TclParserError ex) {
          Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
          }*/
+        
+        AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
+                new TclLexer("expr {9.6e+6 / 2 + 3.5e+10* 3.2e-4 - 4.6e+6};")));
+        try {
+            System.out.println(inter.run());
+        } catch (TclParser.TclParserError ex) {
+            Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
