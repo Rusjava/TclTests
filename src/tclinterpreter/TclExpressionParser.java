@@ -65,7 +65,6 @@ public class TclExpressionParser extends AbstractTclParser {
          Is the first token an argument?
          */
         arg = getArgument();
-        System.out.println(arg);
         /*
          Cycling over the long expression
          */
@@ -82,7 +81,6 @@ public class TclExpressionParser extends AbstractTclParser {
                 }
             }
         }
-
         return arg;
     }
 
@@ -102,10 +100,7 @@ public class TclExpressionParser extends AbstractTclParser {
         /*
          Cycling over the long expression
          */
-        while (currenttoken.type != TclTokenType.EOF
-                && currenttoken.type != TclTokenType.PLUS
-                && currenttoken.type != TclTokenType.MINUS
-                && currenttoken.type != TclTokenType.RIGHTPAR) {
+        do {
             try {
                 op = getProdOperation();
                 op.getChildren().add(fact);
@@ -120,7 +115,10 @@ public class TclExpressionParser extends AbstractTclParser {
                     throw error;
                 }
             }
-        }
+        } while (currenttoken.type != TclTokenType.EOF
+                && currenttoken.type != TclTokenType.PLUS
+                && currenttoken.type != TclTokenType.MINUS
+                && currenttoken.type != TclTokenType.RIGHTPAR);
         return fact;
     }
 
