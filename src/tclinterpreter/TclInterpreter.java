@@ -99,8 +99,18 @@ public class TclInterpreter extends AbstractTclInterpreter {
          'Expr' command definition
          */
         COMMANDS.put("expr", node -> {
+            //Reading the expression after all allowed substitutions
+            String expr=readOPNode(node.getChildren().get(0));
+            //The second round of substitutions
+            TclNode exprNode = null;
+            try {
+                exprNode=new TclStringParser(new TclStringLexer(expr)).parse();
+            } catch (AbstractTclParser.TclParserError ex) {
+                Logger.getLogger(TclInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            //Interpreting the expression
             TclExpressionInterpreter inter=new TclExpressionInterpreter(
-                    new TclExpressionParser(new TclExpressionLexer(readOPNode(node.getChildren().get(0)))));
+                    new TclExpressionParser(new TclExpressionLexer(readOPNode(exprNode))));
             try {
                 output.append("Tcl> ")
                         .append(inter.run())

@@ -43,15 +43,19 @@ public class TclExpressionInterpreter extends AbstractTclInterpreter {
         double result;
         /*
         If the node is number, just get its value
-        */
+         */
         if (node.getChildren().isEmpty()) {
-            return Double.parseDouble(node.getValue());
+            if (!node.getValue().isEmpty()) {
+                return Double.parseDouble(node.getValue());
+            } else {
+                return 0;
+            }
         }
         result = CalculateNode(node.getChildren().get(0));
         TclNode node2 = node.getChildren().get(1);
         /*
         Operation depends on the node's value
-        */
+         */
         if (node.getValue().equals("+")) {
             result += CalculateNode(node2);
 

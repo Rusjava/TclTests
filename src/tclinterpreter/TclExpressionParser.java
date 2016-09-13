@@ -40,9 +40,50 @@ public class TclExpressionParser extends AbstractTclParser {
      */
     protected TclNode getFactor() throws TclParserError {
         TclNode node;
-        advanceToken(TclTokenType.NUMBER);
-        node = new TclNode(TclNodeType.NUMBER).setValue(currenttoken.getValue());
+        /*
+         * If it begins with a number, return it. If it begins with an opening paranthesis get the expression in paranthesis
+         */
+        advanceToken(TclTokenType.NUMBER, TclTokenType.LEFTPAR);
+        if (currenttoken.type == TclTokenType.NUMBER) {
+            node = new TclNode(TclNodeType.NUMBER).setValue(currenttoken.getValue());
+        } else {
+            node = getExpression();
+        }
         return node;
+    }
+
+    /**
+     * Returning the expression in parentheses
+     *
+     * @return
+     * @throws tclinterpreter.AbstractTclParser.TclParserError
+     */
+    protected TclNode getExpression() throws TclParserError {
+        TclNode arg;
+        TclNode op;
+        /*
+         Is the first token an argument?
+         */
+        arg = getArgument();
+        System.out.println(arg);
+        /*
+         Cycling over the long expression
+         */
+        while (currenttoken.type != TclTokenType.EOF && currenttoken.type != TclTokenType.RIGHTPAR) {
+            try {
+                op = getAddOperation();
+                op.getChildren().add(arg);
+                arg = getArgument();
+                op.getChildren().add(arg);
+                arg = op;
+            } catch (TclParserError error) {
+                if (currenttoken.type != TclTokenType.EOF && currenttoken.type != TclTokenType.RIGHTPAR) {
+                    throw error;
+                }
+            }
+        }
+
+        return arg;
     }
 
     /**
@@ -63,7 +104,8 @@ public class TclExpressionParser extends AbstractTclParser {
          */
         while (currenttoken.type != TclTokenType.EOF
                 && currenttoken.type != TclTokenType.PLUS
-                && currenttoken.type != TclTokenType.MINUS) {
+                && currenttoken.type != TclTokenType.MINUS
+                && currenttoken.type != TclTokenType.RIGHTPAR) {
             try {
                 op = getProdOperation();
                 op.getChildren().add(fact);
@@ -73,7 +115,8 @@ public class TclExpressionParser extends AbstractTclParser {
             } catch (TclParserError error) {
                 if (currenttoken.type != TclTokenType.EOF
                         && currenttoken.type != TclTokenType.PLUS
-                        && currenttoken.type != TclTokenType.MINUS) {
+                        && currenttoken.type != TclTokenType.MINUS
+                        && currenttoken.type != TclTokenType.RIGHTPAR) {
                     throw error;
                 }
             }
@@ -122,29 +165,20 @@ public class TclExpressionParser extends AbstractTclParser {
 
     @Override
     public TclNode parse() throws TclParserError {
-        TclNode arg;
-        TclNode op;
         /*
-         Is the first token an argument?
+        * Returning an expression evaluation result
          */
-        arg = getArgument();
-        /*
-         Cycling over the long expression
-         */
-        while (currenttoken.type != TclTokenType.EOF) {
-            try {
-                op = getAddOperation();
-                op.getChildren().add(arg);
-                arg = getArgument();
-                op.getChildren().add(arg);
-                arg = op;
-            } catch (TclParserError error) {
-                if (currenttoken.type != TclTokenType.EOF) {
-                    throw error;
-                }
+        TclNode result;
+        try {
+            result = getExpression();
+        } catch (TclParserError error) {
+            if (error.ctokentype == TclTokenType.EOF) {
+                return new TclNode(TclNodeType.QSTRING).setValue("");
+            } else {
+                throw error;
             }
         }
-        return arg;
+        return result;
     }
 
 }
