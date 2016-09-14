@@ -40,6 +40,7 @@ public abstract class AbstractTclParser {
      * @param lexer
      */
     public AbstractTclParser(AbstractTclLexer lexer) {
+        super();
         this.lexer = lexer;
     }
 
@@ -88,8 +89,15 @@ public abstract class AbstractTclParser {
      */
     public static class TclParserError extends Exception {
 
-        String message;
-        TclTokenType ctokentype, etokentype;
+        /**
+         * A message for the exception
+         */
+        protected String message;
+        
+        /**
+         * Current and previous tokens at the moment the exception happened
+         */
+        protected TclTokenType ctokentype, etokentype;
 
         /**
          * Constructor

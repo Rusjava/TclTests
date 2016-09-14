@@ -24,6 +24,11 @@ package tclinterpreter;
 public class TclExpressionParser extends AbstractTclParser {
 
     /**
+     * The number of folded parentheses
+     */
+    protected int fnumber = 0;
+
+    /**
      * Constructor
      *
      * @param lexer
@@ -37,8 +42,9 @@ public class TclExpressionParser extends AbstractTclParser {
      *
      * @return
      * @throws tclinterpreter.AbstractTclParser.TclParserError
+     * @throws tclinterpreter.TclExpressionParser.UnbalancedParenthesesException
      */
-    protected TclNode getFactor() throws TclParserError {
+    protected TclNode getFactor() throws TclParserError, UnbalancedParenthesesException {
         TclNode node;
         /*
          * If it begins with a number, return it. If it begins with an opening paranthesis get the expression in paranthesis
@@ -47,6 +53,7 @@ public class TclExpressionParser extends AbstractTclParser {
         if (currenttoken.type == TclTokenType.NUMBER) {
             node = new TclNode(TclNodeType.NUMBER).setValue(currenttoken.getValue());
         } else {
+            fnumber++; //Increasing number of folded parantheses
             node = getExpression();
         }
         return node;
@@ -57,8 +64,9 @@ public class TclExpressionParser extends AbstractTclParser {
      *
      * @return
      * @throws tclinterpreter.AbstractTclParser.TclParserError
+     * @throws tclinterpreter.TclExpressionParser.UnbalancedParenthesesException
      */
-    protected TclNode getExpression() throws TclParserError {
+    protected TclNode getExpression() throws TclParserError, UnbalancedParenthesesException {
         TclNode arg;
         TclNode op;
         /*
@@ -69,17 +77,11 @@ public class TclExpressionParser extends AbstractTclParser {
          Cycling over the long expression
          */
         while (currenttoken.type != TclTokenType.EOF && currenttoken.type != TclTokenType.RIGHTPAR) {
-            try {
-                op = getAddOperation();
-                op.getChildren().add(arg);
-                arg = getArgument();
-                op.getChildren().add(arg);
-                arg = op;
-            } catch (TclParserError error) {
-                if (currenttoken.type != TclTokenType.EOF && currenttoken.type != TclTokenType.RIGHTPAR) {
-                    throw error;
-                }
-            }
+            op = getAddOperation();
+            op.getChildren().add(arg);
+            arg = getArgument();
+            op.getChildren().add(arg);
+            arg = op;
         }
         return arg;
     }
@@ -89,8 +91,9 @@ public class TclExpressionParser extends AbstractTclParser {
      *
      * @return
      * @throws tclinterpreter.AbstractTclParser.TclParserError
+     * @throws tclinterpreter.TclExpressionParser.UnbalancedParenthesesException
      */
-    protected TclNode getArgument() throws TclParserError {
+    protected TclNode getArgument() throws TclParserError, UnbalancedParenthesesException {
         TclNode fact;
         TclNode op;
         /*
@@ -100,25 +103,30 @@ public class TclExpressionParser extends AbstractTclParser {
         /*
          Cycling over the long expression
          */
-        do {
-            try {
+        try {
+            do {
                 op = getProdOperation();
                 op.getChildren().add(fact);
                 fact = getFactor();
                 op.getChildren().add(fact);
                 fact = op;
-            } catch (TclParserError error) {
-                if (currenttoken.type != TclTokenType.EOF
-                        && currenttoken.type != TclTokenType.PLUS
-                        && currenttoken.type != TclTokenType.MINUS
-                        && currenttoken.type != TclTokenType.RIGHTPAR) {
-                    throw error;
+            } while (true);
+        } catch (TclParserError error) {
+            if (currenttoken.type == TclTokenType.RIGHTPAR) {
+                fnumber--;
+                if (fnumber < 0) {
+                    throw new UnbalancedParenthesesException("The number of closing parentheses exceeds the number of opening parentheses");
                 }
             }
-        } while (currenttoken.type != TclTokenType.EOF
-                && currenttoken.type != TclTokenType.PLUS
-                && currenttoken.type != TclTokenType.MINUS
-                && currenttoken.type != TclTokenType.RIGHTPAR);
+            if ((currenttoken.type != TclTokenType.EOF
+                    && currenttoken.type != TclTokenType.PLUS
+                    && currenttoken.type != TclTokenType.MINUS
+                    && currenttoken.type != TclTokenType.RIGHTPAR)
+                    || error.etokentype == TclTokenType.LEFTPAR
+                    || error.etokentype == TclTokenType.NUMBER) {
+                throw error;
+            }
+        }
         return fact;
     }
 
@@ -164,19 +172,41 @@ public class TclExpressionParser extends AbstractTclParser {
     @Override
     public TclNode parse() throws TclParserError {
         /*
-        * Returning an expression evaluation result
+         * Returning an expression evaluation result
          */
         TclNode result;
         try {
             result = getExpression();
         } catch (TclParserError error) {
             if (error.ctokentype == TclTokenType.EOF) {
-                return new TclNode(TclNodeType.QSTRING).setValue("");
+                return new TclNode(TclNodeType.QSTRING).setValue("0");
             } else {
                 throw error;
             }
         }
+        if (fnumber > 0) {
+            throw new UnbalancedParenthesesException("The number of openning parentheses exceeds the number of closing parentheses");
+        }
         return result;
     }
 
+    /**
+     * A class for an exception thrown if the parentheses are unbalanced
+     */
+    public static class UnbalancedParenthesesException extends AbstractTclParser.TclParserError {
+
+        /**
+         * A constructor
+         *
+         * @param msg
+         */
+        public UnbalancedParenthesesException(String msg) {
+            super(msg, null, null);
+        }
+
+        @Override
+        public String toString() {
+            return message;
+        }
+    }
 }
