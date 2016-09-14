@@ -56,8 +56,16 @@ public class TclTests {
          Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
          }*/
         
+        /*AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
+                new TclLexer("set name1 1.0; expr {(9.6e+6 / ($name1 * 2)+ 3.5e+10* (3.2e-4)*(2*0.5) - 4.6e+6/(1.0*2-1)*(1.0*3-2))};")));
+        try {
+            System.out.println(inter.run());
+        } catch (TclParser.TclParserError ex) {
+            Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        
         AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
-                new TclLexer("set name1 2.0; expr {(9.6e+6 / $name1+ 3.5e+10* 3.2e-4*(1.0) - 4.6e+6)};")));
+                new TclLexer("set name1 1.0; expr {(9.6e+6 / ($name1 * 2)+ 3.5e+10* (((3.2e-4)))*(2*0.5) - 4.6e+6/(1.0*2-1)*(1.0*3-2))};")));
         try {
             System.out.println(inter.run());
         } catch (TclParser.TclParserError ex) {
