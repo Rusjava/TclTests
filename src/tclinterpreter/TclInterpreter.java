@@ -38,17 +38,15 @@ public class TclInterpreter extends AbstractTclInterpreter {
     public static final Map<String, Consumer<TclNode>> COMMANDS = new HashMap<>();
 
     /**
-     * A map for variables
-     */
-    protected final Map<String, String> VARS = new HashMap<>();
-
-    /**
      * Constructor, which sets up the interpreter with an attached parser
      *
      * @param parser
+     * @param context the upper level context pointer or the current context
+     * pointer
+     * @param newcontext Should a new context be created
      */
-    public TclInterpreter(TclParser parser) {
-        super(parser);
+    public TclInterpreter(TclParser parser, TclInterpreterContext context, boolean newcontext) {
+        super(parser, context, newcontext);
     }
 
     /**
@@ -59,31 +57,14 @@ public class TclInterpreter extends AbstractTclInterpreter {
          'Set' command definition
          */
         COMMANDS.put("set", node -> {
-            String key;
-            try {
-                key = VARS.keySet().stream().filter(cmd -> {
-                    return cmd.equals(node.getChildren().get(0).getValue());
-                }).findFirst().get();
-            } catch (NoSuchElementException ex) {
-                VARS.put(readOPNode(node.getChildren().get(0)), readOPNode(node.getChildren().get(1)));
-                return;
-            }
-            VARS.replace(key, readOPNode(node.getChildren().get(1)));
-
+            context.setVaribale(node.getChildren().get(0).getValue(), node.getChildren().get(1).getValue());
         });
+
         /*
          'Unset' command definition
          */
         COMMANDS.put("unset", node -> {
-            String key;
-            try {
-                key = VARS.keySet().stream().filter(cmd -> {
-                    return cmd.equals(node.getChildren().get(0).getValue());
-                }).findFirst().get();
-            } catch (NoSuchElementException ex) {
-                return;
-            }
-            VARS.remove(key);
+            context.deleteVaribale(node.getChildren().get(0).getValue());
         });
 
         /*
@@ -94,27 +75,25 @@ public class TclInterpreter extends AbstractTclInterpreter {
                     .append(readOPNode(node.getChildren().get(0)))
                     .append("\n");
         });
-        
+
         /*
          'Expr' command definition
          */
         COMMANDS.put("expr", node -> {
             //Reading the expression after all allowed substitutions
-            String expr=readOPNode(node.getChildren().get(0));
+            String expr = readOPNode(node.getChildren().get(0));
             //The second round of substitutions
             TclNode exprNode = null;
             try {
-                exprNode=new TclStringParser(new TclStringLexer(expr)).parse();
+                exprNode = new TclStringParser(new TclStringLexer(expr)).parse();
             } catch (AbstractTclParser.TclParserError ex) {
                 Logger.getLogger(TclInterpreter.class.getName()).log(Level.SEVERE, null, ex);
             }
             //Interpreting the expression
-            TclExpressionInterpreter inter=new TclExpressionInterpreter(
+            TclExpressionInterpreter inter = new TclExpressionInterpreter(
                     new TclExpressionParser(new TclExpressionLexer(readOPNode(exprNode))));
             try {
-                output.append("Tcl> ")
-                        .append(inter.run())
-                        .append("\n");
+                output.append(inter.run());
             } catch (AbstractTclParser.TclParserError ex) {
                 Logger.getLogger(TclInterpreter.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -141,22 +120,49 @@ public class TclInterpreter extends AbstractTclInterpreter {
     protected String readOPNode(TclNode node) {
         StringBuilder str = new StringBuilder("");
         for (TclNode child : node.getChildren()) {
-            if (child.type == TclNodeType.NAME) {
-                str.append(
-                        VARS.get(VARS.keySet().stream().filter(cmd -> {
-                            return cmd.equals(child.getValue());
-                        }).findFirst().get()));
-            } else if (child.type == TclNodeType.QSTRING) {
-                str.append(child.getValue());
-            } else if (child.type == TclNodeType.CURLYSTRING) {
-                str.append(child.getValue());
-            } else if (child.type == TclNodeType.PROGRAM) {
-                str.append("[").append(child.getValue()).append("]");
-            } else if (child.type == TclNodeType.WORD) {
-                str.append(child.getValue());
+            if (null != child.type) {
+                switch (child.type) {
+                    case NAME:
+                        str.append(context.getVaribale(child.getValue()));
+                        break;
+                    case QSTRING:
+                        str.append(child.getValue());
+                        break;
+                    case CURLYSTRING:
+                        str.append(child.getValue());
+                        break;
+                    case PROGRAM:
+                        AbstractTclInterpreter subinterpreter
+                                = new TclInterpreter(new TclParser(new TclLexer(child.getValue())), context, false);
+                        String result = null;
+                        try {
+                            result = subinterpreter.run();
+                        } catch (AbstractTclParser.TclParserError ex) {
+                            Logger.getLogger(TclInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        str.append(result);
+                        break;
+                    case WORD:
+                        str.append(child.getValue());
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         return str.toString();
+    }
+
+    /**
+     * Executing a sequence of commands
+     *
+     * @param program
+     */
+    protected void executeProgram(TclNode program) {
+        List<TclNode> chld = program.getChildren();
+        for (TclNode node : chld) {
+            executeCommand(node);
+        }
     }
 
     /**
@@ -168,11 +174,8 @@ public class TclInterpreter extends AbstractTclInterpreter {
     @Override
     public String run() throws TclParser.TclParserError {
         TclNode root = parser.parse();
-        List<TclNode> chld = root.getChildren();
         output.append("Executing ").append(root.getValue()).append("\n");
-        for (TclNode node : chld) {
-            executeCommand(node);
-        }
+        executeProgram(root);
         return output.toString();
     }
 

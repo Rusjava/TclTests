@@ -71,7 +71,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
-import tclinterpreter.TclTokenType;
+import tclinterpreter.AbstractTclInterpreter;
 import tclinterpreter.TclInterpreter;
 import tclinterpreter.TclLexer;
 import tclinterpreter.TclNode;
@@ -92,7 +92,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
     private SwingWorker<Integer, Void> worker;
     private boolean working = false;
     JFormattedTextField maxRayNumberBox, beginColumn, endColumn;
-    TclInterpreter interpreter;
+    AbstractTclInterpreter interpreter;
 
     /**
      * Creates new form ShadowFileConverterJForme
@@ -507,7 +507,7 @@ public class ShadowFileConverterJForme extends javax.swing.JFrame {
         //Showing help and reading the result
         int option = JOptionPane.showConfirmDialog(null, message, "Script", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            interpreter=new TclInterpreter(new TclParser(new TclLexer(scriptArea.getText())));
+            interpreter=new TclInterpreter(new TclParser(new TclLexer(scriptArea.getText())), null, true);
         }
 
     }//GEN-LAST:event_ScriptJMenuItemActionPerformed

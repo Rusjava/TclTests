@@ -27,10 +27,10 @@ public class TclExpressionInterpreter extends AbstractTclInterpreter {
     /**
      * Constructor
      *
-     * @param parser
+     * @param parser an expression parser
      */
     public TclExpressionInterpreter(TclExpressionParser parser) {
-        super(parser);
+        super(parser, null, false);
     }
 
     /**
@@ -74,7 +74,9 @@ public class TclExpressionInterpreter extends AbstractTclInterpreter {
 
     @Override
     public String run() throws AbstractTclParser.TclParserError {
-        return Double.toString(CalculateNode(parser.parse()));
+        String result=Double.toString(CalculateNode(parser.parse()));
+        output.append(result);
+        return result;
     }
 
 }

@@ -34,12 +34,26 @@ public abstract class AbstractTclInterpreter {
     protected AbstractTclParser parser;
 
     /**
-     * Constructor taking a parser as an argument
+     * The local context, which includes varibales, the pointer to the upper
+     * level context and attributes
+     */
+    protected TclInterpreterContext context;
+
+    /**
+     * Constructor taking a parser and a context as an argument
      *
      * @param parser
+     * @param context the upper level context pointer or the current context
+     * pointer
+     * @param newcontext Should a new context be created
      */
-    public AbstractTclInterpreter(AbstractTclParser parser) {
+    public AbstractTclInterpreter(AbstractTclParser parser, TclInterpreterContext context, boolean newcontext) {
         this.parser = parser;
+        if (newcontext) {
+            this.context = new TclInterpreterContext(context);
+        } else {
+            this.context = context;
+        }
     }
 
     /**
