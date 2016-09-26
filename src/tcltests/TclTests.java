@@ -67,9 +67,10 @@ public class TclTests {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
         */
+        
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
-                new TclLexer("puts \"Octal number: \\073; Hex number: \\x19FA\";")),
+                new TclLexer("puts \"Octal number: \\073; Hex number:\\\n\n\t\n \\x19FA; Unicode: \\u0030\"; puts \\u0030hhh\\\n\n\thg;")),
                 null, true, stream, "cp1251");
         try {
             inter.run();
