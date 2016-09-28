@@ -42,7 +42,7 @@ public class TclTests {
          } catch (TclParser.TclParserError ex) {
          Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
          }*/
-        /*TclParser parser = new TclParser(
+ /*TclParser parser = new TclParser(
          new TclLexer("puts имя; puts [set nn 1;]; set имя1 1.0; set vr 2; unset vr; set vr 9.6e+6; set vrr 3.2e-6; set vrr \"3.2e-4\";"
          + "puts [expr {($vr / ($имя1 * 2)+ 3.5e+10* ($vrr)*(2*0.5) - 4.6e+6/($имя1*2-1)*($имя1*3-2))};];"));
          try {
@@ -50,15 +50,14 @@ public class TclTests {
          } catch (TclParser.TclParserError ex) {
          Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
          }*/
-        
-        /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
-                new TclLexer("puts имя; puts [set nn 1.0;]; set имя1 1.0; set vr 2; unset vr; set vr 9.6e+6; set vrr 3.2e-6; set vrr \"3.2e-4\";"
-                        + "puts [expr {($vr / ($имя1 * 2)+ 3.5e+10* ($vrr)*(2*0.5) - 4.6e+6/($имя1*2-1)*($имя1*3-2))};];")),
+                new TclLexer("puts имя; puts [set nn [expr {(2.0**10)+3};];]; set имя1 0; set vr 2; unset vr; set vr 9.6e+6; set vrr 3.2e-6; set vrr \"3.2e-4\";"
+                        + "puts [expr {($vr / (-!$имя1 * -2)+ 3.5e+10* ($vrr)*(~~2*0.5) - 4.6e+6/(!$имя1*2-1)*(!$имя1*3-2))};];")),
                 null, true, stream, "cp1251");
         try {
             inter.run();
-        } catch (TclParser.TclParserError ex) {
+        } catch (Exception ex) {
             Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println(inter.getOutput());
@@ -66,9 +65,8 @@ public class TclTests {
             System.out.println(stream.toString("cp1251"));
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
-        */
-        
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        }
+        /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
         AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
                 new TclLexer("puts \"Octal number: \\073; Hex number:\\\n\n\t\n \\x19FA; Unicode: \\u0030\"; puts \\u0030hhh\\\n\n\thg;")),
                 null, true, stream, "cp1251");
@@ -82,7 +80,7 @@ public class TclTests {
             System.out.println(stream.toString("cp1251"));
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
 
 }
