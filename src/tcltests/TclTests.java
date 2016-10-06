@@ -52,9 +52,10 @@ public class TclTests {
          }*/
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
-                new TclLexer("puts [expr 05;]; puts [set nn [expr {(2.0**10)+3*1};];]; set имя1 0.0; set vr 2; unset vr; set vr 9.6e+6; set vrr 3.2e-6; set vrr \"3.2e-4\";"
-                        + "puts [expr {($vr / (-!$имя1 * -2)+ 3.5e+10* ($vrr)*(~~2*0.5) - 4.6e+6/(!$имя1*2-1)*(!$имя1*3-2))};];"
-                        + "puts [expr {((1<<012)+3)%10};]; puts [expr {\"string\"+\"1\" ne \"string2\"};];")),
+                new TclLexer("puts [expr 05;]; puts [set nn [expr {(2.0**10)+3*1};];]; set имя1 0.0; set vr 2; unset vr; set vr(0) 9.6e+6; set vr(1) 3.2e-6; set vr(1) \"3.2e-4\";"
+                        + "puts [expr {($vr(0) / (-!$имя1 * -2)+ 3.5e+10* ($vr(1))*(~~2*0.5) - 4.6e+6/(!$имя1*2-1)*(!$имя1*3-2))};];"
+                        + "puts [expr {((1<<012)+3)%10};]; puts [expr {\"string\"+\"1\" ne \"string2\"};];"
+                        + "")),
                 null, true, stream, "cp1251");
         try {
             inter.run();
