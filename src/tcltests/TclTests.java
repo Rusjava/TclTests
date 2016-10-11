@@ -55,9 +55,12 @@ public class TclTests {
                         + "puts [expr {($vr(0) / (-!$имя1 * -2)+ 3.5e+10* ($vr(1))*(~~2*0.5) - 4.6e+6/(!$имя1*2-1)*(!$имя1*3-2))};];"
                         + "puts [expr {((1<<012)+3)%10};]; puts [expr {\"string\"+\"1\" ne \"string2\"};];"
                         + "puts [set vr(1);]; puts [set vr(0);];"
-                        + "puts [if [expr {$vr(0)<1};] then 25 elseif [expr {$vr(0)>1};] 35 else 45];"
-                        + "set vv 22; puts [set vv];")),
+                        + "puts [if {$vr(0)>1} then 25 elseif [expr {$vr(0)>1};] 35 else 45];"
+                        + "set vv 22; puts [set vv];"
+                        + "set i 0;  while {$i<6} {[set i [expr {$i+1}]]}; puts $i;"
+                        + "for {[set i 0; set ii 1;]} {$i<6} {[set i [expr {$i+1}]]} {[set ii [expr {$ii*($i+1)}];];}; puts $ii;")),
                 null, true, stream, "cp1251");
+        
         try {
             inter.run();
         } catch (Exception ex) {
