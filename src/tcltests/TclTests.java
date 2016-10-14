@@ -55,10 +55,13 @@ public class TclTests {
                         + "puts [expr {($vr(0) / (-!$имя\\\n1 * -2)+ 3.5e+10* ($vr(1))*(~~2*0.5) - 4.6e+6/(!$имя1*2-1)*(!$имя1*3-2))};];"
                         + "puts [expr {((1<<0\\\n12)+3)%10};]; puts [expr {\"string\"+\"1\" ne \"string2\"};];"
                         + "puts [set vr(1);]; puts [set vr(0);];"
-                        + "puts [if {$vr(0)>1} then 25 elseif [expr {$vr(0)>1};] 35 else 45];"
+                        + "puts [if {$vr(0)>1} then {expr [expr 25]} elseif {$vr(0)>1} {expr 35} else {expr 45}];"
                         + "set vv 22; puts [\\\n set vv];"
-                        + "set i 0;  while {$i<6} {[set i [expr {$i+1}]]}; puts $i;"
-                        + "for {[set i 0; set ii 1;]} {$i<6} {[set i [expr {$i+1}]]} {[set ii [expr {$ii*($i+1)}];];}; puts $ii;")),
+                        + "set i 0;  while {$i<6} {set i [expr {$i+1}]}; puts $i;"
+                        + "for {set i 0; set ii 1;} {$i<6} {set i [expr {$i+1}]} {set ii [expr {$ii*($i+1)}];}; puts $ii;"
+                        + "puts [string index \"str1\" 2];"
+                        + "puts [string match \"*nk?cm\" \"lhemk3cm\"];"
+                        + "puts [expr {2*asin(1)}]")),
                 null, true, stream, "cp1251");
         
         try {
