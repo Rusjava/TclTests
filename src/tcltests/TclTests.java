@@ -61,7 +61,7 @@ public class TclTests {
                         + "for {set i 0; set ii 1;} {$i<6} {set i [expr {$i+1}]} {set ii [expr {$ii*($i+1)}];}; puts $ii;"
                         + "puts [string index \"str1\" 2];"
                         + "puts [string match \"*nk?cm\" \"lhemk3cm\"];"
-                        + "puts [expr {2*asin(1)}]")),
+                        + "puts [expr {2*double(1)}]")),
                 null, true, stream, "cp1251");
         
         try {
