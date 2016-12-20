@@ -60,7 +60,8 @@ public class TclTests {
                         + "set i 0;  while {$i<6} {set i [expr {$i+1}]}; puts $i;"
                         + "for {set i 0; set ii 1;} {$i<6} {set i [expr {$i+1}]} {set ii [expr {$ii*($i+1)}];}; puts $ii;"
                         + "puts [string index \"str1\" 2];"
-                        + "puts [string trimleft \"sttssrssstttr1\" \"st\"];"
+                        + "puts [string trim \"sttssrrststrrsts\" \"st\"];"
+                        + "puts [string wordend \"fgh45t 1e4hjktfd\" \"7\"];"
                         + "puts [string match \"*mk?cm\" \"lhemk3cm\"];"
                         + "puts [expr {2*double(1)}];"
                         + "list 23 45 gh;")),
@@ -71,7 +72,7 @@ public class TclTests {
         } catch (Exception ex) {
             Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(inter.getOutput());
+        //System.out.println(inter.getOutput());
         try {
             System.out.println(stream.toString("cp1251"));
         } catch (UnsupportedEncodingException ex) {
