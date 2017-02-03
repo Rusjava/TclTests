@@ -64,8 +64,10 @@ public class TclTests {
                         + "puts [string wordend \"fgh45t 1e4hjktfd\" \"7\"];"
                         + "puts [string match \"*mk?cm\" \"lhemk3cm\"];"
                         + "puts [expr {2*double(1)}];"
-                        + "list 23 45 gh;"
-                        + "puts [format \"%s%f%d%g\" 25 34];")),
+                        + "set mlist [list 23 45 gh;];"
+                        + "puts $mlist;"
+                        + "puts [llength mlist;];"
+                        + "puts [format \"%x %4.2g %f %d %c\" 28 44.2234 5.4 34 h];")),
                 null, true, stream, "cp1251");
         
         try {
