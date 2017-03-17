@@ -16,6 +16,8 @@
  */
 package tcltests;
 
+import tclparser.TclParser;
+import tcllexer.TclLexer;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
@@ -64,9 +66,11 @@ public class TclTests {
                         + "puts [string wordend \"fgh45t 1e4hjktfd\" \"7\"];"
                         + "puts [string match \"*mk?cm\" \"lhemk3cm\"];"
                         + "puts [expr {2*double(1)}];"
-                        + "set mlist [list 23 45 gh;];"
+                        + "set mlist [list {23 uh} 45 {{gh ft}};];"
                         + "puts $mlist;"
-                        + "puts [llength mlist;];"
+                        + "puts [llength $mlist;];"
+                        + "puts [lindex $mlist 2 0 1;];"
+                        + "set sss(0) rt; lappend sss(0) fg gh nt; puts $sss(0);"
                         + "puts [format \"%x %4.2g %f %d %c\" 28 44.2234 5.4 34 h];")),
                 null, true, stream, "cp1251");
         
