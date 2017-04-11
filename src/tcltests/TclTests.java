@@ -16,7 +16,7 @@
  */
 package tcltests;
 
-import tclparser.TclParser;
+import tclparser.*;
 import tcllexer.TclLexer;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -52,7 +52,7 @@ public class TclTests {
          Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
          }*/
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        AbstractTclInterpreter inter = new TclInterpreter(new TclParser(
+        AbstractTclInterpreter inter = new TclListInterpreter(new TclListParser(
                 new TclLexer("puts {23}; # This is a comment\n puts [set nn [expr {(2.0**10)+3*1};];]; set имя1 0.0; set vr 2; unset vr; set vr(0) 9.6e+6; set vr(1) 3.2e-6; set vr(1) \"3.2e-4\";"
                         + "puts [expr {($vr(0) / (-!$имя\\\n1 * -2)+ 3.5e+10* ($vr(1))*(~~2*0.5) - 4.6e+6/(!$имя1*2-1)*(!$имя1*3-2))};];"
                         + "puts [expr {((1<<0\\\n12)+3)%10};]; puts [expr {\"string\"+\"1\" ne \"string2\"};];"
