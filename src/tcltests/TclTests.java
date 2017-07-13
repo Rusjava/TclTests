@@ -17,12 +17,12 @@
 package tcltests;
 
 import tclparser.*;
-import tcllexer.TclLexer;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tclinterpreter.*;
+import tcllexer.ParallelTclLexer;
 
 /**
  *
@@ -53,7 +53,7 @@ public class TclTests {
          }*/
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         AbstractTclInterpreter inter = new TclListInterpreter(new TclListParser(
-                new TclLexer("puts {23}; # This is a comment\n puts [set nn [expr {(2.0**10)+3*1};];]; set имя1 0.0; set vr 2; unset vr; set vr(0) 9.6e+6; set vr(1) 3.2e-6; set vr(1) \"3.2e-4\";"
+                new ParallelTclLexer("puts {23}; # This is a comment\n puts [set nn [expr {(2.0**10)+3*1};];]; set имя1 0.0; set vr 2; unset vr; set vr(0) 9.6e+6; set vr(1) 3.2e-6; set vr(1) \"3.2e-4\";"
                         + "puts [expr {($vr(0) / (-!$имя\\\n1 * -2)+ 3.5e+10* ($vr(1))*(~~2*0.5) - 4.6e+6/(!$имя1*2-1)*(!$имя1*3-2))};];"
                         + "puts [expr {((1<<0\\\n12)+3)%10};]; puts [expr {\"string\"+\"2\" ne \"string2\"};];"
                         + "puts [set vr(1);]; puts [set vr(0);];"
@@ -75,12 +75,12 @@ public class TclTests {
                         + "proc newcom {ar1 ar2} {upvar 1 mlist mlst; set mlst {{kj} {ed2}}; puts $mlst; return [expr {$ar1**2+$ar2**2};]};"
                         + "puts [newcom 12 7;]; puts $mlist;"
                         + "puts [lassign {ghf thk hfg rty} vv1 vv2 vv3;]; puts \"$vv1 $vv2 $vv3\";"
-                        + "for {set i 0;} {$i<100} {set i [expr {$1+2}]} {if {$i>20} {continue;} else {puts $i};}; puts $i;")),
+                        + "for {set i 0;} {$i<100} {set i [expr {$i+2}]} {if {$i>20} {continue;} else {puts $i};}; puts $i;")),
                 null, true, stream, "cp1251");
         
         try {
             inter.run();
-        } catch (Exception ex) {
+        } catch (AbstractTclParser.TclParserError | AbstractTclInterpreter.TclExecutionException | AbstractTclInterpreter.TclCommandException ex) {
             Logger.getLogger(TclTests.class.getName()).log(Level.SEVERE, null, ex);
         }
         //System.out.println(inter.getOutput());
