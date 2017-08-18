@@ -75,7 +75,7 @@ public class TclTests {
                         + "proc newcom {ar1 ar2} {upvar 1 mlist mlst; set mlst {{kj} {ed2}}; puts $mlst; return [expr {$ar1**2+$ar2**2};]};"
                         + "puts [newcom 12 7;]; puts $mlist;"
                         + "puts [lassign {ghf thk hfg rty} vv1 vv2 vv3;]; puts \"$vv1 $vv2 $vv3\";"
-                        + "for {set i 0;} {$i<100} {set i [expr {$i+2}]} {if {$i>20} {continue;} else {puts $i};}; puts $i;")),
+                        + "for {set i 0;} {$i<98} {set i [expr {$i+2}]} {if {$i>22} {continue;} else {puts $i};}; puts $i;")),
                 null, true, stream, "cp1251");
         
         try {
